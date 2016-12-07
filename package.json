@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run clean & gatsby build",
     "clean": "rm -rf public",
-    "deploy": "gatsby build --prefix-links && gh-pages -d public",
+    "deploy": "gatsby build --prefix-links && gh-pages -d public -b master",
     "develop": "gatsby develop",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "lint": "standard",
