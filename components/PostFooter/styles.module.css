@@ -1,0 +1,25 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.2);
+  margin: 2rem 0;
+  padding: 2rem;
+}
+.root :global(p:last-child) {
+  margin: 0;
+}
+.heading {
+  margin-bottom: 0;
+}
+.avatar {
+  background: url(./photo.jpg) no-repeat center center;
+  background-size: cover;
+  border: 1px solid rgba(0,0,0,0.4);
+  border-radius: 110px;
+  flex: none;
+  height: 110px;
+  margin-right: 2rem;
+  width: 110px;
+}
+

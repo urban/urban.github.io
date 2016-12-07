@@ -1,0 +1,9 @@
+.root {
+  background-color: rgba(0,0,0,0.02);
+  border-top: 1px solid rgba(0,0,0,0.2);
+  color: rgba(0,0,0,0.4);
+  padding: 1em 0;
+}
+.content {
+  composes: wrapper from '../../pages/_template.module.css';
+}

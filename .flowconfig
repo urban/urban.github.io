@@ -1,0 +1,27 @@
+[ignore]
+.*/public
+.*/node_modules/babel-plugin-flow-react-proptypes/src/.*
+.*/node_modules/gatsby/lib/.*
+.*node_modules/fbjs.*
+
+[include]
+./interfaces/.*
+./node_modules/gatsby/interfaces/.*
+
+[libs]
+./node_modules/fbjs/node_modules/promise
+./node_modules/fbjs/flow/lib
+
+[options]
+module.name_mapper='^components' -> '<PROJECT_ROOT>/components'
+module.name_mapper='^pages' -> '<PROJECT_ROOT>/pages'
+module.name_mapper='^gatsby-helpers' -> '<PROJECT_ROOT>/node_modules/gatsby/dist/isomorphic/gatsby-helpers'
+
+module.use_strict=true
+
+# experimental.const_params=true
+esproposal.export_star_as=enable
+esproposal.class_instance_fields=enable
+
+[version]
+^0.36.0

@@ -1,0 +1,12 @@
+.root {
+  margin-bottom: 40px;
+}
+.root :global(h1) {
+  font-size: 36px;
+  margin-top: 0;
+}
+.root :global(p) {
+  font-size: 16px;
+  line-height: 26px;
+  margin-bottom: 26px;
+}

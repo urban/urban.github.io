@@ -1,0 +1,10 @@
+siteTitle = "Urban Faubion"
+siteAuthor = "Urban Faubion"
+
+siteTwitterUrl = "https://twitter.com/urbanfaubion"
+siteGithubUrl = "https://github.com/urban"
+siteEmailUrl = "urban@urbanfaubion.com"
+
+googleAnalyticsId = "UA-88688732-1"
+
+linkPrefix = "/gatsby-starter-lumen"

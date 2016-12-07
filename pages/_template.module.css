@@ -1,0 +1,8 @@
+.root {
+  border-top: 5px solid rgba(0, 0, 0, 0.8);
+}
+.wrapper {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: calc(960px - (1.25rem * 2));
+}

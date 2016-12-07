@@ -1,0 +1,25 @@
+.root {
+  min-height: 4em;
+}
+.root :global(ul) {
+  list-style: none;
+  padding-left: 0;
+}
+.root :global(ul li) {
+  margin: 1rem 0;
+}
+.link {
+  font-size: 16px;
+  line-heigh: 26px;
+  margin-bottom: 26px;
+  border-bottom: 0;
+  font-weight: 400;
+  color: #222;
+}
+.link:hover {
+  border-bottom: 1px solid;
+}
+.activeLink {
+  composes: link;
+  border-bottom: 1px solid;
+}
