@@ -1,4 +1,4 @@
-# urban.github.com
+# urbanfaubion.com
 
 Personal website of Urban Faubion
 
