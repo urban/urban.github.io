@@ -7,13 +7,13 @@ import styles from './styles.module.css'
 
 export default class SiteNav extends React.Component {
   render () {
-    const {location} = this.props
+    const { location } = this.props
     const isActive = (x) => location.pathname === prefixLink(x)
     return (
       <nav className={styles.root}>
         <ul>
           <li>
-            <Link to='/' className={isActive('/') ? styles.activeLink : styles.link}>
+            <Link to='/articles/' className={isActive('/articles/') ? styles.activeLink : styles.link}>
               Articles
             </Link>
           </li>

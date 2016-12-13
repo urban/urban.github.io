@@ -2,6 +2,7 @@
 import type { Props } from './Icon'
 
 import React from 'react'
+// eslint-disable-next-line no-duplicate-imports
 import Icon from './Icon'
 
 export default function Logo (props: Props) {

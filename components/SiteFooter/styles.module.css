@@ -5,5 +5,5 @@
   padding: 1em 0;
 }
 .content {
-  composes: wrapper from '../../pages/_template.module.css';
+  composes: content from '../../pages/_template.module.css';
 }

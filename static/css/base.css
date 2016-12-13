@@ -97,11 +97,8 @@ a {
  * Blockquotes
  */
 blockquote {
-  color: #454848;
-  border-left: 4px solid #787b7b;
-  padding-left: 0.625rem;
-  font-size: 18px;
-  letter-spacing: -1px;
+  border-left: 1px solid rgba(0,0,0,1);
+  padding-left: 1em;
   font-style: italic;
 
 }
@@ -114,6 +111,7 @@ blockquote > :last-child {
  */
 pre,
 code {
+  background-color: rgba(0,0,0,0.03);
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 3px;
   color: rgba(0,0,0,0.6);
@@ -122,10 +120,10 @@ code {
   white-space: nowrap;
 }
 code {
+  display: inline-block;
   padding: 0.15em 0.25em;
 }
 pre {
-  background-color: rgba(0,0,0,0.03);
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 3px;
   overflow: auto;
@@ -133,7 +131,6 @@ pre {
   -webkit-font-smoothing: inherit;
 }
 pre code {
-  background: transparent;
   border: none;
   padding: 0;
   margin: 0;

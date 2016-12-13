@@ -5,13 +5,18 @@
   "author": "Urban Faubion <urban.faubion@gmail.com>",
   "main": "n/a",
   "scripts": {
-    "build": "npm run clean & gatsby build",
-    "clean": "rm -rf public",
-    "deploy": "gatsby build --prefix-links && gh-pages -d public -b master",
+    "build": "gatsby build",
+      "prebuild": "npm run clean",
+      "postbuild": "npm run clean",
+    "clean": "rm -rf public/",
+    "copy": "cp static/CNAME public/",
+    "deploy": "gatsby build --prefix-links",
+      "predeploy": "npm run test",
+      "postdeploy": "gh-pages -d public -b master",
     "develop": "gatsby develop",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "lint": "standard",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run lint && npm run flow"
   },
   "keywords": [
     "gatsby"
@@ -24,7 +29,8 @@
       "jsx-a11y"
     ],
     "ignore": [
-      "public"
+      "public",
+      "flow-typed"
     ],
     "globals": []
   },

@@ -1,8 +1,19 @@
 .root {
   border-top: 5px solid rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
-.wrapper {
+.content {
   margin-right: auto;
   margin-left: auto;
   max-width: calc(960px - (1.25rem * 2));
+}
+.main {
+  composes: content;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  align-content: center;
+  justify-content: center;
 }

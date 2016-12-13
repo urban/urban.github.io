@@ -12,19 +12,11 @@ export default class Template extends React.Component {
     return (
       <div className={styles.root}>
         <SiteHeader {...this.props} />
-        <div className={styles.wrapper}>
-          <div className={styles.content}>
-            { this.props.children }
-          </div>
+        <div className={styles.main}>
+          { this.props.children }
         </div>
         <SiteFooter {...this.props} />
       </div>
     )
   }
-}
-
-Template.propTypes = {
-  children: React.PropTypes.any,
-  location: React.PropTypes.object,
-  route: React.PropTypes.object
 }
