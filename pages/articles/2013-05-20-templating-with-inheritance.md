@@ -22,7 +22,57 @@ To demonstrate the template inheritance implementation I have a slightly contriv
   <em>Note:</em> JavaScript doesn't have a [here document] syntax so string literal newlines are manually escaped.
 </div>
 
-{% gist 5881295 fiddle.js %}
+```js
+!function () {
+
+  var TEMPLATES = window.TEMPLATES = window.TEMPLATES || {};
+  
+  //  modal-layout
+  TEMPLATES["modal-layout"] = Hogan.compile(' \
+  <section class="modal {{ class-names }}"> \
+    <div class="modal-chrome"> \
+      <header> \
+        <h3>{{ title }}</h3> \
+        {{# has-close-button }} \
+        <a href="#" class="close" data-js-action="remove" data-js-target="body > .modal">X</a> \
+        {{/ has-close-button}} \
+      </header> \
+      <div class="modal-content"> \
+        {{$ body }} \
+          Default content! \
+        {{/ body }} \
+      </div> \
+      {{$ footer }}{{/ footer }} \
+    </div> \
+  </section> \
+  ');
+
+  //  foo-modal
+  TEMPLATES["foo-modal"] = Hogan.compile(' \
+  {{< modal-layout }} \
+    {{$ body }} \
+      <p>This is the <b>foo</b> modal!</p> \
+    {{/ body }} \
+  {{/ modal-layout }} \
+  ');
+
+  //  bar-modal
+  TEMPLATES["bar-modal"] = Hogan.compile(' \
+  {{< modal-layout }} \
+    {{$ body }} \
+      <p>This is the <b>bar</b> modal!</p> \
+    {{/ body }} \
+    {{$ footer }} \
+      <footer> \
+        <a href="#" data-js-action="remove" data-js-target="body > .modal">Cancel</a> \
+        <a href="#" data-js-action="remove" data-js-target="body > .modal">Okay</a> \
+      </footer> \
+    {{/ footer }} \
+  {{/ modal-layout }} \
+  ');
+
+}();
+```
 
 <div class="alert note">
   <em>Note:</em> The `fiddle.css` Gist is purposefully not including however it can be [viewed here][fiddle.css].
@@ -34,7 +84,46 @@ The first listens for `click` events on anchors within the modal menu. When dete
 
 The second listener is delegated to the document and controls the removal of the modal.  It listens for a `click` event on an anchor with the `data-js-action=remove` attribute and removes the element that matches the selector in the `data-js-target` attribute from the DOM.
 
-{% gist 5881295 fiddle.html %}
+```html
+<nav id="modal-menu" class="menu">
+  <dl>
+    <dt>Modal Menu</dt>
+    <dd><a href="#" data-modal-name="foo-modal">Show foo!</a></dd>
+    <dd><a href="#" data-modal-name="bar-modal">Show bar!</a></dd>
+  </dl>
+</nav>
+
+<script>
+
+  // template data
+  var data = {
+    "foo-modal": {
+      "title": "Foo Modal",
+      "has-close-button": true
+    },
+    "bar-modal": {
+      "title": "Bar Modal",
+      "class-names": "bar-modal"
+    }
+  };
+
+  // create modal
+  $("#modal-menu").on("click", "a", function (event) {
+    event.preventDefault();
+    var modalName = $(this).data("modal-name");
+    var output = TEMPLATES[modalName].render(data[modalName], TEMPLATES);
+    $("body").append(output);
+  });
+
+  // remove modal
+  $(document).on("click", "a[data-js-action='remove']", function (event) {
+    event.preventDefault();
+    var target = $(this).data("js-target");
+    $(target).remove();
+  });
+
+</script>
+```
 
 ## Next Steps
 
