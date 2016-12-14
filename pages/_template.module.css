@@ -8,6 +8,7 @@
   margin-right: auto;
   margin-left: auto;
   max-width: calc(960px - (1.25rem * 2));
+  padding: 0 1rem;
 }
 .main {
   composes: content;
