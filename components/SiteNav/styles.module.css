@@ -1,17 +1,18 @@
 .root {
-  min-height: 4em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .root :global(ul) {
   list-style: none;
+  margin: 0;
   padding-left: 0;
 }
 .root :global(ul li) {
-  margin: 1rem 0;
+  margin: 0;
 }
 .link {
-  font-size: 16px;
-  line-heigh: 26px;
-  margin-bottom: 26px;
+  font-size: 1rem;
   border-bottom: 0;
   font-weight: 400;
   color: #222;
