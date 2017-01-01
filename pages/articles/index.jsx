@@ -11,43 +11,42 @@ export default class SiteIndex extends React.Component {
   render () {
     return (
       <DocumentTitle title={config.siteTitle}>
-        <div className='content'>
-          <ul className={styles.postList}>
-            { R.compose(
-                mapIndexed((x, idx) => <li key={idx}>{x}</li>),
-                postExcerpts
-              )(this.props)
-            }
-          </ul>
-        </div>
+        <ul className={styles.root}>
+          {R.compose(
+            mapIndexed((x, idx) => <li key={idx}>{x}</li>),
+            postExcerpts
+          )(this.props)}
+        </ul>
       </DocumentTitle>
     )
   }
 }
 
 const mapIndexed = R.addIndex(R.map)
-const getPages = R.path(['route', 'pages'])
-const isPost = R.both(
+const isAricle = R.both(
   R.pathEq(['file', 'ext'], 'md'),
-  R.pathEq(['data', 'layout'], 'post')
+  R.pathEq(['file', 'dirname'], 'articles')
 )
 const sortByDate = R.compose(
   R.reverse,
   R.sortBy(R.pathOr('', ['data', 'date']))
 )
-const createPost = R.compose(
-  (props) => React.createElement(PostExcerpt, props),
-  R.applySpec({
-    title: R.path(['data', 'title']),
-    description: R.path(['data', 'description']),
-    datePublished: R.path(['data', 'date']),
-    category: R.path(['data', 'category']),
-    path: R.prop('path')
-  })
+const getProps = R.converge(
+  R.merge,
+  [
+    R.compose(
+      R.pick(['title', 'description', 'date', 'category']),
+      R.prop('data')
+    ),
+    R.pick(['path'])
+  ]
 )
 const postExcerpts = R.compose(
-  R.map(createPost),
+  R.map(R.compose(
+    (props) => React.createElement(PostExcerpt, props),
+    getProps
+  )),
   sortByDate,
-  R.filter(isPost),
-  getPages
+  R.filter(isAricle),
+  R.path(['route', 'pages'])
 )

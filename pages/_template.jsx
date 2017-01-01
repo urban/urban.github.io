@@ -12,9 +12,9 @@ export default class Template extends React.Component {
     return (
       <div className={styles.root}>
         <SiteHeader {...this.props} />
-        <div className={styles.main}>
+        <main className={styles.main}>
           { this.props.children }
-        </div>
+        </main>
         <SiteFooter {...this.props} />
       </div>
     )

@@ -2,7 +2,6 @@
 title: Templating With Inheritance
 date: "2013-05-20T16:00:00.000Z"
 layout: post
-path: "/articles/2013-05-20-templating-with-inheritance/"
 category: Programming
 tags: [JavaScript]
 description: The [Hogan.js](http://twitter.github.io/hogan.js/) templating engine extends the [Mustache](http://mustache.github.io/) spec by allowing inheritance. This lets you create layouts and [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself) up your code without having to use an MVC library. ([demo](/examples/templating-with-inheritance/), [source](https://gist.github.com/urban/5881295))

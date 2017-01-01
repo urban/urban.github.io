@@ -12,7 +12,7 @@ import styles from './styles.module.css'
 export default class SiteHeader extends React.Component {
   render () {
     return (
-      <header className={styles.root}>
+      <header>
         <div className={styles.content}>
           <Link to={prefixLink('/')}>
             <Logo className={styles.logo} />

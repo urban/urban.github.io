@@ -22,12 +22,10 @@ export default function MarkdownWrapper (props: Props) {
 
   return (
     <DocumentTitle title={`${post.title} - ${config.siteTitle}`}>
-      <div>
-        {React.createElement(
-          post.layout !== 'page' ? Post : Page,
-          props
-        )}
-      </div>
+      {React.createElement(
+        post.layout !== 'page' ? Post : Page,
+        props
+      )}
     </DocumentTitle>
   )
 }

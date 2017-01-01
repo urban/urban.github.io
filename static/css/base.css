@@ -7,18 +7,25 @@ hr, dl, dd, ol, ul, figure {
   padding: 0;
 }
 
-
-
 /**
  * Basic styling
  */
+html {
+  box-sizing: border-box;
+  height: 100%;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
 body {
+  /* background-color: hsla(240, 7%, 95%, 1); */
+  color: hsla(240,7%,20%,1);
   font-family: Helvetica, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   font-weight: 300;
   font-style: normal;
-  color: rgba(0,0,0,0.8);
+  height: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -71,7 +78,7 @@ ul[unstyled] > li, ol[unstyled] > li {
  * Headings
  */
 h1, h2, h3, h4, h5, h6 {
-  cursor: text;
+  color: hsla(240,7%,20%,1);
   font-weight: bold;
   margin: 2rem 0 1rem;
   padding: 0;
@@ -80,7 +87,7 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
-  color: rgba(0,0,0,0.3);
+  color: hsla(240,7%,50%,1);
   font-size: 0.5em;
 }
 

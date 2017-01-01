@@ -10,7 +10,7 @@ import styles from './styles.module.css'
 export default class PostFooter extends React.Component {
   render () {
     return (
-      <section className={styles.root}>
+      <footer className={styles.root}>
         {/* <Link to={prefixLink('/about')}> */}
         <div className={styles.avatar} />
         {/* </Link> */}
@@ -23,7 +23,7 @@ export default class PostFooter extends React.Component {
             <Link to={config.siteTwitterUrl}><Twitter /></Link>
           </p>
         </div>
-      </section>
+      </footer>
     )
   }
 }

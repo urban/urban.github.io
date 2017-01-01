@@ -9,15 +9,18 @@ export default class SiteNav extends React.Component {
   render () {
     const { location } = this.props
     const isActive = (x) => location.pathname === prefixLink(x)
+    const styleFor = (x) => isActive(x) ? styles.activeLink : styles.link
     return (
       <nav className={styles.root}>
-        <ul>
-          <li>
-            <Link to='/articles/' className={isActive('/articles/') ? styles.activeLink : styles.link}>
-              Articles
-            </Link>
-          </li>
-        </ul>
+        <Link to='/articles/' className={styleFor('/articles/')}>
+          Articles
+        </Link>
+        <Link to='/projects/' className={styleFor('/projects/')}>
+          Projects
+        </Link>
+      {/*   <Link to='/work/' className={styleFor('/work/')}> */}
+      {/*     Work */}
+      {/*   </Link> */}
       </nav>
     )
   }

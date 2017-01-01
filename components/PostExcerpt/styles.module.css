@@ -1,25 +1,13 @@
-.root {
-  margin-bottom: 2rem;
-}
-.root:last-child {
-  margin-bottom: 1rem;
-}
-.root :global(h2) {
+.title {
   margin-top: 1rem;
   line-height: 2rem;
   margin-bottom: 1rem;
 }
-.root :global(h2 small) {
+.subtitle {
   font-style: italic;
   font-weight: 500;
 }
-. :global(p) {
-  font-size: 16px;
-  line-height: 26px;
-  margin-bottom: 26px;
-}
 .readmore {
-  font-size: 16px;
   color: #5d93ff;
 }
 .readmore:hover {

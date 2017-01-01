@@ -1,7 +1,3 @@
-.root {
-  min-height: 4em;
-  position: relative;
-}
 .content {
   composes: content from 'pages/_template.module.css';
   display: flex;

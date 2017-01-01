@@ -2,7 +2,6 @@
 title: New Mac Setup
 date: "2014-01-02T17:00:00.000Z"
 layout: post
-path: "/articles/2014-01-02-new-mac-setup/"
 category: General
 tags: [Tools]
 description: New Mac setup for play and development.

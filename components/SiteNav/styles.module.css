@@ -3,13 +3,11 @@
   flex-direction: row;
   align-items: center;
 }
-.root :global(ul) {
-  list-style: none;
-  margin: 0;
-  padding-left: 0;
+.root :global(> *) {
+  margin-left: 1rem;
 }
-.root :global(ul li) {
-  margin: 0;
+.root :global(> *:first-child) {
+  margin-left: 0;
 }
 .link {
   font-size: 1rem;

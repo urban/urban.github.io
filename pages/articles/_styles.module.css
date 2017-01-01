@@ -1,12 +1,12 @@
-.postList {
+.root {
   margin: 0;
   padding: 0;
 }
-.postList :global(li) {
+.root :global(li) {
   margin-left: 0;
   padding: 2em 0;
   list-style: none;
 }
-.postList :global(li:not(:last-child)) {
+.root :global(li:not(:last-child)) {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }

@@ -1,0 +1,23 @@
+.repos {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.repos :global(> *) {
+  margin-bottom: 1rem;
+  min-height: 18.75rem;
+  width: calc((99.9% - 1rem * 2) / 3);
+}
+@media screen and (max-width: 960px) {
+  .repos :global(> *) {
+    min-height: 9.375rem;
+    width: calc((99.9% - 1rem) /2 );
+  }
+}
+@media screen and (max-width: 600px) {
+  .repos :global(> *) {
+    width: 100%;
+  }
+}

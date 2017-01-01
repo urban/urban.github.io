@@ -2,7 +2,6 @@
 title: Managing Ruby
 date: "2013-12-31T17:00:00.000Z"
 layout: post
-path: "/articles/2013-12-31-managing-ruby/"
 category: Programming
 tags: [Tools, Ruby, CLI]
 description: Ruby environment setup and management with `chruby`, `ruby-install`, `.ruby-version` files and `bundler`.
