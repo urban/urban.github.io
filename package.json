@@ -7,7 +7,6 @@
   "scripts": {
     "build": "gatsby build",
     "prebuild": "npm run clean",
-    "postbuild": "npm run clean",
     "clean": "rm -rf public/",
     "copy": "cp static/CNAME public/",
     "deploy": "gatsby build --prefix-links",
