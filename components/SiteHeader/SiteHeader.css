@@ -1,13 +1,17 @@
-.content {
-  composes: content from 'pages/_template.module.css';
+.site-header {
   display: flex;
   align-content: center;
   justify-content: space-between;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0 1.25rem;
+  max-width: calc(960px - (1.25rem * 2));
+  padding: 0 1rem;
 }
-.logo {
+.site-header__logo {
   font-size: 1.2rem;
 }
-.siteTitle {
+.site-header__title {
   border-left: 1px solid rgba(0, 0, 0, 0.4);
   font-size: 1.2rem;
   line-height: 4em;

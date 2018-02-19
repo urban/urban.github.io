@@ -1,0 +1,43 @@
+.gist .line-numbers {
+  font-size: 0.93rem;
+}
+
+/**
+ * Icons
+ */
+.icon > svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+.icon > svg path {
+  fill: #454848;
+}
+
+/**
+ * Alert
+ */
+.alert {
+  background: rgba(0,0,0,0.025);
+  border: 1px solid rgba(0,0,0,0.3);
+  border-radius: 3px;
+  font-size: 0.8em;
+  margin-bottom: 2rem;
+  padding: 1em;
+  position: relative;
+}
+.alert *:last-child {
+  margin-bottom: 0;
+}
+.alert a {
+  font-weight: bold;
+}
+.alert.note {
+  background: #FEF9AF;
+  border: 1px solid #989349;
+}
+.alert.info {
+  background: #ace8ff;
+  border: 1px solid #79b5e7;
+}

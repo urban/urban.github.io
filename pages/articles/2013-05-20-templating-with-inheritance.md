@@ -22,55 +22,59 @@ To demonstrate the template inheritance implementation I have a slightly contriv
 </div>
 
 ```js
-!function () {
+!(function() {
+  var TEMPLATES = (window.TEMPLATES = window.TEMPLATES || {})
 
-  var TEMPLATES = window.TEMPLATES = window.TEMPLATES || {};
-  
   //  modal-layout
-  TEMPLATES["modal-layout"] = Hogan.compile(' \
-  <section class="modal {{ class-names }}"> \
-    <div class="modal-chrome"> \
-      <header> \
-        <h3>{{ title }}</h3> \
-        {{# has-close-button }} \
-        <a href="#" class="close" data-js-action="remove" data-js-target="body > .modal">X</a> \
-        {{/ has-close-button}} \
-      </header> \
-      <div class="modal-content"> \
-        {{$ body }} \
-          Default content! \
-        {{/ body }} \
-      </div> \
-      {{$ footer }}{{/ footer }} \
-    </div> \
-  </section> \
-  ');
+  TEMPLATES["modal-layout"] = Hogan.compile(
+    ' \
+          <section class="modal {{ class-names }}"> \
+            <div class="modal-chrome"> \
+              <header> \
+                <h3>{{ title }}</h3> \
+                {{# has-close-button }} \
+                <a href="#" class="close" data-js-action="remove" data-js-target="body > .modal">X</a> \
+                {{/ has-close-button}} \
+              </header> \
+              <div class="modal-content"> \
+                {{$ body }} \
+                  Default content! \
+                {{/ body }} \
+              </div> \
+              {{$ footer }}{{/ footer }} \
+            </div> \
+          </section> \
+          ',
+  )
 
   //  foo-modal
-  TEMPLATES["foo-modal"] = Hogan.compile(' \
-  {{< modal-layout }} \
-    {{$ body }} \
-      <p>This is the <b>foo</b> modal!</p> \
-    {{/ body }} \
-  {{/ modal-layout }} \
-  ');
+  TEMPLATES["foo-modal"] = Hogan.compile(
+    " \
+          {{< modal-layout }} \
+            {{$ body }} \
+              <p>This is the <b>foo</b> modal!</p> \
+            {{/ body }} \
+          {{/ modal-layout }} \
+          ",
+  )
 
   //  bar-modal
-  TEMPLATES["bar-modal"] = Hogan.compile(' \
-  {{< modal-layout }} \
-    {{$ body }} \
-      <p>This is the <b>bar</b> modal!</p> \
-    {{/ body }} \
-    {{$ footer }} \
-      <footer> \
-        <a href="#" data-js-action="remove" data-js-target="body > .modal">Cancel</a> \
-        <a href="#" data-js-action="remove" data-js-target="body > .modal">Okay</a> \
-      </footer> \
-    {{/ footer }} \
-  {{/ modal-layout }} \
-  ');
-
-}();
+  TEMPLATES["bar-modal"] = Hogan.compile(
+    ' \
+          {{< modal-layout }} \
+            {{$ body }} \
+              <p>This is the <b>bar</b> modal!</p> \
+            {{/ body }} \
+            {{$ footer }} \
+              <footer> \
+                <a href="#" data-js-action="remove" data-js-target="body > .modal">Cancel</a> \
+                <a href="#" data-js-action="remove" data-js-target="body > .modal">Okay</a> \
+              </footer> \
+            {{/ footer }} \
+          {{/ modal-layout }} \
+          ',
+  )
+})()
 ```
 
 <div class="alert note">
@@ -81,7 +85,7 @@ The `index.html` is very bare bones. The only HTML markup is a menu that will sp
 
 The first listens for `click` events on anchors within the modal menu. When detected, the name of the modal that needs to open is retrieved from the custom `data-modal-name` attribute. Since I'm using [convention over configuration], the name is used as a key to look up the template and corresponding data. The template is then rendered to the DOM with data and any partials and layouts it might need.
 
-The second listener is delegated to the document and controls the removal of the modal.  It listens for a `click` event on an anchor with the `data-js-action=remove` attribute and removes the element that matches the selector in the `data-js-target` attribute from the DOM.
+The second listener is delegated to the document and controls the removal of the modal. It listens for a `click` event on an anchor with the `data-js-action=remove` attribute and removes the element that matches the selector in the `data-js-target` attribute from the DOM.
 
 ```html
 <nav id="modal-menu" class="menu">
@@ -133,19 +137,19 @@ Templating with inheritance is a powerful tool to have in your arsenal. Once you
 * Hogan.js [version 3.0][]
 
 [frog]: http://frogdesign.com
-[DRY]: http://en.wikipedia.org/wiki/Don't_repeat_yourself "Don't repeat yourself"
-[Mustache]: http://mustache.github.io/ "Mustache templating language"
-[Node]: http://nodejs.org/ "Node.js"
+[dry]: http://en.wikipedia.org/wiki/Don't_repeat_yourself "Don't repeat yourself"
+[mustache]: http://mustache.github.io/ "Mustache templating language"
+[node]: http://nodejs.org/ "Node.js"
 [stinks]: http://en.wikipedia.org/wiki/Code_smell "code smells"
-[Proposal: Template inheritance]: https://github.com/mustache/spec/issues/38
+[proposal: template inheritance]: https://github.com/mustache/spec/issues/38
 [mustache/spec]: https://github.com/mustache/spec
-[Github]: https://github.com/
+[github]: https://github.com/
 [v2.0]: https://github.com/mustache/spec/issues?labels=v2.0.0&page=1&state=open
 [hogan.js]: http://twitter.github.io/hogan.js/ "Hogan.js"
 [builds]: https://github.com/twitter/hogan.js/tree/master/web/builds
 [hogan.js tests]: https://github.com/twitter/hogan.js/blob/master/test/index.js
 [version 3.0]: https://github.com/twitter/hogan.js/tree/master/web/builds/3.0.2
-[jQuery]: http://jquery.com/
+[jquery]: http://jquery.com/
 [fiddle.css]: https://gist.github.com/urban/5579302#file-fiddle-css
 [here document]: http://en.wikipedia.org/wiki/Here_document
 [convention over configuration]: http://en.wikipedia.org/wiki/Convention_over_configuration

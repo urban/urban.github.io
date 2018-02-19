@@ -12,32 +12,17 @@
     "deploy": "gatsby build --prefix-links",
     "predeploy": "npm run test",
     "postdeploy": "gh-pages -d public -b master",
-    "develop": "gatsby develop",
-    "flow": "flow; test $? -eq 0 -o $? -eq 2",
-    "lint": "standard",
+    "dev": "gatsby develop",
+    "typecheck": "glow --include-warnings",
+    "lint": "eslint --format codeframe './{components,pages,static}/**/*.{js,json}'",
+    "fix": "prettier --write '{components,pages,static}/**/*.{js,json,md}'",
     "test": "npm run lint && npm run flow"
   },
   "keywords": [
     "gatsby"
   ],
   "license": "MIT",
-  "standard": {
-    "parser": "babel-eslint",
-    "plugins": [
-      "flowtype",
-      "jsx-a11y"
-    ],
-    "ignore": [
-      "public",
-      "flow-typed"
-    ],
-    "globals": []
-  },
   "dependencies": {
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-react": "^6.11.1",
-    "babel-preset-stage-0": "^6.5.0",
     "front-matter": "^2.0.8",
     "gatsby": "^0.12.0",
     "history": "^2.1.1",
@@ -52,25 +37,33 @@
     "react-router": "^2.6.1"
   },
   "devDependencies": {
-    "autoprefixer": "^6.3.7",
     "babel-core": "^6.11.4",
-    "babel-eslint": "^7.1.1",
+    "babel-eslint": "8.2.1",
     "babel-loader": "^6.2.4",
-    "babel-plugin-transform-flow-strip-types": "^6.18.0",
+    "babel-preset-env": "1.6.1",
+    "babel-preset-flow": "6.23.0",
+    "babel-preset-react": "6.24.1",
     "babel-preset-react-hmre": "^1.1.1",
     "css-loader": "^0.23.1",
-    "eslint-plugin-flowtype": "^2.29.0",
+    "eslint": "4.17.0",
+    "eslint-config-babel": "7.0.2",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-flowtype": "2.43.0",
+    "eslint-plugin-jest": "21.9.0",
+    "eslint-plugin-json": "1.2.0",
     "eslint-plugin-jsx-a11y": "^2.0.1",
+    "eslint-plugin-prettier": "2.6.0",
+    "eslint-plugin-react": "7.6.1",
     "file-loader": "^0.9.0",
     "flow-bin": "^0.36.0",
     "gh-pages": "^0.11.0",
+    "glow": "1.2.2",
     "image-webpack-loader": "^2.0.0",
     "null-loader": "^0.1.1",
-    "postcss-loader": "^0.9.1",
+    "prettier": "1.10.2",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
     "redbox-react": "^1.2.10",
-    "standard": "^8.6.0",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.1"
   }

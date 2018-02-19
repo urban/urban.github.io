@@ -6,15 +6,17 @@ import Repo from 'components/Repo'
 import {config} from 'config'
 import R from 'ramda'
 import {Future} from 'ramda-fantasy'
-import styles from './_styles.module.css'
+
+import './projects.css'
 
 export default class SiteIndex extends React.Component {
   state = {repos: []}
 
   componentDidMount() {
-    getRepos(
-      'https://api.github.com/users/urban/repos'
-    ).fork(console.error, repos => this.setState({repos}))
+    getRepos('https://api.github.com/users/urban/repos').fork(
+      console.error,
+      repos => this.setState({repos})
+    )
   }
 
   render() {
@@ -23,7 +25,7 @@ export default class SiteIndex extends React.Component {
       <DocumentTitle title={config.siteTitle}>
         <div>
           <h1>Projects</h1>
-          <div className={styles.repos}>
+          <div className="repos">
             {R.map(({id, ...props}) => <Repo key={id} {...props} />, repos)}
           </div>
         </div>

@@ -1,24 +1,23 @@
-.root {
+.site-nav {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-.root :global(> *) {
+.site-nav > * {
   margin-left: 1rem;
 }
-.root :global(> *:first-child) {
+.site-nav > *:first-child {
   margin-left: 0;
 }
-.link {
+.site-nav__link {
   font-size: 1rem;
   border-bottom: 0;
   font-weight: 400;
 }
-.link:hover {
+.site-nav__link:hover {
   border-bottom: 1px solid;
 }
-.activeLink {
-  composes: link;
+.site-nav__link--state-active {
   border-bottom: 1px solid;
   color: #222;
 }

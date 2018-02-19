@@ -1,12 +1,12 @@
-.root {
+.articles-list {
   margin: 0;
   padding: 0;
 }
-.root :global(li) {
+.articles-list li {
   margin-left: 0;
   padding: 2em 0;
   list-style: none;
 }
-.root :global(li:not(:last-child)) {
+.articles-list li:not(:last-child) {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }

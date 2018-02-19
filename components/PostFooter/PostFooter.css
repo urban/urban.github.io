@@ -1,15 +1,15 @@
-.root {
+.post-footer {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-.root :global(p:last-child) {
+.post-footer p:last-child {
   margin: 0;
 }
-.heading {
+.post-footer h4 {
   margin-bottom: 0;
 }
-.avatar {
+.post-footer__avatar {
   background: url(./photo.jpg) no-repeat center center;
   background-size: cover;
   border: 1px solid rgba(0,0,0,0.4);
@@ -20,7 +20,7 @@
   width: 110px;
 }
 @media screen and (max-width: 960px) {
-  .avatar {
+  .post-footer__avatar {
     display: none;
   }
 }

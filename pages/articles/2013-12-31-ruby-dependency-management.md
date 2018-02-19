@@ -11,10 +11,10 @@ In the Ruby community you have a lot of choices when it comes to versions of the
 
 I recently changed Ruby version manager and thought I'd write it down for posterity and in case others might like to do the same.
 
- 1. Ruby version switcher - `chruby`
- 2. Ruby version installer - `ruby-install`
- 3. Switch Ruby version based on _context_ - `.ruby-version`
- 4. Project specific dependency management - `bundler`
+1. Ruby version switcher - `chruby`
+2. Ruby version installer - `ruby-install`
+3. Switch Ruby version based on _context_ - `.ruby-version`
+4. Project specific dependency management - `bundler`
 
 ## Ruby Version Switcher
 
@@ -110,18 +110,17 @@ Below are the entries for my `~/.bashrc` file:
 
 Overall I think that `chrbuy` with `bundler` is a simple and elegant solution for managing Ruby versions and individual project dependencies.
 
-[Bundler]:http://bundler.io
-[Ruby MRI]:http://en.wikipedia.org/wiki/Ruby_MRI
-[ruby-build]:https://github.com/sstephenson/ruby-build
-[ruby-install]:https://github.com/postmodern/ruby-install
-[Homebrew]:http://brew.sh
-[chruby#install]:https://github.com/postmodern/chruby#install
-[PROMPT_COMMAND]:http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x264.html
-[shims]:https://github.com/sstephenson/rbenv/#understanding-shims
-[rvm]:http://github.com/wayneeseguin/rvm
-[rbenv]:https://github.com/sstephenson/rbenv/
-[chrbuy]:http://pbrisbin.com/posts/chruby/
-[Unix Philosophies]:http://en.wikipedia.org/wiki/Unix_philosophy#Mike_Gancarz:_The_UNIX_Philosophy
-
-[How I setup chruby]:http://www.codeography.com/2013/09/23/how_i_setup_chruby.html
-[Another chruby]:http://pbrisbin.com/posts/chruby/
+[bundler]: http://bundler.io
+[ruby mri]: http://en.wikipedia.org/wiki/Ruby_MRI
+[ruby-build]: https://github.com/sstephenson/ruby-build
+[ruby-install]: https://github.com/postmodern/ruby-install
+[homebrew]: http://brew.sh
+[chruby#install]: https://github.com/postmodern/chruby#install
+[prompt_command]: http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x264.html
+[shims]: https://github.com/sstephenson/rbenv/#understanding-shims
+[rvm]: http://github.com/wayneeseguin/rvm
+[rbenv]: https://github.com/sstephenson/rbenv/
+[chrbuy]: http://pbrisbin.com/posts/chruby/
+[unix philosophies]: http://en.wikipedia.org/wiki/Unix_philosophy#Mike_Gancarz:_The_UNIX_Philosophy
+[how i setup chruby]: http://www.codeography.com/2013/09/23/how_i_setup_chruby.html
+[another chruby]: http://pbrisbin.com/posts/chruby/

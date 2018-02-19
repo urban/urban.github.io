@@ -1,22 +1,22 @@
 // @flow
 import React from 'react'
 // $FlowFixMe
-import { config } from 'config'
-import { prefixLink } from 'gatsby-helpers'
-import { Link } from 'react-router'
+import {config} from 'config'
+import {prefixLink} from 'gatsby-helpers'
+import {Link} from 'react-router'
 import SiteNav from 'components/SiteNav'
-import { Logo } from 'components/Icons'
+import {Logo} from 'components/Icons'
 
-import styles from './styles.module.css'
+import './SiteHeader.css'
 
 export default class SiteHeader extends React.Component {
-  render () {
+  render() {
     return (
       <header>
-        <div className={styles.content}>
+        <div className="site-header">
           <Link to={prefixLink('/')}>
-            <Logo className={styles.logo} />
-            <span className={styles.siteTitle}>{config.siteTitle}</span>
+            <Logo className="site-header__logo" />
+            <span className="site-header__title">{config.siteTitle}</span>
           </Link>
           <SiteNav {...this.props} />
         </div>
