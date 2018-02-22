@@ -1,28 +1,27 @@
 // @flow
-import React from 'react'
-import DocumentTitle from 'react-document-title'
-import Repo from 'components/Repo'
+import React from "react"
+import DocumentTitle from "react-document-title"
+import Repo from "../../components/Repo"
 // $FlowFixMe
-import {config} from 'config'
-import R from 'ramda'
-import {Future} from 'ramda-fantasy'
+import R from "ramda"
+import {Future} from "ramda-fantasy"
 
-import './projects.css'
+import "./projects.css"
 
 export default class SiteIndex extends React.Component {
   state = {repos: []}
 
   componentDidMount() {
-    getRepos('https://api.github.com/users/urban/repos').fork(
+    getRepos("https://api.github.com/users/urban/repos").fork(
       console.error,
-      repos => this.setState({repos})
+      repos => this.setState({repos}),
     )
   }
 
   render() {
     const {repos} = this.state
     return (
-      <DocumentTitle title={config.siteTitle}>
+      <DocumentTitle title={siteTitle(this.props.data)}>
         <div>
           <h1>Projects</h1>
           <div className="repos">
@@ -34,19 +33,21 @@ export default class SiteIndex extends React.Component {
   }
 }
 
+const siteTitle = R.path(["site", "siteMetadata", "title"])
+
 const fetch = url =>
   new Future((rej, res) => {
     const req = new XMLHttpRequest()
     req.addEventListener(
-      'load',
+      "load",
       function() {
         this.status === 200 ? res(this.responseText) : rej(this.responseText)
       },
-      false
+      false,
     )
-    req.addEventListener('error', rej, false)
-    req.addEventListener('abort', rej, false)
-    req.open('GET', url, true)
+    req.addEventListener("error", rej, false)
+    req.addEventListener("abort", rej, false)
+    req.open("GET", url, true)
     req.send()
   })
 
@@ -60,13 +61,13 @@ const parseJSON = str =>
   })
 
 const repoData = R.pick([
-  'id',
-  'name',
-  'html_url',
-  'description',
-  'language',
-  'created_at',
-  'updated_at',
+  "id",
+  "name",
+  "html_url",
+  "description",
+  "language",
+  "created_at",
+  "updated_at",
 ])
 
 const getRepos = R.compose(
@@ -74,10 +75,10 @@ const getRepos = R.compose(
     R.compose(
       R.map(repoData),
       R.reverse,
-      R.sortBy(R.prop('updated_at')),
-      R.filter(R.propEq('fork', false))
-    )
+      R.sortBy(R.prop("updated_at")),
+      R.filter(R.propEq("fork", false)),
+    ),
   ),
   R.chain(parseJSON),
-  fetch
+  fetch,
 )

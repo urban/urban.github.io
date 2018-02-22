@@ -1,12 +1,12 @@
 // @flow
 import React from 'react'
-import SiteHeader from 'components/SiteHeader'
-import SiteFooter from 'components/SiteFooter'
+import SiteHeader from '../components/SiteHeader'
+import SiteFooter from '../components/SiteFooter'
 
-import '../static/css/reset.css'
-import '../static/css/base.css'
-import '../static/css/gist.css'
-import '../static/css/highlight.css'
+import '../../static/css/reset.css'
+import '../../static/css/base.css'
+import '../../static/css/gist.css'
+import '../../static/css/highlight.css'
 
 const styles = {
   root: {

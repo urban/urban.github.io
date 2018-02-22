@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import moment from 'moment'
-import PostFooter from 'components/PostFooter'
+import PostFooter from '../PostFooter'
 
 const publishDate = x => moment(x).format('D MMM YYYY')
 

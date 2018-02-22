@@ -2,8 +2,8 @@
 import React from 'react'
 // $FlowFixMe
 import {config} from 'config'
-import {Link} from 'react-router'
-import {GitHub, Twitter} from 'components/Icons'
+import Link from 'gatsby-link'
+import {GitHub, Twitter} from '../Icons'
 
 import './PostFooter.css'
 

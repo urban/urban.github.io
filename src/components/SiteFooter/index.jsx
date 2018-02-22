@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 // $FlowFixMe
-import {config} from 'config'
+import {config} from '../../config'
 import moment from 'moment'
 
 import './SiteFooter.css'

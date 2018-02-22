@@ -1,9 +1,9 @@
 // @flow
-import React from 'react'
-import {Link} from 'react-router'
-import {prefixLink} from 'gatsby-helpers'
+import React from "react"
+import Link from "gatsby-link"
+import {prefixLink} from "gatsby-helpers"
 
-import './SiteNav.css'
+import "./SiteNav.css"
 
 export default class SiteNav extends React.Component {
   render() {
@@ -11,14 +11,14 @@ export default class SiteNav extends React.Component {
     const isActive = x => location.pathname === prefixLink(x)
     const styleFor = x =>
       isActive(x)
-        ? 'site-nav__link site-nav__link--state-active'
-        : 'site-nav__link'
+        ? "site-nav__link site-nav__link--state-active"
+        : "site-nav__link"
     return (
       <nav className="site-nav">
-        <Link to="/articles/" className={styleFor('/articles/')}>
+        <Link to="/articles/" className={styleFor("/articles/")}>
           Articles
         </Link>
-        <Link to="/projects/" className={styleFor('/projects/')}>
+        <Link to="/projects/" className={styleFor("/projects/")}>
           Projects
         </Link>
         {/*   <Link to='/work/' className={styleFor('/work/')}> */}

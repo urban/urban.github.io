@@ -1,9 +1,8 @@
 // @flow
-import React from 'react'
-import {Link} from 'react-router'
-import moment from 'moment'
-import {prefixLink} from 'gatsby-helpers'
-import MarkdownIt from 'markdown-it'
+import React from "react"
+import Link from "gatsby-link"
+import moment from "moment"
+import MarkdownIt from "markdown-it"
 
 const md = new MarkdownIt()
 
@@ -15,14 +14,14 @@ export default class PostExcerpt extends React.Component {
       <article>
         <header>
           <h2>
-            <Link style={{borderBottom: 'none'}} to={prefixLink(path)}>
+            <Link style={{borderBottom: "none"}} to={path}>
               {title}
             </Link>
             <small>
-              Posted at{' '}
-              <time dateTime={moment(date).format('MMMM D, YYYY')}>
-                {moment(date).format('MMMM YYYY')}
-              </time>{' '}
+              Posted at{" "}
+              <time dateTime={moment(date).format("MMMM D, YYYY")}>
+                {moment(date).format("MMMM YYYY")}
+              </time>{" "}
               in {category}
             </small>
           </h2>

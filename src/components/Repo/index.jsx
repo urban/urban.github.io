@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import {Link} from 'react-router'
+import Link from 'gatsby-link'
 import './Repo.css'
 
 const nbsp = '\u00a0'

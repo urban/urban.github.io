@@ -3,9 +3,9 @@ import React from 'react'
 // $FlowFixMe
 import {config} from 'config'
 import {prefixLink} from 'gatsby-helpers'
-import {Link} from 'react-router'
-import SiteNav from 'components/SiteNav'
-import {Logo} from 'components/Icons'
+import Link from 'gatsby-link'
+import SiteNav from '../SiteNav'
+import {Logo} from '../Icons'
 
 import './SiteHeader.css'
 

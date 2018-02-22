@@ -1,25 +1,26 @@
 // @flow
-import React from 'react'
-import DocumentTitle from 'react-document-title'
-// $FlowFixMe
-import {config} from 'config'
+import React from "react"
+import {path} from "ramda"
+import DocumentTitle from "react-document-title"
+
+const siteTitle = path(["site", "siteMetadata", "title"])
 
 const styles = {
   root: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: '100%',
-    position: 'absolute',
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    height: "100%",
+    position: "absolute",
   },
   quote: {
-    fontSize: '1.5rem',
+    fontSize: "1.5rem",
   },
 }
 export default class SiteIndex extends React.Component {
   render() {
     return (
-      <DocumentTitle title={config.siteTitle}>
+      <DocumentTitle title={siteTitle(this.props.data)}>
         <div style={styles.root}>
           <blockquote style={styles.quote}>
             <p>
