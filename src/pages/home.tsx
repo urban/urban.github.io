@@ -2,18 +2,6 @@ import * as React from "react";
 import Helmet from "react-helmet";
 import styled from "styled-components";
 
-const Container = styled.div`
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  height: "100%",
-  position: "absolute",
-`;
-
-const Quote = styled.div`
-  fontsize: "1.5rem";
-`;
-
 interface Props {
   data: {
     site: {
@@ -48,4 +36,14 @@ export const pageQuery = graphql`
       }
     }
   }
+`;
+
+const Container = styled.div`
+  display: flex;
+  flexDirection: column;
+  justifyContent: center;
+`;
+
+const Quote = styled.blockquote`
+  fontsize: "1.5rem";
 `;
