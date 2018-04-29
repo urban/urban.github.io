@@ -1,7 +1,8 @@
 import Link from "gatsby-link";
 import * as React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
+import { desktop, tablet } from "../styles/media";
 import { colorProp } from "../styles/themes";
 
 interface Props {
@@ -18,22 +19,15 @@ export default ({ location }: Props) => (
         <SubTitle>Design Technologist</SubTitle>
       </Logo>
       <Nav>
-        <NavLink to="/">
-          Portfolio
-        </NavLink>
-        <NavLink to="/resume">
-          Resume
-        </NavLink>
-        <StyledLink href="mailto:urban@urbanfaubion.com">
-          Contact
-        </StyledLink>
+        <NavLink to="/">Portfolio</NavLink>
+        <NavLink to="/resume">Resume</NavLink>
+        <StyledLink href="mailto:urban@urbanfaubion.com">Contact</StyledLink>
       </Nav>
     </Container>
   </Header>
 );
 
-const Header = styled.header`
-`;
+const Header = styled.header``;
 
 const Container = styled.div`
   align-content: center;
@@ -48,31 +42,45 @@ const Container = styled.div`
   width: 100%;
 `;
 
-const Logo = styled.a``;
+const Logo = styled.a`
+  border-bottom: none;
+`;
 
 const Title = styled.h1`
   display: inline-block;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0;
   white-space: nowrap;
 
-  :after {
-    color: ${colorProp("grey")};
-    content: "/";
-    font-size: 1em;
-    font-weight: normal;
-    margin: 0 .5em;
+  :hover {
+    color: inherit;
+  }
+
+  @media ${desktop}, ${tablet} {
+    font-size: 1.2rem;
   }
 `;
 
 const SubTitle = styled.h2`
   color: ${colorProp("grey")};
-  display: inline-block;
+  display: none;
   font-size: 1.2rem;
   font-weight: 400;
   margin: 0;
   white-space: nowrap;
+
+  :before {
+    color: ${colorProp("grey")};
+    content: "/";
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0 0.5em;
+  }
+
+  @media ${desktop}, ${tablet} {
+    display: inline-block;
+  }
 `;
 
 const Nav = styled.nav`
@@ -82,20 +90,14 @@ const Nav = styled.nav`
   justify-content: space-between;
 `;
 
-const NavLink = styled(Link)`
-  color: ${colorProp("dark")};
+const linkStyles = css`
   margin-left: 1rem;
+`;
 
-  :hover {
-    border-bottom: 1px solid;
-  }
+const NavLink = styled(Link)`
+  ${linkStyles};
 `;
 
 const StyledLink = styled.a`
-  color: ${colorProp("dark")};
-  margin-left: 1rem;
-
-  :hover {
-    border-bottom: 1px solid;
-  }
+  ${linkStyles};
 `;

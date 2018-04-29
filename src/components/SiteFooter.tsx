@@ -6,18 +6,16 @@ export default () => {
   return (
     <Footer>
       <Container>
-        <span>
-          &copy; Urban Faubion {year}
-        </span>
+        <span>&copy; Urban Faubion {year}</span>
       </Container>
     </Footer>
   );
 };
 
 const Footer = styled.footer`
-  background-color: rgba(0,0,0,0.02);
-  border-top: 1px solid rgba(0,0,0,0.2);
-  color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.4);
   font-size: 0.75rem;
   padding: 1em 0;
 `;

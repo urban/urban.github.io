@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: "Urban Faubion - Design Technologist",
+    title: "Urban Faubion / Design Technologist",
     author: "Urban Faubion"
   },
   plugins: [

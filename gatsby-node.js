@@ -53,10 +53,13 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
           console.log(result.errors);
           reject(result.errors);
         }
+        const posts = result.data.posts.edges.map(x => x.node);
 
-        const articles = result.data.posts.edges
-          .map(x => x.node)
-          .filter(x => x.fields.slug.startsWith("/articles/"));
+        console.log(posts);
+
+        const articles = posts.filter(x =>
+          x.fields.slug.startsWith("/articles/")
+        );
 
         toArticles(articles).forEach(x => createPage(x));
       })

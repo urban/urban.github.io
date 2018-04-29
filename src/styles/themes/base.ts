@@ -14,9 +14,9 @@ export const colors = {
   primary: _colors.deepSkyBlue,
   secondary: _colors.apache,
   success: _colors.bilbao,
-  warning: _colors.tahiniGold,
+  warning: _colors.tahiniGold
 };
 
 export default {
-  colors,
+  colors
 };

@@ -95,8 +95,14 @@ h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
  */
 a {
   background-color: transparent;
+  border-bottom: 1px solid transparent;
   color: steelblue;
   text-decoration: none;
+  transition: border-bottom 1s;
+}
+
+a:hover {
+  border-bottom-color: inherit;
 }
 
 /**

@@ -12,7 +12,7 @@ interface Props {
     site: {
       siteMetadata: {
         title: string;
-      },
+      };
     };
     allMarkdownRemark: MarkdownRemarkConnection;
   };
@@ -30,11 +30,9 @@ export default ({ data }: Props) => {
           date: node.frontmatter.date,
           excerpt: node.excerpt,
           slug: node.fields.slug,
-          title: path(["frontmatter", "title"], node) || node.fields.slug,
+          title: path(["frontmatter", "title"], node) || node.fields.slug
         };
-        return (
-          <ArticleListing key={props.slug} {...props} />
-        );
+        return <ArticleListing key={props.slug} {...props} />;
       })}
     </div>
   );
@@ -48,12 +46,9 @@ export const pageQuery = graphql`
       }
     }
     allMarkdownRemark(
-      sort: {
-        fields: [frontmatter___date],
-        order: DESC
-      },
+      sort: { fields: [frontmatter___date], order: DESC }
       filter: {
-        frontmatter: { draft: { ne: true } },
+        frontmatter: { draft: { ne: true } }
         fileAbsolutePath: { regex: "/articles/" }
       }
     ) {

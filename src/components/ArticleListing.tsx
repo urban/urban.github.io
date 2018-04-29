@@ -11,7 +11,7 @@ interface Props {
   title: string;
 }
 
-export default ({date, excerpt, slug, title}: Props) => (
+export default ({ date, excerpt, slug, title }: Props) => (
   <Listing>
     <Title>
       <Link style={{ boxShadow: "none" }} to={slug}>

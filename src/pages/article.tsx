@@ -10,7 +10,7 @@ interface Props {
     site: {
       siteMetadata: {
         title: string;
-      },
+      };
     };
     allMarkdownRemark: MarkdownRemarkConnection;
   };

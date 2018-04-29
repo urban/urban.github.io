@@ -26,5 +26,5 @@ export const colorProp = (c: ColorNames) => (props: { theme: Theme }) =>
   props.theme.colors[c];
 
 export default {
-  [BASE]: baseTheme,
+  [BASE]: baseTheme
 };

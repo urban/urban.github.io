@@ -18,7 +18,7 @@ interface Props {
     site: {
       siteMetadata: {
         title: string;
-      },
+      };
     };
     allSitePage: {
       edges: SitePageEdge;
@@ -35,9 +35,7 @@ export default ({ data, pathContext }: Props) => {
 
   return (
     <div>
-      <Helmet
-        title={`${frontmatter.title} | ${siteTitle(data)}`}
-      />
+      <Helmet title={`${frontmatter.title} | ${siteTitle(data)}`} />
       <h1>{frontmatter.title}</h1>
       <p>{frontmatter.date}</p>
       <div dangerouslySetInnerHTML={{ __html: html }} />

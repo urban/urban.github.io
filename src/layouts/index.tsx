@@ -2,9 +2,9 @@ import Link from "gatsby-link";
 import * as React from "react";
 import styled, { ThemeProvider } from "styled-components";
 
-import theme from "../styles/themes/base";
 import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
+import theme from "../styles/themes/base";
 
 require("normalize.css");
 require("./styles.css");
@@ -20,9 +20,7 @@ export default ({ location, children }: Props) => (
   <ThemeProvider theme={theme}>
     <Page>
       <SiteHeader location={location} />
-      <Main>
-        {children()}
-      </Main>
+      <Main>{children()}</Main>
       <SiteFooter />
     </Page>
   </ThemeProvider>
@@ -44,4 +42,8 @@ const Main = styled.main`
   margin-left: auto;
   max-width: calc(960px - (1.25rem * 2));
   width: 100%;
+
+  @media screen and (max-width: 960px) {
+    padding: 2rem 1rem;
+  }
 `;
