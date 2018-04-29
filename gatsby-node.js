@@ -1,59 +1,76 @@
-const path = require("path")
+const Promise = require("bluebird");
+const path = require("path");
+const { createFilePath } = require("gatsby-source-filesystem");
 
-exports.onCreateNode = ({node, boundActionCreators, getNode}) => {
-  const {createNodeField} = boundActionCreators
+// Create slugs for files.
+// // Slug will used for blog page path.
+exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
+  const { createNodeField } = boundActionCreators;
 
-  if (node.internal.type === "MarkdownRemark") {
-    const value = createFilePath({node, getNode})
+  if (node.internal.type === `MarkdownRemark`) {
+    const value = createFilePath({ node, getNode });
     createNodeField({
       name: `slug`,
       node,
-      value,
-    })
+      value
+    });
   }
-}
+};
 
-exports.createPage = ({graphql, boundActionCreators}) => {
-  const {createPage} = boundActionCreators
+// Implement the Gatsby API `createPages`.
+// This is called after the Gatsby bootstrap is finished
+// so you have access to any information necessary to
+// programatically create pages.
+exports.createPages = ({ graphql, boundActionCreators }) => {
+  const { createPage } = boundActionCreators;
 
   return new Promise((resolve, reject) => {
-    const pages = []
-    const blogPost = path.resolve("src/templates/blog-post.js")
-    // Query for all markdown "nodes" and for the slug we previously created.
+    const articleTemplate = path.resolve("./src/templates/article.tsx");
+    const toArticles = toPages(articleTemplate);
     resolve(
       graphql(
         `
           {
-            allMarkdownRemark {
+            posts: allMarkdownRemark(
+              sort: { fields: [frontmatter___date], order: DESC }
+              limit: 1000
+            ) {
               edges {
                 node {
                   fields {
                     slug
                   }
+                  frontmatter {
+                    title
+                  }
                 }
               }
             }
           }
-        `,
+        `
       ).then(result => {
         if (result.errors) {
-          console.log(result.errors)
-          reject(result.errors)
+          console.log(result.errors);
+          reject(result.errors);
         }
 
-        // Create blog posts pages.
-        result.data.allMarkdownRemark.edges.forEach(edge => {
-          createPage({
-            path: edge.node.fields.slug, // required
-            component: blogPost,
-            context: {
-              slug: edge.node.fields.slug,
-            },
-          })
-        })
+        const articles = result.data.posts.edges
+          .map(x => x.node)
+          .filter(x => x.fields.slug.startsWith("/articles/"));
 
-        return
-      }),
-    )
-  })
-}
+        toArticles(articles).forEach(x => createPage(x));
+      })
+    );
+  });
+};
+
+const toPages = template => xs =>
+  xs.map((x, i) => ({
+    path: x.fields.slug,
+    component: template,
+    context: {
+      slug: x.fields.slug,
+      previous: i === x.length - 1 ? false : xs[i + 1],
+      next: i === 0 ? false : xs[i - 1]
+    }
+  }));

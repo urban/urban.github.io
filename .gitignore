@@ -1,12 +1,7 @@
-.DS_Store
 node_modules/
-npm-debug.log
-yarn-error.log
 public
-
 .gatsby-context.js
-src/pages/.manifest
-.idea
-
-src/components/WorkExcerpt/
-src/pages/work/
+.DS_Store
+.intermediate-representation/
+.cache/
+yarn.lock

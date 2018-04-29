@@ -2,14 +2,6 @@
 
 Personal website of Urban Faubion
 
-## Features
-
-* CSS Modules.
-* Clean and extensible code.
-* Simple, useful components.
-* [Ramda](http://ramdajs.com/) as a functional utility library.
-* [Flow](https://flowtype.org/) for type inference.
-
 ## Running in development
 
 After cloning this repo locally, type the following into terminal:
