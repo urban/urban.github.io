@@ -19,7 +19,7 @@ export default ({ location }: Props) => (
         <SubTitle>Design Technologist</SubTitle>
       </Logo>
       <Nav>
-        <NavLink to="/">Portfolio</NavLink>
+        <NavLink to="/">Work</NavLink>
         <NavLink to="/resume">Resume</NavLink>
         <StyledLink href="mailto:urban@urbanfaubion.com">Contact</StyledLink>
       </Nav>
