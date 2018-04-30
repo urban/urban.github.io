@@ -25,6 +25,10 @@ export default ({ date, excerpt, slug, title }: Props) => (
 
 const Listing = styled.div`
   border-bottom: 1px solid ${colorProp("greyLight")};
+
+  :last-child {
+    border-bottom-color: transparent;
+  }
 `;
 
 const Title = styled.h3`

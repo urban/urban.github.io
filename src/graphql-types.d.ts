@@ -78,6 +78,7 @@ export interface fields_2 {
 
 export interface frontmatter_2 {
   title?: string | null; 
+  draft?: boolean | null; 
 }
 /* Node of type SitePlugin */
 export interface SitePlugin extends Node {
@@ -102,6 +103,10 @@ export interface pluginOptions_3 {
   name?: string | null; 
   maxWidth?: number | null; 
   wrapperStyle?: string | null; 
+  backgroundColor?: string | null; 
+  linkImagesToOriginal?: boolean | null; 
+  pathPrefix?: string | null; 
+  ignoreFileExtensions?: string[] | null; 
 }
 
 export interface plugins_2 {
@@ -116,6 +121,10 @@ export interface plugins_2 {
 export interface pluginOptions_4 {
   maxWidth?: number | null; 
   wrapperStyle?: string | null; 
+  backgroundColor?: string | null; 
+  linkImagesToOriginal?: boolean | null; 
+  pathPrefix?: string | null; 
+  ignoreFileExtensions?: string[] | null; 
 }
 
 export interface packageJson_2 {
@@ -363,12 +372,13 @@ export interface frontmatter_3 {
   title?: string | null; 
   _PARENT?: string | null; 
   parent?: string | null; 
+  client?: string | null; 
   date?: Date | null; 
+  draft?: boolean | null; 
+  layout?: string | null; 
   category?: string | null; 
   tags?: string[] | null; 
   description?: string | null; 
-  layout?: string | null; 
-  draft?: boolean | null; 
 }
 
 export interface fields_3 {
@@ -552,6 +562,7 @@ export interface sitePageConnectionContextPreviousFieldsSlugQueryString {
 
 export interface sitePageConnectionContextPreviousFrontmatterInputObject {
   title?: sitePageConnectionContextPreviousFrontmatterTitleQueryString | null; 
+  draft?: sitePageConnectionContextPreviousFrontmatterDraftQueryBoolean | null; 
 }
 
 export interface sitePageConnectionContextPreviousFrontmatterTitleQueryString {
@@ -559,6 +570,11 @@ export interface sitePageConnectionContextPreviousFrontmatterTitleQueryString {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePageConnectionContextPreviousFrontmatterDraftQueryBoolean {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
 }
 
 export interface sitePageConnectionUpdatedAtQueryInteger {
@@ -615,6 +631,10 @@ export interface sitePageConnectionPluginCreatorPluginOptionsInputObject {
   name?: sitePageConnectionPluginCreatorPluginOptionsNameQueryString | null; 
   maxWidth?: sitePageConnectionPluginCreatorPluginOptionsMaxWidthQueryInteger | null; 
   wrapperStyle?: sitePageConnectionPluginCreatorPluginOptionsWrapperStyleQueryString | null; 
+  backgroundColor?: sitePageConnectionPluginCreatorPluginOptionsBackgroundColorQueryString | null; 
+  linkImagesToOriginal?: sitePageConnectionPluginCreatorPluginOptionsLinkImagesToOriginalQueryBoolean | null; 
+  pathPrefix?: sitePageConnectionPluginCreatorPluginOptionsPathPrefixQueryString | null; 
+  ignoreFileExtensions?: sitePageConnectionPluginCreatorPluginOptionsIgnoreFileExtensionsQueryList | null; 
 }
 
 export interface sitePageConnectionPluginCreatorPluginOptionsPluginsQueryList {
@@ -661,6 +681,10 @@ export interface sitePageConnectionPluginCreatorPluginOptionsPluginsVersionQuery
 export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsInputObject {
   maxWidth?: sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger | null; 
   wrapperStyle?: sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsWrapperStyleQueryString | null; 
+  backgroundColor?: sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsBackgroundColorQueryString | null; 
+  linkImagesToOriginal?: sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean | null; 
+  pathPrefix?: sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsPathPrefixQueryString | null; 
+  ignoreFileExtensions?: sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList | null; 
 }
 
 export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger {
@@ -673,6 +697,33 @@ export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOption
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsBackgroundColorQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsPathPrefixQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePageConnectionPluginCreatorPluginOptionsPluginsPluginFilepathQueryString {
@@ -706,6 +757,33 @@ export interface sitePageConnectionPluginCreatorPluginOptionsWrapperStyleQuerySt
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsBackgroundColorQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsLinkImagesToOriginalQueryBoolean {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsPathPrefixQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePageConnectionPluginCreatorPluginOptionsIgnoreFileExtensionsQueryList {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePageConnectionPluginCreatorNodeApIsQueryList {
@@ -1006,6 +1084,10 @@ export interface sitePluginConnectionPluginOptionsInputObject_2 {
   name?: sitePluginConnectionPluginOptionsNameQueryString_2 | null; 
   maxWidth?: sitePluginConnectionPluginOptionsMaxWidthQueryInteger_2 | null; 
   wrapperStyle?: sitePluginConnectionPluginOptionsWrapperStyleQueryString_2 | null; 
+  backgroundColor?: sitePluginConnectionPluginOptionsBackgroundColorQueryString_2 | null; 
+  linkImagesToOriginal?: sitePluginConnectionPluginOptionsLinkImagesToOriginalQueryBoolean_2 | null; 
+  pathPrefix?: sitePluginConnectionPluginOptionsPathPrefixQueryString_2 | null; 
+  ignoreFileExtensions?: sitePluginConnectionPluginOptionsIgnoreFileExtensionsQueryList_2 | null; 
 }
 
 export interface sitePluginConnectionPluginOptionsPluginsQueryList_2 {
@@ -1052,6 +1134,10 @@ export interface sitePluginConnectionPluginOptionsPluginsVersionQueryString_2 {
 export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsInputObject_2 {
   maxWidth?: sitePluginConnectionPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger_2 | null; 
   wrapperStyle?: sitePluginConnectionPluginOptionsPluginsPluginOptionsWrapperStyleQueryString_2 | null; 
+  backgroundColor?: sitePluginConnectionPluginOptionsPluginsPluginOptionsBackgroundColorQueryString_2 | null; 
+  linkImagesToOriginal?: sitePluginConnectionPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean_2 | null; 
+  pathPrefix?: sitePluginConnectionPluginOptionsPluginsPluginOptionsPathPrefixQueryString_2 | null; 
+  ignoreFileExtensions?: sitePluginConnectionPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList_2 | null; 
 }
 
 export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger_2 {
@@ -1064,6 +1150,33 @@ export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsWrapperSty
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsBackgroundColorQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean_2 {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsPathPrefixQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePluginConnectionPluginOptionsPluginsPluginFilepathQueryString_2 {
@@ -1097,6 +1210,33 @@ export interface sitePluginConnectionPluginOptionsWrapperStyleQueryString_2 {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsBackgroundColorQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsLinkImagesToOriginalQueryBoolean_2 {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsPathPrefixQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginConnectionPluginOptionsIgnoreFileExtensionsQueryList_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePluginConnectionNodeApIsQueryList_2 {
@@ -1942,12 +2082,13 @@ export interface markdownRemarkConnectionFrontmatterInputObject_2 {
   title?: markdownRemarkConnectionFrontmatterTitleQueryString_2 | null; 
   _PARENT?: markdownRemarkConnectionFrontmatterParentQueryString_3 | null; 
   parent?: markdownRemarkConnectionFrontmatterParentQueryString_4 | null; 
+  client?: markdownRemarkConnectionFrontmatterClientQueryString_2 | null; 
   date?: markdownRemarkConnectionFrontmatterDateQueryString_2 | null; 
+  draft?: markdownRemarkConnectionFrontmatterDraftQueryBoolean_2 | null; 
+  layout?: markdownRemarkConnectionFrontmatterLayoutQueryString_2 | null; 
   category?: markdownRemarkConnectionFrontmatterCategoryQueryString_2 | null; 
   tags?: markdownRemarkConnectionFrontmatterTagsQueryList_2 | null; 
   description?: markdownRemarkConnectionFrontmatterDescriptionQueryString_2 | null; 
-  layout?: markdownRemarkConnectionFrontmatterLayoutQueryString_2 | null; 
-  draft?: markdownRemarkConnectionFrontmatterDraftQueryBoolean_2 | null; 
 }
 
 export interface markdownRemarkConnectionFrontmatterTitleQueryString_2 {
@@ -1971,7 +2112,26 @@ export interface markdownRemarkConnectionFrontmatterParentQueryString_4 {
   glob?: string | null; 
 }
 
+export interface markdownRemarkConnectionFrontmatterClientQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
 export interface markdownRemarkConnectionFrontmatterDateQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface markdownRemarkConnectionFrontmatterDraftQueryBoolean_2 {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface markdownRemarkConnectionFrontmatterLayoutQueryString_2 {
   eq?: string | null; 
   ne?: string | null; 
   regex?: string | null; 
@@ -1998,18 +2158,6 @@ export interface markdownRemarkConnectionFrontmatterDescriptionQueryString_2 {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
-}
-
-export interface markdownRemarkConnectionFrontmatterLayoutQueryString_2 {
-  eq?: string | null; 
-  ne?: string | null; 
-  regex?: string | null; 
-  glob?: string | null; 
-}
-
-export interface markdownRemarkConnectionFrontmatterDraftQueryBoolean_2 {
-  eq?: boolean | null; 
-  ne?: boolean | null; 
 }
 
 export interface excerptQueryString_4 {
@@ -2172,6 +2320,7 @@ export interface sitePageContextPreviousFieldsSlugQueryString {
 
 export interface sitePageContextPreviousFrontmatterInputObject {
   title?: sitePageContextPreviousFrontmatterTitleQueryString | null; 
+  draft?: sitePageContextPreviousFrontmatterDraftQueryBoolean | null; 
 }
 
 export interface sitePageContextPreviousFrontmatterTitleQueryString {
@@ -2179,6 +2328,11 @@ export interface sitePageContextPreviousFrontmatterTitleQueryString {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePageContextPreviousFrontmatterDraftQueryBoolean {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
 }
 
 export interface sitePageUpdatedAtQueryInteger {
@@ -2235,6 +2389,10 @@ export interface sitePagePluginCreatorPluginOptionsInputObject {
   name?: sitePagePluginCreatorPluginOptionsNameQueryString | null; 
   maxWidth?: sitePagePluginCreatorPluginOptionsMaxWidthQueryInteger | null; 
   wrapperStyle?: sitePagePluginCreatorPluginOptionsWrapperStyleQueryString | null; 
+  backgroundColor?: sitePagePluginCreatorPluginOptionsBackgroundColorQueryString | null; 
+  linkImagesToOriginal?: sitePagePluginCreatorPluginOptionsLinkImagesToOriginalQueryBoolean | null; 
+  pathPrefix?: sitePagePluginCreatorPluginOptionsPathPrefixQueryString | null; 
+  ignoreFileExtensions?: sitePagePluginCreatorPluginOptionsIgnoreFileExtensionsQueryList | null; 
 }
 
 export interface sitePagePluginCreatorPluginOptionsPluginsQueryList {
@@ -2281,6 +2439,10 @@ export interface sitePagePluginCreatorPluginOptionsPluginsVersionQueryString {
 export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsInputObject {
   maxWidth?: sitePagePluginCreatorPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger | null; 
   wrapperStyle?: sitePagePluginCreatorPluginOptionsPluginsPluginOptionsWrapperStyleQueryString | null; 
+  backgroundColor?: sitePagePluginCreatorPluginOptionsPluginsPluginOptionsBackgroundColorQueryString | null; 
+  linkImagesToOriginal?: sitePagePluginCreatorPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean | null; 
+  pathPrefix?: sitePagePluginCreatorPluginOptionsPluginsPluginOptionsPathPrefixQueryString | null; 
+  ignoreFileExtensions?: sitePagePluginCreatorPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList | null; 
 }
 
 export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger {
@@ -2293,6 +2455,33 @@ export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsWrapperSt
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsBackgroundColorQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsPathPrefixQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePagePluginCreatorPluginOptionsPluginsPluginFilepathQueryString {
@@ -2326,6 +2515,33 @@ export interface sitePagePluginCreatorPluginOptionsWrapperStyleQueryString {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsBackgroundColorQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsLinkImagesToOriginalQueryBoolean {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsPathPrefixQueryString {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePagePluginCreatorPluginOptionsIgnoreFileExtensionsQueryList {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePagePluginCreatorNodeApIsQueryList {
@@ -2607,6 +2823,10 @@ export interface sitePluginPluginOptionsInputObject_2 {
   name?: sitePluginPluginOptionsNameQueryString_2 | null; 
   maxWidth?: sitePluginPluginOptionsMaxWidthQueryInteger_2 | null; 
   wrapperStyle?: sitePluginPluginOptionsWrapperStyleQueryString_2 | null; 
+  backgroundColor?: sitePluginPluginOptionsBackgroundColorQueryString_2 | null; 
+  linkImagesToOriginal?: sitePluginPluginOptionsLinkImagesToOriginalQueryBoolean_2 | null; 
+  pathPrefix?: sitePluginPluginOptionsPathPrefixQueryString_2 | null; 
+  ignoreFileExtensions?: sitePluginPluginOptionsIgnoreFileExtensionsQueryList_2 | null; 
 }
 
 export interface sitePluginPluginOptionsPluginsQueryList_2 {
@@ -2653,6 +2873,10 @@ export interface sitePluginPluginOptionsPluginsVersionQueryString_2 {
 export interface sitePluginPluginOptionsPluginsPluginOptionsInputObject_2 {
   maxWidth?: sitePluginPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger_2 | null; 
   wrapperStyle?: sitePluginPluginOptionsPluginsPluginOptionsWrapperStyleQueryString_2 | null; 
+  backgroundColor?: sitePluginPluginOptionsPluginsPluginOptionsBackgroundColorQueryString_2 | null; 
+  linkImagesToOriginal?: sitePluginPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean_2 | null; 
+  pathPrefix?: sitePluginPluginOptionsPluginsPluginOptionsPathPrefixQueryString_2 | null; 
+  ignoreFileExtensions?: sitePluginPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList_2 | null; 
 }
 
 export interface sitePluginPluginOptionsPluginsPluginOptionsMaxWidthQueryInteger_2 {
@@ -2665,6 +2889,33 @@ export interface sitePluginPluginOptionsPluginsPluginOptionsWrapperStyleQueryStr
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePluginPluginOptionsPluginsPluginOptionsBackgroundColorQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginPluginOptionsPluginsPluginOptionsLinkImagesToOriginalQueryBoolean_2 {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePluginPluginOptionsPluginsPluginOptionsPathPrefixQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginPluginOptionsPluginsPluginOptionsIgnoreFileExtensionsQueryList_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePluginPluginOptionsPluginsPluginFilepathQueryString_2 {
@@ -2698,6 +2949,33 @@ export interface sitePluginPluginOptionsWrapperStyleQueryString_2 {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
+}
+
+export interface sitePluginPluginOptionsBackgroundColorQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginPluginOptionsLinkImagesToOriginalQueryBoolean_2 {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface sitePluginPluginOptionsPathPrefixQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface sitePluginPluginOptionsIgnoreFileExtensionsQueryList_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+  in?: string[] | null; 
 }
 
 export interface sitePluginNodeApIsQueryList_2 {
@@ -3523,12 +3801,13 @@ export interface markdownRemarkFrontmatterInputObject_2 {
   title?: markdownRemarkFrontmatterTitleQueryString_2 | null; 
   _PARENT?: markdownRemarkFrontmatterParentQueryString_3 | null; 
   parent?: markdownRemarkFrontmatterParentQueryString_4 | null; 
+  client?: markdownRemarkFrontmatterClientQueryString_2 | null; 
   date?: markdownRemarkFrontmatterDateQueryString_2 | null; 
+  draft?: markdownRemarkFrontmatterDraftQueryBoolean_2 | null; 
+  layout?: markdownRemarkFrontmatterLayoutQueryString_2 | null; 
   category?: markdownRemarkFrontmatterCategoryQueryString_2 | null; 
   tags?: markdownRemarkFrontmatterTagsQueryList_2 | null; 
   description?: markdownRemarkFrontmatterDescriptionQueryString_2 | null; 
-  layout?: markdownRemarkFrontmatterLayoutQueryString_2 | null; 
-  draft?: markdownRemarkFrontmatterDraftQueryBoolean_2 | null; 
 }
 
 export interface markdownRemarkFrontmatterTitleQueryString_2 {
@@ -3552,7 +3831,26 @@ export interface markdownRemarkFrontmatterParentQueryString_4 {
   glob?: string | null; 
 }
 
+export interface markdownRemarkFrontmatterClientQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
 export interface markdownRemarkFrontmatterDateQueryString_2 {
+  eq?: string | null; 
+  ne?: string | null; 
+  regex?: string | null; 
+  glob?: string | null; 
+}
+
+export interface markdownRemarkFrontmatterDraftQueryBoolean_2 {
+  eq?: boolean | null; 
+  ne?: boolean | null; 
+}
+
+export interface markdownRemarkFrontmatterLayoutQueryString_2 {
   eq?: string | null; 
   ne?: string | null; 
   regex?: string | null; 
@@ -3579,18 +3877,6 @@ export interface markdownRemarkFrontmatterDescriptionQueryString_2 {
   ne?: string | null; 
   regex?: string | null; 
   glob?: string | null; 
-}
-
-export interface markdownRemarkFrontmatterLayoutQueryString_2 {
-  eq?: string | null; 
-  ne?: string | null; 
-  regex?: string | null; 
-  glob?: string | null; 
-}
-
-export interface markdownRemarkFrontmatterDraftQueryBoolean_2 {
-  eq?: boolean | null; 
-  ne?: boolean | null; 
 }
 
 export interface excerptQueryString_3 {
@@ -4009,16 +4295,16 @@ export type sitePageDistinctEnum = "layout" | "jsonName" | "internalComponentNam
 export type sitePageGroupEnum = "layout" | "jsonName" | "internalComponentName" | "path" | "component" | "componentChunkName" | "context___slug" | "context___previous___fields" | "context___previous___frontmatter" | "context___next" | "updatedAt" | "pluginCreator___NODE" | "pluginCreatorId" | "componentPath" | "id" | "parent" | "internal___type" | "internal___contentDigest" | "internal___owner";
 
 
-export type SitePluginConnectionSortByFieldsEnum = "resolve" | "id" | "name" | "version" | "pluginOptions___plugins" | "pluginOptions___path" | "pluginOptions___name" | "pluginOptions___maxWidth" | "pluginOptions___wrapperStyle" | "nodeAPIs" | "browserAPIs" | "ssrAPIs" | "pluginFilepath" | "packageJson___name" | "packageJson___description" | "packageJson___version" | "packageJson___main" | "packageJson___author" | "packageJson___license" | "packageJson___dependencies" | "packageJson___devDependencies" | "packageJson___peerDependencies" | "packageJson___optionalDependecies" | "packageJson___bundledDependecies" | "packageJson___keywords" | "parent" | "children" | "internal___contentDigest" | "internal___type" | "internal___owner";
+export type SitePluginConnectionSortByFieldsEnum = "resolve" | "id" | "name" | "version" | "pluginOptions___plugins" | "pluginOptions___path" | "pluginOptions___name" | "pluginOptions___maxWidth" | "pluginOptions___wrapperStyle" | "pluginOptions___backgroundColor" | "pluginOptions___linkImagesToOriginal" | "pluginOptions___pathPrefix" | "pluginOptions___ignoreFileExtensions" | "nodeAPIs" | "browserAPIs" | "ssrAPIs" | "pluginFilepath" | "packageJson___name" | "packageJson___description" | "packageJson___version" | "packageJson___main" | "packageJson___author" | "packageJson___license" | "packageJson___dependencies" | "packageJson___devDependencies" | "packageJson___peerDependencies" | "packageJson___optionalDependecies" | "packageJson___bundledDependecies" | "packageJson___keywords" | "parent" | "children" | "internal___contentDigest" | "internal___type" | "internal___owner";
 
 
 export type sitePluginConnectionSortOrderValues = "ASC" | "DESC";
 
 
-export type sitePluginDistinctEnum = "resolve" | "id" | "name" | "version" | "pluginOptions___plugins" | "pluginOptions___path" | "pluginOptions___name" | "pluginOptions___maxWidth" | "pluginOptions___wrapperStyle" | "nodeAPIs" | "browserAPIs" | "ssrAPIs" | "pluginFilepath" | "packageJson___name" | "packageJson___description" | "packageJson___version" | "packageJson___main" | "packageJson___author" | "packageJson___license" | "packageJson___dependencies" | "packageJson___devDependencies" | "packageJson___peerDependencies" | "packageJson___keywords" | "parent" | "internal___contentDigest" | "internal___type" | "internal___owner";
+export type sitePluginDistinctEnum = "resolve" | "id" | "name" | "version" | "pluginOptions___plugins" | "pluginOptions___path" | "pluginOptions___name" | "pluginOptions___maxWidth" | "pluginOptions___wrapperStyle" | "pluginOptions___backgroundColor" | "pluginOptions___linkImagesToOriginal" | "pluginOptions___pathPrefix" | "pluginOptions___ignoreFileExtensions" | "nodeAPIs" | "browserAPIs" | "ssrAPIs" | "pluginFilepath" | "packageJson___name" | "packageJson___description" | "packageJson___version" | "packageJson___main" | "packageJson___author" | "packageJson___license" | "packageJson___dependencies" | "packageJson___devDependencies" | "packageJson___peerDependencies" | "packageJson___keywords" | "parent" | "internal___contentDigest" | "internal___type" | "internal___owner";
 
 
-export type sitePluginGroupEnum = "resolve" | "id" | "name" | "version" | "pluginOptions___plugins" | "pluginOptions___path" | "pluginOptions___name" | "pluginOptions___maxWidth" | "pluginOptions___wrapperStyle" | "nodeAPIs" | "browserAPIs" | "ssrAPIs" | "pluginFilepath" | "packageJson___name" | "packageJson___description" | "packageJson___version" | "packageJson___main" | "packageJson___author" | "packageJson___license" | "packageJson___dependencies" | "packageJson___devDependencies" | "packageJson___peerDependencies" | "packageJson___keywords" | "parent" | "internal___contentDigest" | "internal___type" | "internal___owner";
+export type sitePluginGroupEnum = "resolve" | "id" | "name" | "version" | "pluginOptions___plugins" | "pluginOptions___path" | "pluginOptions___name" | "pluginOptions___maxWidth" | "pluginOptions___wrapperStyle" | "pluginOptions___backgroundColor" | "pluginOptions___linkImagesToOriginal" | "pluginOptions___pathPrefix" | "pluginOptions___ignoreFileExtensions" | "nodeAPIs" | "browserAPIs" | "ssrAPIs" | "pluginFilepath" | "packageJson___name" | "packageJson___description" | "packageJson___version" | "packageJson___main" | "packageJson___author" | "packageJson___license" | "packageJson___dependencies" | "packageJson___devDependencies" | "packageJson___peerDependencies" | "packageJson___keywords" | "parent" | "internal___contentDigest" | "internal___type" | "internal___owner";
 
 
 export type DirectoryConnectionSortByFieldsEnum = "id" | "children" | "parent" | "internal___contentDigest" | "internal___type" | "internal___owner" | "sourceInstanceName" | "absolutePath" | "relativePath" | "extension" | "size" | "prettySize" | "modifiedTime" | "accessTime" | "changeTime" | "birthTime" | "root" | "dir" | "base" | "ext" | "name" | "relativeDirectory" | "dev" | "mode" | "nlink" | "uid" | "gid" | "rdev" | "blksize" | "ino" | "blocks" | "atimeMs" | "mtimeMs" | "ctimeMs" | "birthtimeMs" | "atime" | "mtime" | "ctime" | "birthtime";
@@ -4048,14 +4334,14 @@ export type fileDistinctEnum = "id" | "children" | "parent" | "internal___conten
 export type fileGroupEnum = "id" | "children" | "parent" | "internal___contentDigest" | "internal___mediaType" | "internal___type" | "internal___owner" | "sourceInstanceName" | "absolutePath" | "relativePath" | "extension" | "size" | "prettySize" | "modifiedTime" | "accessTime" | "changeTime" | "birthTime" | "root" | "dir" | "base" | "ext" | "name" | "relativeDirectory" | "dev" | "mode" | "nlink" | "uid" | "gid" | "rdev" | "blksize" | "ino" | "blocks" | "atimeMs" | "mtimeMs" | "ctimeMs" | "birthtimeMs" | "atime" | "mtime" | "ctime" | "birthtime";
 
 
-export type MarkdownRemarkConnectionSortByFieldsEnum = "id" | "children" | "parent" | "internal___content" | "internal___contentDigest" | "internal___type" | "internal___owner" | "internal___fieldOwners___slug" | "frontmatter___title" | "frontmatter____PARENT" | "frontmatter___parent" | "frontmatter___date" | "frontmatter___category" | "frontmatter___tags" | "frontmatter___description" | "frontmatter___layout" | "frontmatter___draft" | "excerpt" | "fileAbsolutePath" | "fields___slug" | "html" | "headings" | "timeToRead" | "tableOfContents" | "wordCount___paragraphs" | "wordCount___sentences" | "wordCount___words";
+export type MarkdownRemarkConnectionSortByFieldsEnum = "id" | "children" | "parent" | "internal___content" | "internal___contentDigest" | "internal___type" | "internal___owner" | "internal___fieldOwners___slug" | "frontmatter___title" | "frontmatter____PARENT" | "frontmatter___parent" | "frontmatter___client" | "frontmatter___date" | "frontmatter___draft" | "frontmatter___layout" | "frontmatter___category" | "frontmatter___tags" | "frontmatter___description" | "excerpt" | "fileAbsolutePath" | "fields___slug" | "html" | "headings" | "timeToRead" | "tableOfContents" | "wordCount___paragraphs" | "wordCount___sentences" | "wordCount___words";
 
 
 export type markdownRemarkConnectionSortOrderValues = "ASC" | "DESC";
 
 
-export type markdownRemarkDistinctEnum = "id" | "parent" | "internal___content" | "internal___contentDigest" | "internal___type" | "internal___owner" | "internal___fieldOwners___slug" | "frontmatter___title" | "frontmatter____PARENT" | "frontmatter___parent" | "frontmatter___date" | "frontmatter___category" | "frontmatter___tags" | "frontmatter___description" | "frontmatter___layout" | "frontmatter___draft" | "excerpt" | "fileAbsolutePath" | "fields___slug";
+export type markdownRemarkDistinctEnum = "id" | "parent" | "internal___content" | "internal___contentDigest" | "internal___type" | "internal___owner" | "internal___fieldOwners___slug" | "frontmatter___title" | "frontmatter____PARENT" | "frontmatter___parent" | "frontmatter___client" | "frontmatter___date" | "frontmatter___draft" | "frontmatter___layout" | "frontmatter___category" | "frontmatter___tags" | "frontmatter___description" | "excerpt" | "fileAbsolutePath" | "fields___slug";
 
 
-export type markdownRemarkGroupEnum = "id" | "parent" | "internal___content" | "internal___contentDigest" | "internal___type" | "internal___owner" | "internal___fieldOwners___slug" | "frontmatter___title" | "frontmatter____PARENT" | "frontmatter___parent" | "frontmatter___date" | "frontmatter___category" | "frontmatter___tags" | "frontmatter___description" | "frontmatter___layout" | "frontmatter___draft" | "excerpt" | "fileAbsolutePath" | "fields___slug";
+export type markdownRemarkGroupEnum = "id" | "parent" | "internal___content" | "internal___contentDigest" | "internal___type" | "internal___owner" | "internal___fieldOwners___slug" | "frontmatter___title" | "frontmatter____PARENT" | "frontmatter___parent" | "frontmatter___client" | "frontmatter___date" | "frontmatter___draft" | "frontmatter___layout" | "frontmatter___category" | "frontmatter___tags" | "frontmatter___description" | "excerpt" | "fileAbsolutePath" | "fields___slug";
 

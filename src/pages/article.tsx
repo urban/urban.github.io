@@ -3,6 +3,8 @@ import { path } from "ramda";
 import * as React from "react";
 import Helmet from "react-helmet";
 
+import ArticleListing from "../components/ArticleListing";
+import { H4 } from "../components/Headings";
 import { MarkdownRemarkConnection } from "../graphql-types";
 
 interface Props {
@@ -17,25 +19,19 @@ interface Props {
 }
 
 export default ({ data }: Props) => {
-  const posts = path(["allMarkdownRemark", "edges"], data);
-
+  const articles = path(["allMarkdownRemark", "edges"], data);
   return (
     <div>
       <Helmet title={data.site.siteMetadata.title} />
-      <h1>Articles</h1>
-      {Object.values(posts).map(({ node }) => {
-        const title = path(["frontmatter", "title"], node) || node.fields.slug;
-        return (
-          <div key={node.fields.slug}>
-            <h3>
-              <Link style={{ boxShadow: "none" }} to={node.fields.slug}>
-                {title}
-              </Link>
-            </h3>
-            <small>{node.frontmatter.date}</small>
-            <p dangerouslySetInnerHTML={{ __html: node.excerpt }} />
-          </div>
-        );
+      <H4>Articles</H4>
+      {Object.values(articles).map(({ node }) => {
+        const props = {
+          date: node.frontmatter.date,
+          excerpt: node.excerpt,
+          slug: node.fields.slug,
+          title: path(["frontmatter", "title"], node) || node.fields.slug
+        };
+        return <ArticleListing key={props.slug} {...props} />;
       })}
     </div>
   );
@@ -48,7 +44,13 @@ export const pageQuery = graphql`
         title
       }
     }
-    allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+    allMarkdownRemark(
+      sort: { fields: [frontmatter___date], order: DESC }
+      filter: {
+        frontmatter: { draft: { ne: true } }
+        fileAbsolutePath: { regex: "/article/" }
+      }
+    ) {
       edges {
         node {
           excerpt

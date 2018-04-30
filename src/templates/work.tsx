@@ -2,19 +2,15 @@ import Link from "gatsby-link";
 import { path } from "ramda";
 import * as React from "react";
 import Helmet from "react-helmet";
+import styled from "styled-components";
 
-import ArticleFooter from "../components/ArticleFooter";
 // import ArticleNav from "../components/ArticleNav";
 import PageTitle from "../components/PageTitle";
 import { MarkdownRemark, SitePageEdge } from "../graphql-types";
 
-require("./article.css");
+require("./work.css");
 
 interface Props {
-  pathContext: {
-    next: false | MarkdownRemark;
-    previous: false | MarkdownRemark;
-  };
   data: {
     site: {
       siteMetadata: {
@@ -30,27 +26,23 @@ interface Props {
 
 const siteTitle = path(["site", "siteMetadata", "title"]);
 
-export default ({ data, pathContext }: Props) => {
+export default ({ data }: Props) => {
   const { frontmatter, html } = data.markdownRemark;
-  const { previous, next } = pathContext;
 
   return (
     <div>
       <Helmet title={`${frontmatter.title} | ${siteTitle(data)}`} />
-      <PageTitle title={frontmatter.title} subTitle={frontmatter.date} />
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-      {/* <ArticleFooter {...pathContext} /> */}
-      <ArticleFooter />
+      <PageTitle title={frontmatter.title} subTitle={frontmatter.client} />
+      <div className="work" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
 };
 
 export const pageQuery = graphql`
-  query ArticleByPath($slug: String!) {
+  query WorkByPath($slug: String!) {
     site {
       siteMetadata {
         title
-        author
       }
     }
     markdownRemark(fields: { slug: { eq: $slug } }) {
@@ -58,8 +50,10 @@ export const pageQuery = graphql`
       html
       frontmatter {
         title
-        date(formatString: "MMMM DD, YYYY")
+        client
       }
     }
   }
 `;
+
+const PublishDate = styled.span``;

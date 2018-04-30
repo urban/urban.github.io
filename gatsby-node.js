@@ -2,6 +2,8 @@ const Promise = require("bluebird");
 const path = require("path");
 const { createFilePath } = require("gatsby-source-filesystem");
 
+const prod = process.env.NODE_ENV === "production";
+
 // Create slugs for files.
 // // Slug will used for blog page path.
 exports.onCreateNode = ({ node, boundActionCreators, getNode }) => {
@@ -27,6 +29,9 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
   return new Promise((resolve, reject) => {
     const articleTemplate = path.resolve("./src/templates/article.tsx");
     const toArticles = toPages(articleTemplate);
+    const workTemplate = path.resolve("./src/templates/work.tsx");
+    const toWork = toPages(workTemplate);
+
     resolve(
       graphql(
         `
@@ -42,6 +47,7 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
                   }
                   frontmatter {
                     title
+                    draft
                   }
                 }
               }
@@ -53,15 +59,20 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
           console.log(result.errors);
           reject(result.errors);
         }
-        const posts = result.data.posts.edges.map(x => x.node);
 
-        console.log(posts);
+        const isDraft = x => x.frontmatter.draft;
+        const filterDrafts = prod ? x => !isDraft(x) : x => x;
+        const posts = result.data.posts.edges
+          .map(x => x.node)
+          .filter(filterDrafts);
 
         const articles = posts.filter(x =>
-          x.fields.slug.startsWith("/articles/")
+          x.fields.slug.startsWith("/article/")
         );
-
         toArticles(articles).forEach(x => createPage(x));
+
+        const work = posts.filter(x => x.fields.slug.startsWith("/work/"));
+        toWork(work).forEach(x => createPage(x));
       })
     );
   });

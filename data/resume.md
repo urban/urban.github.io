@@ -5,7 +5,7 @@ title: Resume
 # Urban Faubion
 
 10421 SW Bank Rd #17 • Vashon WA 98070 • (206) 472-0935<br/>
-[urban@urbanfaubion.com](mailto:urban@urbanfaubion.com) •
+[urban.faubion@gmail.com](mailto:urban.faubion@gmail.com) •
 [urbanfaubion.com](https://urbanfaubion.com) •
 [github.com/urban](https://github.com/urban)
 
