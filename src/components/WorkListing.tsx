@@ -1,3 +1,4 @@
+import Img from "gatsby-image";
 import Link from "gatsby-link";
 import * as React from "react";
 import styled from "styled-components";
@@ -6,28 +7,34 @@ import { colorProp } from "../styles/themes";
 
 interface Props {
   client: string;
-  excerpt: string;
+  color: string;
+  image: any;
   slug: string;
   title: string;
 }
 
-export default ({ client, excerpt, slug, title }: Props) => (
-  <Listing style={{ boxShadow: "none" }} to={slug}>
-    <Header>
-      <Title>{title}</Title>
-      <SubTitle>{client}</SubTitle>
+export default ({ client, color, image, slug, title }: Props) => (
+  <Listing to={slug}>
+    <Header color={color}>
+      <h4>{title}</h4>
+      <small>{client}</small>
     </Header>
-    <Excerpt dangerouslySetInnerHTML={{ __html: excerpt }} />
+    <Img
+      sizes={image.childImageSharp.sizes}
+      style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+    />
   </Listing>
 );
 
 const Listing = styled(Link)`
   box-shadow: none;
   text-decoration: none;
-  border: 1px solid ${colorProp("greyLight")} !important;
+  border: none !important;
+  box-shadow: none;
   display: block;
   height: 100%;
   position: relative;
+  transition: border-color 0.3s ease-in-out;
   width: 100%;
 
   :after {
@@ -38,32 +45,32 @@ const Listing = styled(Link)`
     z-index: -1;
     width: 100%;
     height: 100%;
-    border-radius: 4px;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.3s ease-in-out;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease-in-out;
   }
 
   :hover::after {
-    opacity: 0;
+    box-shadow: 0 0 8px rgb(51, 125, 168, 0.3);
   }
 `;
 
 const Header = styled.header`
-  border-left: 4px solid rgba(0, 0, 0, 0.6);
-  padding-left: 1rem;
-`;
-
-const Title = styled.h4`
-  margin-bottom: 0;
-`;
-
-const SubTitle = styled.small`
-  color: ${colorProp("greyLight")};
+  border-left: 4px solid ${props => props.color};
   display: block;
-  font-style: italic;
-  margin-bottom: 1rem;
-`;
+  margin: 0 2rem 0 0;
+  padding: 0.25rem 1rem;
+  position: relative;
+  top: 1rem;
+  z-index: 1;
 
-const Excerpt = styled.p`
-  margin: 1rem;
+  & > h4 {
+    margin: 0;
+  }
+
+  & > small {
+    color: ${colorProp("greyLight")};
+    display: block;
+    font-style: italic;
+    margin: 0;
+  }
 `;

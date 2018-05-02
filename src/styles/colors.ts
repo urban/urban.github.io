@@ -12,6 +12,7 @@ export const salmon = "rgb(254,110,89)";
 export const pastelPink = "rgb(255,209,220)";
 export const lavenderBlush = "rgb(255,240,245)";
 export const deepSkyBlue = "rgb(9,165,255)";
+export const steelblue = "rgb(70,130,180)";
 export const apache = "rgb(211,169,90)";
 export const cinnabar = "rgb(216,65,50)";
 export const tahiniGold = "rgb(220,114,42)";

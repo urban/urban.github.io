@@ -27,6 +27,10 @@ interface Props {
 const siteTitle = path(["site", "siteMetadata", "title"]);
 
 export default ({ data }: Props) => {
+  if (!data) {
+    return null;
+  }
+
   const { frontmatter, html } = data.markdownRemark;
 
   return (

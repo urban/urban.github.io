@@ -10,6 +10,7 @@ export interface Colors {
   greyLight: string;
   info: string;
   light: string;
+  link: string;
   primary: string;
   secondary: string;
   success: string;

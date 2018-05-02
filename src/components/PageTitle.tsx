@@ -16,14 +16,12 @@ export default ({ title, subTitle }: Props) => (
 );
 
 const Title = styled.h1`
-  font-family: Georgia;
   margin-bottom: 0;
 `;
 
 const SubTitle = styled.small`
   color: ${colorProp("greyLight")};
   display: block;
-  font-family: Georgia;
   font-style: italic;
   font-weight: normal;
   margin-bottom: 1rem;

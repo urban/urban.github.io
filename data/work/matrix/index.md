@@ -2,21 +2,21 @@
 title: Matrix
 client: MileZero
 date: "2016-12-06T16:00:00.000Z"
+listingImage: "./listing-image.png"
+color: "rgb(17,169,231)"
 ---
 
-MileZero is building a Software as a Service in the transportation and logistics industry. The software focuses on the "middle mile" and "last mile" segments and will coordinate same day services such as delivery, pickup, install and etc.
+At [MileZero](https://www.milezero.com/) we built a Software as a Service (SaaS) in the transportation and logistics industry. The software focuses on the "middle mile" and "last mile" segments and coordinates same day services such as delivery, pickup, installation and etc.
 
-I was hired by MileZero as Head of Design to design and develop an application for Network and Fleet managers to use that gave them visibility into there workforce as they execute tasks.
+As Head of Design, I designed and developed an application that gave Network and Fleet managers visibility into there workforce as they execute same-day tasks and services. Built on our own SaaS API's, it provides real-world positioning and Key Performance Indicators (KPI), along with workflows for gracefully handling real-world unpredictability.
 
-In a quick research phase, I gathered user requirements and features from my stakeholders and prioritized a list of capabilities for the application. I then established UX & Design principles, a UX model and began wire-framing the application. With the help of a contract visual designer, I art directed a few iterations of design until we landed on something that fit my vision.
+### Activities & Responsibilities
 
-After the design phase, I developed a real-time mock server that uses JSON API REST endpoints to develop and test the UI against. I also developed the web application and a component Library using Webpack 2, React, Redux, React Router Redux, Redux-Saga, Reselect, Ramda and CSS Modules.
+* conducted design research and a competitive analysis
+* established the visual and UX design
+* helped design the REST API's
+* developed the web application with React, Redux, Redux-Saga and CSS Modules
+* created a real-time mock server in Node.js and Express.js
 
-## Responsibilities
-
-Design research, UX/UI design, creative direction, API Design, UI development, real-time API test server
-
-## Deliverables
-
-* Real-time web app
-* Design system & omponent
+![Matrix Page 01](./Matrix-Page-01.png)
+![Matrix Page 02](./Matrix-Page-02.png)

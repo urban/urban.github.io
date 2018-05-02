@@ -22,7 +22,7 @@ interface Props {
 
 export default ({ data }: Props) => {
   const articles = path(["allMarkdownRemark", "edges"], data);
-  console.log(articles);
+
   return (
     <div>
       <Helmet title={data.site.siteMetadata.title} />
@@ -31,7 +31,8 @@ export default ({ data }: Props) => {
         {Object.values(articles).map(({ node }) => {
           const props = {
             client: node.frontmatter.client,
-            excerpt: node.excerpt,
+            color: node.frontmatter.color,
+            image: node.frontmatter.listingImage,
             slug: node.fields.slug,
             title: path(["frontmatter", "title"], node) || node.fields.slug
           };
@@ -49,21 +50,22 @@ export default ({ data }: Props) => {
 const Work = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
+  margin: -1rem 0 0 -1rem;
 `;
 
 const WorkItem = styled.div`
-  margin-bottom: 1rem;
+  margin: 1rem 0 0 1rem;
   min-height: 18.75rem;
   width: 100%;
 
   @media ${tablet} {
-    width: calc((99.9% - 1rem) / 2);
+    width: calc((99.9% - 2rem) / 2);
   }
 
   @media ${desktop} {
-    width: calc((99.9% - 1rem * 2) / 3);
+    width: calc((99.9% - 4rem) / 3);
   }
 `;
 
@@ -88,8 +90,16 @@ export const pageQuery = graphql`
             slug
           }
           frontmatter {
+            color
             client
             title
+            listingImage {
+              childImageSharp {
+                sizes(maxWidth: 642) {
+                  ...GatsbyImageSharpSizes
+                }
+              }
+            }
           }
         }
       }

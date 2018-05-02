@@ -31,6 +31,9 @@ interface Props {
 const siteTitle = path(["site", "siteMetadata", "title"]);
 
 export default ({ data, pathContext }: Props) => {
+  if (!data) {
+    return null;
+  }
   const { frontmatter, html } = data.markdownRemark;
   const { previous, next } = pathContext;
 
