@@ -26,31 +26,23 @@ export default ({ client, color, image, slug, title }: Props) => (
   </Listing>
 );
 
+const transitionDuration = "0.2s";
+
 const Listing = styled(Link)`
-  box-shadow: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2) !important;
   text-decoration: none;
   border: none !important;
   box-shadow: none;
   display: block;
   height: 100%;
   position: relative;
-  transition: border-color 0.3s ease-in-out;
+  transition: box-shadow ${transitionDuration} ease-in-out,
+    transform ${transitionDuration} ease-in-out;
   width: 100%;
 
-  :after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-    transition: box-shadow 0.3s ease-in-out;
-  }
-
-  :hover::after {
-    box-shadow: 0 0 8px rgb(51, 125, 168, 0.3);
+  :hover {
+    box-shadow: 0 0 4px rgb(2, 35, 67, 0.3) !important;
+    transform: scale(0.98);
   }
 `;
 
@@ -59,6 +51,7 @@ const Header = styled.header`
   display: block;
   margin: 0 2rem 0 0;
   padding: 0.25rem 1rem;
+  pointer-events: none;
   position: relative;
   top: 1rem;
   z-index: 1;

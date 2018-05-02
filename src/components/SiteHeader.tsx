@@ -30,10 +30,11 @@ export default ({ location }: Props) => (
 const Header = styled.header``;
 
 const Container = styled.div`
-  align-content: center;
   align-items: baseline;
   display: flex;
   height: calc(6 * 1rem);
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   margin-right: auto;
   margin-left: auto;
@@ -43,14 +44,16 @@ const Container = styled.div`
 `;
 
 const Logo = styled.a`
+  align-items: baseline;
   border-bottom: none;
+  display: flex;
 `;
 
 const Title = styled.h1`
   display: inline-block;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  margin: 0;
+  margin: 0 2rem 0 0;
   white-space: nowrap;
 
   :hover {
@@ -58,7 +61,7 @@ const Title = styled.h1`
   }
 
   @media ${desktop}, ${tablet} {
-    font-size: 1.2rem;
+    margin: 0;
   }
 `;
 
@@ -73,13 +76,13 @@ const SubTitle = styled.h2`
   :before {
     color: ${colorProp("grey")};
     content: "/";
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: normal;
-    margin: 0 0.5em;
+    margin: 0 0.25em;
   }
 
   @media ${desktop}, ${tablet} {
-    display: inline-block;
+    display: block;
   }
 `;
 
@@ -96,6 +99,10 @@ const linkStyles = css`
 
 const NavLink = styled(Link)`
   ${linkStyles};
+
+  &:first-child {
+    margin-left: 0;
+  }
 `;
 
 const StyledLink = styled.a`
