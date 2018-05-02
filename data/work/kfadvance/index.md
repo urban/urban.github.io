@@ -8,7 +8,7 @@ color: "rgb(211,169,80)"
 
 [KFAdvance](https://kfadvance.com/) is a product that connects individuals with [Korn Ferry's](https://www.kornferry.com) executive coaches to help them advance their career. These coaches can give targeted career advice, specifically tailored to their needs and situation, potentially forging an ongoing relationship that can last until retirement. I played a pivotal role on the team and contributing in multiple ways, from brand and execution, to UX and code.
 
-My first challenge was to help them launch a pilot program of the product. The team was experiencing serious performance and velocity issues with their existing single-page web and needed help. I began by refactoring and updating their existing code base and build pipeline while teaching the team to use modern web technologies and best practices.
+My first challenge was to help them launch a pilot program of the product. The team was experiencing serious performance and velocity issues with their existing single-page website and needed help. I began by refactoring and updating their existing code base and build pipeline while teaching the team to use modern web technologies and best practices.
 
 After successfully launching the pilot, I helped transform it into multiple products customers could purchase to accomplish specific tasks such as resume creation, interview coaching, salary negotiation and more. As part of this effort, I rebranded, designed and developed the product marketing pages, decoupling them from the existing code base. Not only did this give the product a new business model, it enabled us to iterate on the two independently.
 

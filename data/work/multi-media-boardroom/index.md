@@ -10,7 +10,7 @@ color: "rgb(2,35,67)"
 
 [frog](https://www.frogdesign.com/) was hired to help Daimler evaluate and pick a software partner to power a multi-screen, multi-purpose conference rooms that include remote participation.
 
-In partnership with [macom](https://www.macom.de/en/), I developed a 60 page "Vendor Briefing" document to be used for evaluating software vendor solutions. Using the Vendor Briefing document and a mock conference room with the required hardware, each vendor demonstrating the strengths and weaknesses of their software according to several user journey scenarios in a full day presentation. Following the vendor presentations, I lead the evaluation workshop to discuss the different software solutions and provided my recommendation.
+In partnership with [macom](https://www.macom.de/en/), I developed a 60 page "Vendor Briefing" document to be used for evaluating software vendor solutions. Using the Vendor Briefing document and a mock conference room with the required hardware, each vendor would demonstrate the strengths and weaknesses of their software according to several user journey scenarios in a full day presentation. Following the vendor presentations, I lead the evaluation workshop to discuss the different software solutions and provided my recommendation.
 
 ### Activities & Deliverables
 

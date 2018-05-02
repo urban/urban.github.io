@@ -8,7 +8,7 @@ color: "rgb(17,169,231)"
 
 At [MileZero](https://www.milezero.com/) we built a Software as a Service (SaaS) in the transportation and logistics industry. The software focuses on the "middle mile" and "last mile" segments and coordinates same day services such as delivery, pickup, installation and etc.
 
-As Head of Design, I designed and developed an application that gave Network and Fleet managers visibility into there workforce as they execute same-day tasks and services. Built on our own SaaS API's, it provides real-world positioning and Key Performance Indicators (KPI), along with workflows for gracefully handling real-world unpredictability.
+As Head of Design, I designed and developed an application that gave Network and Fleet managers visibility into their workforce as they execute same-day tasks and services. Built on our own SaaS APIs, it provides real-world positioning and Key Performance Indicators (KPIs), as well as workflows for gracefully handling real-world unpredictability.
 
 ### Activities & Responsibilities
 
