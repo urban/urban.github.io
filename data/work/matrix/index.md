@@ -2,7 +2,7 @@
 title: Matrix
 client: MileZero
 date: "2016-12-06T16:00:00.000Z"
-listingImage: "./listing-image.png"
+listingImage: "./Matrix-Listing.png"
 color: "rgb(17,169,231)"
 ---
 

@@ -52,7 +52,7 @@ export const pageQuery = graphql`
         title
       }
     }
-    markdownRemark {
+    markdownRemark(fields: { slug: { eq: "/resume/" } }) {
       html
       frontmatter {
         title

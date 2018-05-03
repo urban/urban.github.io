@@ -2,7 +2,7 @@
 title: Search 20/20
 client: Korn Ferry
 date: "2014-09-02T16:00:00.000Z"
-listingImage: "./listing-image.png"
+listingImage: "./Search-2020-Listing.png"
 color: "rgb(217,86,81)"
 ---
 

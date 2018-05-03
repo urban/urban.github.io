@@ -2,7 +2,7 @@
 title: KFAdvance
 client: Korn Ferry
 date: "2018-04-30T16:00:00.000Z"
-listingImage: "./listing-image.png"
+listingImage: "./KFAdvance-Listing.png"
 color: "rgb(211,169,80)"
 ---
 

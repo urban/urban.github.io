@@ -4,10 +4,20 @@ title: Resume
 
 # Urban Faubion
 
-10421 SW Bank Rd #17 • Vashon WA 98070 • (206) 472-0935<br/>
-[urban.faubion@gmail.com](mailto:urban.faubion@gmail.com) •
-[urbanfaubion.com](https://urbanfaubion.com) •
-[github.com/urban](https://github.com/urban)
+<p class="social-links">
+  <a href="mailto:urban.faubion@gmail.com" target="_blank">
+    <span style="display: none;">Email</span>
+    <i class="icon-mail-alt"></i>
+  </a>&nbsp;
+  <a href="https://www.linkedin.com/in/urbanfaubion/" target="_blank">
+    <i class="icon-linkedin"></i>
+    <span style="display: none;">Linkedin</span>
+  </a>&nbsp;
+  <a href="https://github.com/urban" target="_blank">
+    <i class="icon-github"></i>
+    <span style="display: none;">GitHub</span>
+  </a>
+</p>
 
 I am a developer and designer with more than 15+ years of experience creating digital products and services. I thrive in a collaborative environment where **development and design are deeply integrated**. I enjoy using **systematic design thinking** that enable teams to **create multiple products simultaneously**. Combined with particular development methodologies and practices, I can help teams **maintain velocity in the face of changing requirements**.
 

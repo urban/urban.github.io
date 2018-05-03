@@ -2,7 +2,7 @@
 title: Multi Media Boardroom
 client: Daimler
 date: "2015-09-28T16:00:00.000Z"
-listingImage: "./listing-image.png"
+listingImage: "./Daimler-Listing.png"
 color: "rgb(2,35,67)"
 ---
 
