@@ -25,6 +25,8 @@ Next, I focused my attention on changing the product from one that solved a spec
 * redesigned the product, created a design system using Sketch and a component
   library in React and Styled-JSX
 
+<p style="height: 2rem;"></p>
+
 ![KFAdvance Page 01](./KFAdvance-Page-01.png)
 ![KFAdvance Page 02](./KFAdvance-Page-02.png)
 ![KFAdvance Page 03](./KFAdvance-Page-03.png)

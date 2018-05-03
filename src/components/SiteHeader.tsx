@@ -52,7 +52,7 @@ const Logo = styled.a`
 const Title = styled.h1`
   display: inline-block;
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 500;
   margin: 0 2rem 0 0;
   white-space: nowrap;
 
@@ -69,7 +69,7 @@ const SubTitle = styled.h2`
   color: ${colorProp("grey")};
   display: none;
   font-size: 1.2rem;
-  font-weight: 400;
+  font-weight: 300;
   margin: 0;
   white-space: nowrap;
 
@@ -77,7 +77,7 @@ const SubTitle = styled.h2`
     color: ${colorProp("grey")};
     content: "/";
     font-size: 1.2em;
-    font-weight: normal;
+    font-weight: 300;
     margin: 0 0.25em;
   }
 
@@ -95,6 +95,8 @@ const Nav = styled.nav`
 
 const linkStyles = css`
   margin-left: 1rem;
+  font-weight: 300;
+  text-transform: uppercase;
 `;
 
 const NavLink = styled(Link)`

@@ -18,5 +18,7 @@ As Head of Design, I designed and developed an application that gave Network and
 * developed the web application with React, Redux, Redux-Saga and CSS Modules
 * created a real-time mock server in Node.js and Express.js
 
+<p style="height: 2rem;"></p>
+
 ![Matrix Page 01](./Matrix-Page-01.png)
 ![Matrix Page 02](./Matrix-Page-02.png)

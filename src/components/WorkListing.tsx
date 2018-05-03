@@ -64,6 +64,7 @@ const Header = styled.header`
     color: ${colorProp("greyLight")};
     display: block;
     font-style: italic;
+    font-weight: 300;
     margin: 0;
   }
 `;

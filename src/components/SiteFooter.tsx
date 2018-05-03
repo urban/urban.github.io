@@ -27,7 +27,7 @@ export default () => {
 const Footer = styled.footer`
   background-color: rgba(0, 0, 0, 0.02);
   border-top: 1px solid rgba(0, 0, 0, 0.2);
-  color: rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.54);
   font-size: 0.75rem;
   padding: 1em 0;
 `;

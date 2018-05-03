@@ -27,6 +27,8 @@ Korn Ferry's CTO was so pleased with the design and technical approach, he stopp
 * [Awesome New Technologies for HR
   Award](https://www.kornferry.com/press/awesome-new-technologies-for-hr-hr-tech-conference-selects-korn-ferrys-four-dimensional-executive-assessment/)
 
+<p style="height: 2rem;"></p>
+
 ![KFAdvance Page 01](./Search-2020-Page-01.png)
 
 ![KFAdvance Page 02](./Search-2020-Page-02.png)
