@@ -21,7 +21,7 @@ body {
   /* background-color: hsla(240, 7%, 95%, 1); */
   color: hsla(240,7%,20%,1);
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 10px;
   line-height: 1.5;
   font-weight: 300;
   font-style: normal;
@@ -145,48 +145,32 @@ pre code {
 }
 
 /**
- * Gist
+ * Overrides
  */
-.gist .line-numbers {
-  font-size: 0.93rem;
+
+h1 {
+  font-size: 3.6rem;
+  margin-top: 0;
 }
 
-/**
- * Icons
- */
-.icon > svg {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  vertical-align: middle;
-}
-.icon > svg path {
-  fill: #454848;
+h2 {
+  margin-top: 1rem;
+  line-height: 2rem;
+  margin-bottom: 1rem;
 }
 
-/**
- * Alert
- */
-.alert {
-  background: rgba(0,0,0,0.025);
-  border: 1px solid rgba(0,0,0,0.3);
-  border-radius: 3px;
-  font-size: 0.8em;
-  margin-bottom: 2rem;
-  padding: 1em;
-  position: relative;
+h2 small {
+  font-style: italic;
+  font-weight: 500;
 }
-.alert *:last-child {
-  margin-bottom: 0;
+
+p {
+  font-size: 1.6rem;
+  line-height: 2;
+  margin-bottom: 2em;
 }
-.alert a {
-  font-weight: bold;
-}
-.alert.note {
-  background: #FEF9AF;
-  border: 1px solid #989349;
-}
-.alert.info {
-  background: #ace8ff;
-  border: 1px solid #79b5e7;
+
+article footer {
+  border-top: 1px solid rgba(0,0,0,0.2);
+  margin: 2rem 0;
 }

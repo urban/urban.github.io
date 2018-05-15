@@ -5,8 +5,8 @@ yarn-error.log
 public
 
 .gatsby-context.js
-pages/.manifest
+src/pages/.manifest
 .idea
 
-components/WorkExcerpt/
-pages/work/
+src/components/WorkExcerpt/
+src/pages/work/

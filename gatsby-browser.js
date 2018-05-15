@@ -1,7 +1,7 @@
-import ReactGA from 'react-ga'
-import {config} from 'config'
+import ReactGA from "react-ga"
+import {siteMetadata} from "./gatsby-config"
 
-ReactGA.initialize(config.googleAnalyticsId)
+ReactGA.initialize(siteMetadata.googleAnalyticsId)
 
 exports.onRouteUpdate = (state, page, pages) => {
   ReactGA.pageview(state.pathname)
