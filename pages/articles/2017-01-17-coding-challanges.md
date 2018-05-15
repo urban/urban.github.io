@@ -75,7 +75,9 @@ The following is a solution that uses a while loop.
 function isPalindrome (str) {
   let result = true
   while (str.length) {
-    if (str.charAt(0) != str.charAt(str.length - 1)) result = false
+    if (str[0] != str[str.length - 1]) {
+      result = false
+    }
     str = str.substr(1, str.length - 2)
   }
   return result
@@ -88,8 +90,12 @@ Another solution using recursion.
 
 ```js
 function isPalindrome (str) {
-  if (str.length <= 1) return true
-  if (str.charAt(0) != str.charAt(str.length - 1)) return false
+  if (str.length <= 1) {
+    return true
+  }
+  if (str.charAt(0) != str.charAt(str.length - 1)) {
+    return false
+  }
   return isPalindrome( str.substr(1, str.length - 2) )
 }
 ```
@@ -225,9 +231,9 @@ function longestPalindrome (xs) {
 
 Coding challenges can be fun and help you become a better programmer. They can also teach you new approaches to common problems and help in learning new programming languages. Give them a try today and help keep your brain sharp and focused on problem solving.
 
-[CHALLANGE-1.1]: http://ramdajs.com/repl/?v=0.23.0#?function%20isPalindrome%20%28str%29%20%7B%0A%20%20let%20result%20%3D%20true%0A%20%20while%20%28str.length%29%20%7B%0A%20%20%20%20if%20%28str.charAt%280%29%20%21%3D%20str.charAt%28str.length%20-%201%29%29%20result%20%3D%20false%0A%20%20%20%20str%20%3D%20str.substr%281%2C%20str.length%20-%202%29%0A%20%20%7D%0A%20%20return%20result%0A%7D%0A%0AisPalindrome%28%27abc%27%29%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27xyz%27%29%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27aba%27%29%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27%27%29%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aabbbaa%27%29%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27kayak%27%29%20%20%20%2F%2F%3D%3E%20true
+[CHALLANGE-1.1]:http://ramdajs.com/repl/?v=0.23.0#?function%20isPalindrome%20%28str%29%20%7B%0A%20%20let%20result%20%3D%20true%0A%20%20while%20%28str.length%29%20%7B%0A%20%20%20%20if%20%28str%5B0%5D%20%21%3D%20str%5Bstr.length%20-%201%5D%29%20%7B%0A%20%20%20%20%20%20result%20%3D%20false%0A%20%20%20%20%7D%0A%20%20%20%20str%20%3D%20str.substr%281%2C%20str.length%20-%202%29%0A%20%20%7D%0A%20%20return%20result%0A%7D%0A%0Aconst%20input%20%3D%20%5B%27abc%27%2C%20%27xyz%27%2C%20%27aba%27%2C%20%27%27%2C%20%27aabbaa%27%2C%20%27kayak%27%5D%0Ainput.map%28isPalindrome%29 
 
-[CHALLANGE-1.2]: http://ramdajs.com/repl/?v=0.23.0#?function%20isPalindrome%20%28str%29%20%7B%0A%20%20if%20%28str.length%20%3C%3D%201%29%20return%20true%0A%20%20if%20%28str.charAt%280%29%20%21%3D%20str.charAt%28str.length%20-%201%29%29%20return%20false%0A%20%20return%20isPalindrome%28%20str.substr%281%2C%20str.length%20-%202%29%20%29%0A%7D%0A%0AisPalindrome%28%27abc%27%29%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27xyz%27%29%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27%27%29%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aba%27%29%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aabbbaa%27%29%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27kayak%27%29%20%20%20%2F%2F%3D%3E%20true
+[CHALLANGE-1.2]: http://ramdajs.com/repl/?v=0.23.0#?function%20isPalindrome%20%28str%29%20%7B%0A%20%20if%20%28str.length%20%3C%3D%201%29%20%7B%0A%20%20%20%20return%20true%0A%20%20%7D%0A%20%20if%20%28str.charAt%280%29%20%21%3D%20str.charAt%28str.length%20-%201%29%29%20%7B%0A%20%20%20%20return%20false%0A%20%20%7D%0A%20%20return%20isPalindrome%28%20str.substr%281%2C%20str.length%20-%202%29%20%29%0A%7D%0A%0Aconst%20input%20%3D%20%5B%27abc%27%2C%20%27xyz%27%2C%20%27aba%27%2C%20%27%27%2C%20%27aabbaa%27%2C%20%27kayak%27%5D%0Ainput.map%28isPalindrome%29
 
 [tail call optimization]: http://www.2ality.com/2015/06/tail-call-optimization.html
 
