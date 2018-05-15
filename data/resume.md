@@ -42,7 +42,7 @@ I am a developer and designer with more than 15+ years of experience creating di
 * Designed a real-time map and data visualization intense app for managing a fleet of drivers performing same-day services.
 * Developed the real-time app using React + Redux + Redux-Sagas.
 
-### **Principal Design Technologist**, _[frog](https://frogdesign.com), January 2009 - April 2014_
+### **Principal Design Technologist**, _[frog](https://frogdesign.com), January 2009 - Februray 2016_
 
 * Helped Daimler select the software tech stack and partner for their new multi-screen interactive meeting rooms in Stuttgart, Germany.
 * Helped facilitate the Nordic IoT Hackathon in Lund, Sweden.
