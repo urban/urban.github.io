@@ -1,12 +1,12 @@
 {
   "assetsByChunkName": {
     "component---src-templates-work-tsx": [
-      "component---src-templates-work-tsx-a70de90695918d03e9ff.js",
-      "component---src-templates-work-tsx-a70de90695918d03e9ff.js.map"
+      "component---src-templates-work-tsx-31ddb181505bc8c23930.js",
+      "component---src-templates-work-tsx-31ddb181505bc8c23930.js.map"
     ],
     "component---src-layouts-index-tsx": [
-      "component---src-layouts-index-tsx-1a6f8dd15f348486b5cf.js",
-      "component---src-layouts-index-tsx-1a6f8dd15f348486b5cf.js.map"
+      "component---src-layouts-index-tsx-397c9df08e6cd4e973ed.js",
+      "component---src-layouts-index-tsx-397c9df08e6cd4e973ed.js.map"
     ],
     "path---article-2013-05-20-templating-with-inheritance": [
       "path---article-2013-05-20-templating-with-inheritance-e4298d8cc3c1de836cea.js",
@@ -37,8 +37,8 @@
       "path---work-kfadvance-ae49af595432b8e67a72.js.map"
     ],
     "component---src-templates-article-tsx": [
-      "component---src-templates-article-tsx-50dbd55493727fa7d582.js",
-      "component---src-templates-article-tsx-50dbd55493727fa7d582.js.map"
+      "component---src-templates-article-tsx-708ac74b381476a6d8e5.js",
+      "component---src-templates-article-tsx-708ac74b381476a6d8e5.js.map"
     ],
     "component---node-modules-gatsby-plugin-offline-app-shell-js": [
       "component---node-modules-gatsby-plugin-offline-app-shell-js-5c4c5a0f7af9dc69d6d7.js",
@@ -61,9 +61,9 @@
       "path---index-604262b2ec9545ce0d85.js.map"
     ],
     "commons": [
-      "commons-f61883f37168e26b1525.js",
+      "commons-ba8966a9733982569587.js",
       "build-js-styles.css",
-      "commons-f61883f37168e26b1525.js.map",
+      "commons-ba8966a9733982569587.js.map",
       "build-js-styles.css.map"
     ],
     "component---src-pages-404-tsx": [
@@ -79,8 +79,8 @@
       "path---work-search-2020-ce93373a303e58e2f206.js.map"
     ],
     "component---src-pages-resume-tsx": [
-      "component---src-pages-resume-tsx-2a0c87eec4169a4014a1.js",
-      "component---src-pages-resume-tsx-2a0c87eec4169a4014a1.js.map"
+      "component---src-pages-resume-tsx-a8d0b3645a3f0e462976.js",
+      "component---src-pages-resume-tsx-a8d0b3645a3f0e462976.js.map"
     ],
     "path---work-matrix": [
       "path---work-matrix-67ad569f51cf9d1bee11.js",
@@ -95,8 +95,8 @@
       "path---work-the-girl-effect-83c42c44b9aac2356217.js.map"
     ],
     "path---resume": [
-      "path---resume-dca75c7f86ed40addea8.js",
-      "path---resume-dca75c7f86ed40addea8.js.map"
+      "path---resume-1cc5003e135f94a89b54.js",
+      "path---resume-1cc5003e135f94a89b54.js.map"
     ],
     "component---src-pages-index-tsx": [
       "component---src-pages-index-tsx-49e68e3e2ec1172025b2.js",

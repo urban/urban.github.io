@@ -1,2 +1,2 @@
-webpackJsonp([0x66a4600063f3],{430:function(t,a){t.exports={data:{site:{siteMetadata:{title:"Urban Faubion / Design Technologist"}}},pathContext:{}}}});
+webpackJsonp([0x66a4600063f3],{431:function(t,a){t.exports={data:{site:{siteMetadata:{title:"Urban Faubion / Design Technologist"}}},pathContext:{}}}});
 //# sourceMappingURL=path---home-a46ad4db6d248545d3d0.js.map
