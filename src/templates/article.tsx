@@ -8,7 +8,7 @@ import ArticleFooter from "../components/ArticleFooter";
 import PageTitle from "../components/PageTitle";
 import { MarkdownRemark, SitePageEdge } from "../graphql-types";
 
-require("./article.css");
+require("./article.css"); // tslint:disable-line
 
 interface Props {
   pathContext: {

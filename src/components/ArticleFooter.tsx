@@ -7,7 +7,7 @@ import { colorProp } from "../styles/themes";
 import { H6 } from "./Headings";
 import { GitHub, Twitter } from "./Icons";
 
-const profilePic = require("./profile-pic.jpg");
+import profilePic = require("./profile-pic.jpg");
 
 export default () => (
   <Footer>

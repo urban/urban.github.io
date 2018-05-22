@@ -42,7 +42,7 @@ I am a developer and designer with more than 15+ years of experience creating di
 * Designed a real-time map and data visualization intense app for managing a fleet of drivers performing same-day services.
 * Developed the real-time app using React + Redux + Redux-Sagas.
 
-### **Principal Design Technologist**, _[frog](https://frogdesign.com), January 2009 - Februray 2016_
+### **Principal Design Technologist**, _[frog](https://frogdesign.com), April 2014 - Februray 2016_
 
 * Helped Daimler select the software tech stack and partner for their new multi-screen interactive meeting rooms in Stuttgart, Germany.
 * Helped facilitate the Nordic IoT Hackathon in Lund, Sweden.
@@ -50,6 +50,8 @@ I am a developer and designer with more than 15+ years of experience creating di
 * Lead the development of 3 web apps built in React + Flux to digitize Korn Ferry’s executive search process.
 * Built a search engine UI for PWC with Google, Cambridge Semantics and Wolfram Alpha.
 * Conducted the initial design research, picked the tech stack and developed GE’s IIDS, an internal design system and component library for web app development.
+
+### **Senior Design Technologist**, _[frog](https://frogdesign.com), January 2009 - April 2014_
 
 ### **Senior Developer**, _[Filter Talent](https://www.filterdigital.com/), October 2008 - December 2008_
 

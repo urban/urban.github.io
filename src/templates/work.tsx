@@ -8,7 +8,7 @@ import styled from "styled-components";
 import PageTitle from "../components/PageTitle";
 import { MarkdownRemark, SitePageEdge } from "../graphql-types";
 
-require("./work.css");
+require("./work.css"); // tslint:disable-line
 
 interface Props {
   data: {

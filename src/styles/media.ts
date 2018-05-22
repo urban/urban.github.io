@@ -8,7 +8,7 @@ export default {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
   "x-small": "(min-width:320px)",
   /* smartphones, Android phones, landscape iPhone */
-  small: "(min-width:480px)",
+  small: "(min-width:480px)", // tslint:disable-line
   /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
   medium: "(min-width:600px)",
   /* tablet, landscape iPad, lo-res laptops ands desktops */

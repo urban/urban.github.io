@@ -6,8 +6,8 @@ import SiteFooter from "../components/SiteFooter";
 import SiteHeader from "../components/SiteHeader";
 import theme from "../styles/themes/base";
 
-require("normalize.css");
-require("./styles.css");
+require("normalize.css"); // tslint:disable-line
+require("./styles.css"); // tslint:disable-line
 
 interface Props {
   location: {

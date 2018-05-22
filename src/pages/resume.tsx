@@ -6,7 +6,7 @@ import { MarkdownRemark } from "../graphql-types";
 import { desktop, tablet } from "../styles/media";
 import { colorProp } from "../styles/themes";
 
-require("./resume.css");
+require("./resume.css"); // tslint:disable-line
 
 const Container = styled.div`
   display: "flex",
