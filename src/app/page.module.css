@@ -12,6 +12,30 @@
   text-transform: uppercase;
 }
 
+.page {
+  border-top: 5px solid rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1 0 auto;
+  position: relative;
+  padding: 4rem 1rem;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: calc(960px - (1.25rem * 2));
+  width: 100%;
+}
+
+@media screen and (max-width: 960px) {
+  .main {
+    padding: 2rem 1rem;
+  }
+}
+
 .work {
   display: flex;
   flex-direction: row;
@@ -40,7 +64,7 @@
 
 /* -------------------------------- */
 
-.main {
+/* .main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -149,8 +173,11 @@
 
 .logo {
   position: relative;
-}
+} */
+
 /* Enable hover only on non-touch devices */
+
+/*
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
     background: rgba(var(--card-rgb), 0.1);
@@ -166,9 +193,10 @@
   .card:hover span {
     transform: none;
   }
-}
+} */
 
 /* Mobile */
+/*
 @media (max-width: 700px) {
   .content {
     padding: 4rem;
@@ -243,9 +271,9 @@
     );
     z-index: 1;
   }
-}
-
+} */
 /* Tablet and Smaller Desktop */
+/*
 @media (min-width: 701px) and (max-width: 1120px) {
   .grid {
     grid-template-columns: repeat(2, 50%);
@@ -269,4 +297,4 @@
   to {
     transform: rotate(0deg);
   }
-}
+} */
