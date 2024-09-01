@@ -1,7 +1,9 @@
 import styles from "./page.module.css";
 import SiteHeader from "../components/SiteHeader";
 
-export default function Home() {
+export default async function Page() {
+  console.log('/');
+
   return (
     <div className={styles.page}>
       <SiteHeader />
