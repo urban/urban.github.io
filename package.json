@@ -9,17 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@effect/platform": "^0.63.0",
-    "@effect/schema": "^0.72.0",
-    "effect": "^3.7.0",
+    "@effect/platform": "^0.69.13",
+    "@effect/platform-node": "^0.64.14",
+    "effect": "^3.10.8",
     "gray-matter": "^4.0.3",
-    "next": "14.2.7",
+    "next": "^15.0.2",
     "next-mdx-remote": "^5.0.0",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^22.5.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",

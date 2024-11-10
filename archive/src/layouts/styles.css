@@ -1,0 +1,307 @@
+/**
+ * Google fonts
+ */
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i");
+
+/**
+ * Reset some basic elements
+ */
+body,
+p,
+blockquote,
+pre,
+hr,
+dl,
+dd,
+ol,
+ul,
+figure {
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Basic styling
+ */
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+body {
+  /* background-color: hsla(240, 7%, 95%, 1); */
+  color: rgba(0, 0, 0, 0.54);
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  font-weight: 400;
+  font-style: normal;
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/**
+ * Set `margin-bottom` to maintain vertical rhythm
+ */
+p,
+blockquote,
+pre,
+ul,
+ol,
+dl,
+figure {
+  margin-bottom: 1em;
+}
+
+/**
+ * Images
+ */
+img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/**
+ * Figures
+ */
+figure > img {
+  display: block;
+}
+figcaption {
+  font-size: calc(1rem * 0.875);
+}
+
+/**
+ * Lists
+ */
+ul,
+ol {
+  margin-left: 1.5rem;
+}
+li > ul,
+li > ol {
+  margin-bottom: 0;
+}
+ul[unstyled],
+ol[unstyled] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul[unstyled] > li,
+ol[unstyled] > li {
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Headings
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: 500;
+  margin: 1em 0 1em;
+  padding: 0;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 0.5em;
+}
+
+/**
+ * Links
+ */
+a {
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
+  color: steelblue;
+  font-weight: 300;
+  text-decoration: none;
+  transition: border-bottom 1s;
+}
+
+a:hover {
+  border-bottom-color: inherit;
+}
+
+/**
+ * Blockquotes
+ */
+blockquote {
+  border-left: 1px solid rgba(0, 0, 0, 0.87);
+  color: rgba(0, 0, 0, 0.54);
+  padding-left: 1em;
+  font-style: italic;
+}
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+strong {
+  font-weight: 500;
+}
+
+/**
+ * Code formatting
+ */
+pre,
+code {
+  background-color: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  color: rgba(0, 0, 0, 0.6);
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+code {
+  display: inline-block;
+  padding: 0.25em 0.25em;
+}
+pre {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: auto;
+  padding: 0.5rem 1rem;
+  -webkit-font-smoothing: inherit;
+}
+pre code {
+  border: none;
+  padding: 0;
+  margin: 0;
+  white-space: pre;
+}
+
+/**
+ * Overrides
+ */
+
+h1 {
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+h2 {
+  margin-top: 1em;
+  line-height: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+h2 small {
+  font-style: italic;
+  font-weight: 500;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1em;
+}
+
+article footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  margin: 1rem 0;
+}
+
+/**
+ * Icons
+ */
+.icon > svg {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+.icon > svg path {
+  fill: inherit;
+}
+
+/**
+ * Alert
+ */
+.alert {
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 1em;
+  position: relative;
+}
+.alert *:last-child {
+  margin-bottom: 0;
+}
+.alert a {
+  font-weight: bold;
+}
+.alert.note {
+  background: #fef9af;
+  border: 1px solid #989349;
+}
+.alert.info {
+  background: #ace8ff;
+  border: 1px solid #79b5e7;
+}
+
+/**
+ * Icomoon Fonts
+ */
+@font-face {
+  font-family: "icomoon";
+  src: url("/fonts/icomoon.eot?sfp83s");
+  src: url("/fonts/icomoon.eot?sfp83s#iefix") format("embedded-opentype"),
+    url("/fonts/icomoon.ttf?sfp83s") format("truetype"),
+    url("/fonts/icomoon.woff?sfp83s") format("woff"),
+    url("/fonts/icomoon.svg?sfp83s#icomoon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"],
+[class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "icomoon" !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-mail-alt:before {
+  content: "\e81b";
+}
+.icon-sphere:before {
+  content: "\e9c9";
+}
+.icon-twitter:before {
+  content: "\ea96";
+}
+.icon-github:before {
+  content: "\eab0";
+}
+.icon-linkedin:before {
+  content: "\eac9";
+}

@@ -1,0 +1,48 @@
+.resume {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.resume h1 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 2rem;
+  margin: 0;
+}
+
+.resume h2 {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 1rem;
+  font-weight: 400;
+  padding-top: 1rem;
+}
+
+.resume h3 {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.resume h3 + ul {
+  margin-bottom: 0;
+}
+
+.social-links {
+  font-size: 1rem;
+}
+
+.social-links > a:hover {
+  border-bottom-color: transparent;
+}
+
+[class^="icon-"],
+[class*=" icon-"] {
+  color: rgb(128, 128, 128);
+}
+
+a:hover [class^="icon-"],
+a:hover [class*=" icon-"] {
+  color: inherit;
+}
