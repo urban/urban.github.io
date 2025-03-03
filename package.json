@@ -4,27 +4,31 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "check-types": "tsc --noEmit",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@effect/platform": "^0.69.13",
-    "@effect/platform-node": "^0.64.14",
-    "effect": "^3.10.8",
+    "@effect/platform": "^0.77.4",
+    "@effect/platform-node": "^0.73.4",
+    "effect": "^3.13.4",
     "gray-matter": "^4.0.3",
-    "next": "^15.0.2",
+    "next": "^15.2.0",
     "next-mdx-remote": "^5.0.0",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.5.4",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.7",
-    "typescript": "^5"
+    "@eslint/eslintrc": "^3.3.0",
+    "@next/eslint-plugin-next": "^15.2.0",
+    "@types/node": "^22.13.8",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "eslint": "^9.21.0",
+    "eslint-config-next": "^15.2.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "typescript": "5.8.2"
   },
   "packageManager": "yarn@4.4.1"
 }

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styles from './SiteHeader.module.css';
+import Link from 'next/link';
 
 type NavLink = {
   children: React.ReactNode;
@@ -12,12 +13,13 @@ const NavLink = (props: NavLink) => (
 const SiteHeader = () => (
   <header>
     <div className={styles.container}>
-      <a className={styles.logo} href="/">
+      <Link className={styles.logo} href="/">
         <span className={styles.title}>Urban Faubion</span>
         <span className={styles.subTitle}>Design Technologist</span>
-      </a>
+      </Link>
       <nav className={styles.nav}>
         <NavLink href="/">Work</NavLink>
+        <NavLink href="/articles">Articles</NavLink>
         <NavLink href="/resume">Resume</NavLink>
         <NavLink href="/about">About</NavLink>
       </nav>

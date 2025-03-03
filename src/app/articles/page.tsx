@@ -22,10 +22,10 @@ export default async function Page() {
           main.pipe(
             Effect.match({
               onFailure: Match.valueTags({
-                ParseError: (error) => <span>ParseError</span>,
-                BadArgument: (error) => <span>BadArgument</span>,
-                SystemError: (error) => <span>SystemError</span>,
-                ConfigError: (error) => <span>ConfigError</span>,
+                ParseError: () => <span>ParseError</span>,
+                BadArgument: () => <span>BadArgument</span>,
+                SystemError: () => <span>SystemError</span>,
+                ConfigError: () => <span>ConfigError</span>,
               }),
               onSuccess: (articles) => <Articles articles={articles} />
             })

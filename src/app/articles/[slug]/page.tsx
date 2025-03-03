@@ -14,13 +14,6 @@ const main = (slug: string) =>
     return yield* api.getArticleBySlug({ slug });
   }).pipe(Effect.provide(NodeContext.layer));
 
-const mainAll = Effect.gen(function* () {
-  const api = yield* Api;
-  const result = yield* api.getAllArticles;
-  // 👇 Slug (from file name)
-  return result.map((s) => ({ slug: s.slug }));
-}).pipe(Effect.provide(NodeContext.layer));
-
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = await params;
   const result = await RuntimeServer.runPromise(
@@ -59,6 +52,13 @@ export default async function Page({ params }: { params: { slug: string } }) {
     </div>
   );
 }
+
+const mainAll = Effect.gen(function* () {
+  const api = yield* Api;
+  const result = yield* api.getAllArticles;
+  // 👇 Slug (from file name)
+  return result.map((s) => ({ slug: s.slug }));
+}).pipe(Effect.provide(NodeContext.layer));
 
 export async function generateStaticParams() {
   return await RuntimeServer.runPromise(mainAll);
