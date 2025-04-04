@@ -1,4 +1,4 @@
-import type { Article as Schema } from "#services/schema";
+import type { Article as Schema } from "#schema";
 import Link from "next/link";
 
 const Articles = ({ articles }: { articles: readonly Schema[] }) => {

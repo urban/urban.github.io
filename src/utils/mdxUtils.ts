@@ -1,7 +1,7 @@
 import { Effect, pipe, Schema } from "effect";
 import { FileSystem } from "@effect/platform";
 import matter from "gray-matter";
-import { FrontMatter } from "#services/schema";
+import { FrontMatter } from "#schema";
 import { NodeContext } from "@effect/platform-node";
 import { Slug } from "#services/Slug";
 
