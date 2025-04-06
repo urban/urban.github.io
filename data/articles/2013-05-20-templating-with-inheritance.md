@@ -16,9 +16,8 @@ One Mustache implementation that does include inheritance today is [hogan.js][].
 
 To demonstrate the template inheritance implementation I have a slightly contrived [example][demo] of a menu that when selected, spawns a modal window. Each template uses the `modal-layout` that provides the HTML that will wrap the content. What's distinct about this layout is the `{{ $body }}` and `{{ $footer }}` tags. They are custom tags with default content that will be overridden with content if specified in the `foo-modal` and `bar-modal` templates. Both templates are very similar to each other. The only real difference is the `foo-modal` only overrides default content for the `{{ $body }}` tag and not the `{{ $footer }}` tag in the layout.
 
-<div class="alert info">
-  <em>Note:</em> JavaScript doesn't have a [here document] syntax so string literal newlines are manually escaped.
-</div>
+> [!info]
+> **Note:** JavaScript doesn't have a [here document] syntax so string literal newlines are manually escaped.
 
 ```js
 !(function() {
@@ -76,9 +75,8 @@ To demonstrate the template inheritance implementation I have a slightly contriv
 })();
 ```
 
-<div class="alert note">
-  <em>Note:</em> The `fiddle.css` Gist is purposefully not including however it can be [viewed here][fiddle.css].
-</div>
+> [!info]
+> **Note:** The `fiddle.css` Gist is purposefully not including however it can be [viewed here][fiddle.css].
 
 The `index.html` is very bare bones. The only HTML markup is a menu that will spawn the modal windows. It has an `id` attribute that will be used to set up a delegated event listener and anchor links with custom declarative `data-` attributes using the HTML5 Data API. This is a great technique I often use because with it, I no-longer need to add and remove listeners manually on individual DOM elements.
 
@@ -131,9 +129,9 @@ The second listener is delegated to the document and controls the removal of the
 
 Templating with inheritance is a powerful tool to have in your arsenal. Once you get comfortable with the concept and implementation you speed up your prototyping and improve the portability of your code across projects. It's a technique I use a lot and I hope this has helped inspire you to use it on your next project.
 
-* [demo][]
-* [source][]
-* Hogan.js [version 3.0][]
+- [demo][]
+- [source][]
+- Hogan.js [version 3.0][]
 
 [frog]: http://frogdesign.com
 [dry]: http://en.wikipedia.org/wiki/Don't_repeat_yourself "Don't repeat yourself"

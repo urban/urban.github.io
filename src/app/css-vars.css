@@ -1,0 +1,48 @@
+:root {
+  --grey: rgb(128,128,128);
+
+  --max-width: 1100px;
+  --border-radius: 12px;
+  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
+    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+
+  --foreground-rgb: 0, 0, 0;
+  --foreground-alpha: 0.54;
+
+  --link-rgb: 70, 130, 180;
+
+  --tile-rgb: 239, 245, 249;
+
+  --callout-rgb: 238, 240, 241;
+  --callout-border-rgb: 172, 175, 176;
+
+  --card-rgb: 180, 185, 188;
+  --card-border-rgb: 131, 134, 135;
+
+  --article-font-size: 20;
+  --article-line-height: 1.4;
+  --article-line-length: 648px;
+  --article-text-justify: start;
+  --article-scale: 1.2;
+  --article-root-size: 16;
+
+  --article-base-font-size: calc(var(--article-font-size) / var(--article-root-size)* 1rem);
+  --article-base-line-height: var(--article-line-height);
+  --article-base-margin: calc(var(--article-font-size) / var(--article-root-size)* 1rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --foreground-alpha: 1;
+
+    --tile-rgb: 2, 13, 46;
+
+    --callout-rgb: 20, 20, 20;
+    --callout-border-rgb: 108, 108, 108;
+
+    --card-rgb: 100, 100, 100;
+    --card-border-rgb: 200, 200, 200;
+  }
+}
