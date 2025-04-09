@@ -1,5 +1,6 @@
 import * as React from 'react';
-import styles from './SiteHeader.module.css';
+// import styles from './SiteHeader.module.css';
+import * as styles from './SiteHeader.css';
 import Link from 'next/link';
 
 type NavLink = {
@@ -27,4 +28,4 @@ const SiteHeader = () => (
   </header>
 );
 
-export default SiteHeader;
+export { SiteHeader };

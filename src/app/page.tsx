@@ -1,16 +1,16 @@
-import styles from "./page.module.css";
-import SiteHeader from "../components/SiteHeader";
+import { H4 } from "../components/Typography";
+import { SiteHeader } from "../components/SiteHeader";
+import * as styles from './page.css';
 
 export default async function Page() {
-  console.log('/');
-
   return (
     <div className={styles.page}>
       <SiteHeader />
       <main className={styles.main}>
-        <h4 className={styles.h4}>Featured Work</h4>
+        <H4>Featured Work</H4>
+        {/*
         <div className={styles.work}>
-          {/* {Object.values(articles).map(({ node }) => {
+          {Object.values(articles).map(({ node }) => {
             const props = {
               client: node.frontmatter.client,
               color: node.frontmatter.color,
@@ -24,8 +24,9 @@ export default async function Page() {
                 <WorkListing {...props} />
               </div>
             );
-          })} */}
+          })}
         </div>
+        */}
       </main>
     </div>
   );

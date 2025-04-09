@@ -3,10 +3,11 @@ import { NodeContext } from "@effect/platform-node";
 import { Api } from "#services/Articles";
 import { RuntimeServer } from "#services/RuntimeServer";
 
-import styles from "../../page.module.css";
-import SiteHeader from "#components/SiteHeader";
+import * as styles from '../../page.css';
+import { SiteHeader } from "#components/SiteHeader";
 import { redirect } from "next/navigation";
 import CustomMDX from "../../../components/CustomMDX";
+import { H4 } from "../../../components/Typography";
 
 const main = (slug: string) =>
   Effect.gen(function* () {
@@ -48,10 +49,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
     <div className={styles.page}>
       <SiteHeader />
       <main className={styles.main}>
-        <h4 className={styles.h4}>{data.frontmatter.title}</h4>
-        <div className={styles.work}>
-          <CustomMDX source={data.source} />
-        </div>
+        <H4>{data.frontmatter.title}</H4>
+        <CustomMDX source={data.source} />
       </main>
     </div>
   );
