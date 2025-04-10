@@ -1,39 +1,19 @@
 {
-  "name": "urbanfaubion-website",
+  "name": "@urban/website-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "check-types": "tsc --noEmit",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@effect/platform": "^0.77.4",
-    "@effect/platform-node": "^0.73.4",
-    "@vanilla-extract/recipes": "0.5.5",
-    "effect": "^3.13.4",
-    "gray-matter": "^4.0.3",
-    "next": "^15.2.0",
-    "next-mdx-remote": "^5.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.0",
-    "@next/eslint-plugin-next": "^15.2.0",
-    "@shikijs/rehype": "3.2.1",
-    "@types/node": "^22.13.8",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vanilla-extract/css": "1.17.1",
-    "@vanilla-extract/next-plugin": "2.4.10",
-    "eslint": "^9.21.0",
-    "eslint-config-next": "^15.2.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "rehype-callouts": "2.0.2",
-    "typescript": "5.8.2"
+    "turbo": "^2.5.0"
   },
   "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }
