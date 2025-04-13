@@ -1,37 +1,27 @@
 {
+  "extends": "@urban/config-typescript/nextjs.json",
   "compilerOptions": {
     "outDir": "./dist/",
-    "sourceMap": true,
-    "noImplicitAny": true,
     "module": "ESNext",
     "target": "esnext",
-    "jsx": "preserve",
-    "jsxImportSource": "react",
-    "skipLibCheck": true,
-    "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noEmit": true,
-    "incremental": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
     "plugins": [
       {
         "name": "next"
       }
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
     "paths": {
       "#*": [
         "./src/*"
       ]
     },
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true
   },
   "include": [
     "./src/**/*",
