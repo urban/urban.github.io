@@ -12,6 +12,9 @@
     "test": "turbo run test",
     "lint": "turbo run lint"
   },
+  "engines": {
+    "node": ">= 22.10.0"
+  },
   "devDependencies": {
     "turbo": "^2.5.0"
   },
