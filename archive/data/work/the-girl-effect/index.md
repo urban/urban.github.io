@@ -14,15 +14,15 @@ Based on the in-field observations, I created a mobile service prototype for con
 
 ### Activities & Deliverables
 
-* conducted in-field design research in Africa and South East Asia
-* trained local facilitators on how to use the Girl Club Analog Kit
-* developed a mobile service prototype using Ruby and Twilio
+- conducted in-field design research in Africa and South East Asia
+- trained local facilitators on how to use the Girl Club Analog Kit
+- developed a mobile service prototype using Ruby and Twilio
 
 ### More Info
 
-* [Nike – 100 Million
+- [Nike – 100 Million
   Girls](https://www.frogdesign.com/portfolio/nike-foundation-girl-effect-100-million-girls)
-* [The Girl Effect: The clock is
+- [The Girl Effect: The clock is
   ticking](https://www.youtube.com/watch?v=1e8xgF0JtVg)
 
 ![Collective Action Toolkit](./Collective-Action-Toolkit-Page-01.png)

@@ -16,13 +16,13 @@ Next, I focused my attention on changing the product from one that solved a spec
 
 ### Activities & Deliverables
 
-* taught modern web technologies and best practices
-* upgraded the initial web application from Angular 1.5.8 to Angular 1.6.3 to
+- taught modern web technologies and best practices
+- upgraded the initial web application from Angular 1.5.8 to Angular 1.6.3 to
   leverage a component based approach to UI development
-* replaced Bower with NPM for dependency management
-* replaced the Gulp build pipeline with Webpack and Babel
-* redesigned the product marketing website and redeveloped it as a Progressive Web App (PWA) using React and the Next.js for better Search Engine Optimization (SEO) with Server Side Rendering (SSR)
-* redesigned the product, created a design system using Sketch and a component
+- replaced Bower with NPM for dependency management
+- replaced the Gulp build pipeline with Webpack and Babel
+- redesigned the product marketing website and redeveloped it as a Progressive Web App (PWA) using React and the Next.js for better Search Engine Optimization (SEO) with Server Side Rendering (SSR)
+- redesigned the product, created a design system using Sketch and a component
   library in React and Styled-JSX
 
 <p style="height: 2rem;"></p>

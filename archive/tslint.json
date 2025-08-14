@@ -1,7 +1,0 @@
-{
-  "extends": ["tslint:latest", "tslint-config-prettier", "tslint-react"],
-  "rules": {
-    "jsx-no-multiline-js": false,
-    "interface-name": [true, "never-prefix"]
-  }
-}

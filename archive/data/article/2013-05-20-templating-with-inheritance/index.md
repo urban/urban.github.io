@@ -21,7 +21,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
 </div>
 
 ```js
-!(function() {
+!(function () {
   var TEMPLATES = (window.TEMPLATES = window.TEMPLATES || {});
 
   //  modal-layout
@@ -43,7 +43,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
                           {{$ footer }}{{/ footer }} \
                         </div> \
                       </section> \
-                      '
+                      ',
   );
 
   //  foo-modal
@@ -54,7 +54,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
                           <p>This is the <b>foo</b> modal!</p> \
                         {{/ body }} \
                       {{/ modal-layout }} \
-                      "
+                      ",
   );
 
   //  bar-modal
@@ -71,7 +71,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
                           </footer> \
                         {{/ footer }} \
                       {{/ modal-layout }} \
-                      '
+                      ',
   );
 })();
 ```
@@ -96,17 +96,16 @@ The second listener is delegated to the document and controls the removal of the
 </nav>
 
 <script>
-
   // template data
   var data = {
     "foo-modal": {
-      "title": "Foo Modal",
-      "has-close-button": true
+      title: "Foo Modal",
+      "has-close-button": true,
     },
     "bar-modal": {
-      "title": "Bar Modal",
-      "class-names": "bar-modal"
-    }
+      title: "Bar Modal",
+      "class-names": "bar-modal",
+    },
   };
 
   // create modal
@@ -123,7 +122,6 @@ The second listener is delegated to the document and controls the removal of the
     var target = $(this).data("js-target");
     $(target).remove();
   });
-
 </script>
 ```
 
@@ -131,9 +129,9 @@ The second listener is delegated to the document and controls the removal of the
 
 Templating with inheritance is a powerful tool to have in your arsenal. Once you get comfortable with the concept and implementation you speed up your prototyping and improve the portability of your code across projects. It's a technique I use a lot and I hope this has helped inspire you to use it on your next project.
 
-* [demo][]
-* [source][]
-* Hogan.js [version 3.0][]
+- [demo][]
+- [source][]
+- Hogan.js [version 3.0][]
 
 [frog]: http://frogdesign.com
 [dry]: http://en.wikipedia.org/wiki/Don't_repeat_yourself "Don't repeat yourself"

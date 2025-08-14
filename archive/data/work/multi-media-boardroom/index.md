@@ -14,10 +14,10 @@ In partnership with [macom](https://www.macom.de/en/), I developed a 60 page "Ve
 
 ### Activities & Deliverables
 
-* facilitated a project kick-off and several client and stakeholder workshops
-* wrote and provided creative direction for a 60 page Vendor Briefing document
-* conducted 4 on-site software vendor evaluation at Daimler's AG Headquarters
-* created a vendor evaluation criteria document
-* organized and lead the vendor evaluation workshop
+- facilitated a project kick-off and several client and stakeholder workshops
+- wrote and provided creative direction for a 60 page Vendor Briefing document
+- conducted 4 on-site software vendor evaluation at Daimler's AG Headquarters
+- created a vendor evaluation criteria document
+- organized and lead the vendor evaluation workshop
 
 ![Daimler Vendor Briefing](./Daimler-Page-01.png)
