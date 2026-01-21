@@ -1,0 +1,24 @@
+{
+  "name": "@urban/oxc-config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Opinionated configuration for oxc",
+  "keywords": [
+    "linting",
+    "oxc"
+  ],
+  "license": "MIT",
+  "author": "Urban Faubion <urban.faubion@gmail.com> (http://urbanfaubion.com/)",
+  "sideEffects": [],
+  "exports": {
+    "./package.json": "./package.json",
+    "./oxlintrc.json": "./oxlintrc.json"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "tags": [
+    "linting",
+    "oxc"
+  ]
+}

@@ -4,7 +4,7 @@ date: "2017-01-17T16:00:00.000Z"
 draft: true
 category: Programming
 tags: [JavaScript]
-description: ''
+description: ""
 ---
 
 Coding challenges are a great way to learn new languages or train in a language
@@ -28,10 +28,10 @@ order to get a better understanding of what it would be like working together.
 
 Some of the things they can learn when observing you are:
 
-* How do you approach problems?
-* Can you articulate their thought process?
-* What tools and programming paradigms do you use?
-* What do you do when you get stuck?
+- How do you approach problems?
+- Can you articulate their thought process?
+- What tools and programming paradigms do you use?
+- What do you do when you get stuck?
 
 There are no right and wrong answers to the questions above but it's always
 helpful to articulate your thought process so they can see how you work.
@@ -181,18 +181,14 @@ structures such as Arrays.
 This solution using ECMAScript 2015 features and is conceptually different.
 
 ```js
-const stripWhitespace = s => s.replace(/\s/g, "");
-const splitEvenly = s => {
+const stripWhitespace = (s) => s.replace(/\s/g, "");
+const splitEvenly = (s) => {
   const center = Math.floor(s.length / 2);
-  return [s.slice(0, center + s.length % 2), s.slice(center)];
+  return [s.slice(0, center + (s.length % 2)), s.slice(center)];
 };
-const reverseString = s =>
-  s
-    .split("")
-    .reverse()
-    .join("");
+const reverseString = (s) => s.split("").reverse().join("");
 
-const isPalindrome = s => {
+const isPalindrome = (s) => {
   const halves = splitEvenly(stripWhitespace(String(s)));
   return halves[0] === reverseString(halves[1]);
 };
@@ -211,8 +207,8 @@ lifting</a>
 const stripWhitespace = replace(/\s/g, "");
 const toList = compose(split(""), stripWhitespace, String);
 const coerceArray = unless(Array.isArray, toList);
-const middle = x => Math.floor(x.length / 2);
-const splitEqually = xs => splitAt(middle(xs), xs);
+const middle = (x) => Math.floor(x.length / 2);
+const splitEqually = (xs) => splitAt(middle(xs), xs);
 const alignHalves = (a, b) => [a, reverse(b)];
 const equalPairs = zipWith(equals);
 const equalLists = all(equals(true));
@@ -222,7 +218,7 @@ const isPalindrome = compose(
   apply(equalPairs),
   apply(alignHalves),
   splitEqually,
-  coerceArray
+  coerceArray,
 );
 ```
 

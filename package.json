@@ -1,22 +1,59 @@
 {
-  "name": "@urban/website-monorepo",
+  "name": "@urban/personal-website-monorepo",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
+  "workspaces": {
+    "catalog": {
+      "@effect/platform": "^0.77.4",
+      "@effect/platform-node": "^0.73.4",
+      "effect": "^3.13.4",
+      "typescript": "5.9.2"
+    },
+    "packages": [
+      "scratchpad",
+      "scripts",
+      "packages/*"
+    ]
+  },
   "scripts": {
     "build": "turbo run build",
+    "changeset": "changeset add",
     "dev": "turbo run dev",
+    "fmt": "oxfmt --check",
+    "fmt:fix": "oxfmt",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "release": "echo \"No release script\" && exit 0",
     "test": "turbo run test",
-    "lint": "turbo run lint"
+    "typecheck": "turbo run typecheck",
+    "version": "changeset version && bun install"
   },
-  "engines": {
-    "node": ">= 22.10.0"
+  "dependencies": {
+    "@effect/platform": "0.94.1",
+    "@effect/platform-node": "0.104.0",
+    "@mdx-js/mdx": "3.1.1",
+    "@mdx-js/react": "3.1.1",
+    "@phosphor-icons/react": "2.1.10",
+    "@types/mdx": "2.0.13",
+    "@types/node": "25.0.9",
+    "@types/react": "19.2.9",
+    "@types/react-dom": "19.2.3",
+    "clsx": "2.1.1",
+    "effect": "3.19.14",
+    "gray-matter": "4.0.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tinyglobby": "0.2.15"
   },
   "devDependencies": {
-    "turbo": "^2.5.0"
+    "@changesets/cli": "2.29.8",
+    "oxfmt": "0.26.0",
+    "oxlint": "1.41.0",
+    "turbo": "2.7.5",
+    "typescript": "catalog:"
   },
-  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
+  "engines": {
+    "node": ">= 24.12.0"
+  },
+  "packageManager": "bun@1.3.5"
 }

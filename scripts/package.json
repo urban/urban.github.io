@@ -1,0 +1,9 @@
+{
+  "name": "scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "fast-glob": "3.3.3"
+  }
+}

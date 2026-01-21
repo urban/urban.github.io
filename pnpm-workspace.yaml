@@ -1,6 +1,0 @@
-packages:
-  - 'apps/*'
-  - 'packages/*'
-  - '!**/test/**'
-nodeVersion: 22.13.0
-engineStrict: true

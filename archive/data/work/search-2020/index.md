@@ -14,17 +14,17 @@ Korn Ferry's CTO was so pleased with the design and technical approach, he stopp
 
 ### Activities & Deliverables
 
-* helped facilitate stakeholder workshops
-* advised on the UX and UI design
-* taught my team React and the Flux architecture
-* created a component library in React
-* lead a team developing several single-page web apps concurrently using React
+- helped facilitate stakeholder workshops
+- advised on the UX and UI design
+- taught my team React and the Flux architecture
+- created a component library in React
+- lead a team developing several single-page web apps concurrently using React
   and Flux
 
 ### More Info
 
-* [Gian Leap Forward](https://www.kornferry.com/institute/giant-leap-forward)
-* [Awesome New Technologies for HR
+- [Gian Leap Forward](https://www.kornferry.com/institute/giant-leap-forward)
+- [Awesome New Technologies for HR
   Award](https://www.kornferry.com/press/awesome-new-technologies-for-hr-hr-tech-conference-selects-korn-ferrys-four-dimensional-executive-assessment/)
 
 <p style="height: 2rem;"></p>

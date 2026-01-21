@@ -12,11 +12,11 @@ As Head of Design, I designed and developed an application that gave Network and
 
 ### Activities & Responsibilities
 
-* conducted design research and a competitive analysis
-* established the visual and UX design
-* helped design the REST API's
-* developed the web application with React, Redux, Redux-Saga and CSS Modules
-* created a real-time mock server in Node.js and Express.js
+- conducted design research and a competitive analysis
+- established the visual and UX design
+- helped design the REST API's
+- developed the web application with React, Redux, Redux-Saga and CSS Modules
+- created a real-time mock server in Node.js and Express.js
 
 <p style="height: 2rem;"></p>
 
