@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import { MonitorIcon, MoonIcon, SunIcon } from "@phosphor-icons/react/dist/ssr";
-import { useCallback, useEffect } from "react";
+import { MonitorIcon, MoonIcon, SunIcon } from "@phosphor-icons/react/dist/ssr"
+import { useCallback, useEffect } from "react"
 
-type ColorScheme = "light" | "dark" | "system";
+type ColorScheme = "light" | "dark" | "system"
 
 const disableCSSTransitions = () => {
-  const css = document.createElement("style");
+  const css = document.createElement("style")
 
   // disable transitions when toggling color scheme
   css.appendChild(
@@ -20,58 +20,58 @@ const disableCSSTransitions = () => {
         }
       `,
     ),
-  );
-  document.head.appendChild(css);
+  )
+  document.head.appendChild(css)
 
   return () => {
     // @ts-expect-error _opacity is declared but it's value is never read.
-    const _opacity = window.getComputedStyle(css).opacity;
-    document.head.removeChild(css);
-  };
-};
+    const _opacity = window.getComputedStyle(css).opacity
+    document.head.removeChild(css)
+  }
+}
 
 const toggleColorScheme = (isDark: boolean) => {
-  const resetTransitions = disableCSSTransitions();
+  const resetTransitions = disableCSSTransitions()
 
   if (isDark) {
-    document.documentElement.classList.add("dark");
+    document.documentElement.classList.add("dark")
   } else {
-    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.remove("dark")
   }
 
-  resetTransitions();
-};
+  resetTransitions()
+}
 
 const ToggleColorScheme = () => {
   useEffect(() => {
     const handleMediaChange = (event: MediaQueryListEvent) => {
       if (localStorage.colorScheme === "system" || !localStorage.colorScheme) {
-        toggleColorScheme(event.matches);
+        toggleColorScheme(event.matches)
       }
-    };
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", handleMediaChange);
+    }
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", handleMediaChange)
 
     return () => {
       window
         .matchMedia("(prefers-color-scheme: dark)")
-        .removeEventListener("change", handleMediaChange);
-    };
-  }, []);
+        .removeEventListener("change", handleMediaChange)
+    }
+  }, [])
 
   const handleSelectColorScheme = useCallback((colorScheme: ColorScheme) => {
-    localStorage.setItem("colorScheme", colorScheme);
+    localStorage.setItem("colorScheme", colorScheme)
     switch (colorScheme) {
       case "light":
-        toggleColorScheme(false);
-        break;
+        toggleColorScheme(false)
+        break
       case "dark":
-        toggleColorScheme(true);
-        break;
+        toggleColorScheme(true)
+        break
       case "system":
-        toggleColorScheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-        break;
+        toggleColorScheme(window.matchMedia("(prefers-color-scheme: dark)").matches)
+        break
     }
-  }, []);
+  }, [])
 
   return (
     <div className="flex flex-wrap gap-1 items-center">
@@ -100,7 +100,7 @@ const ToggleColorScheme = () => {
         <MonitorIcon size={21} />
       </button>
     </div>
-  );
-};
+  )
+}
 
-export { ToggleColorScheme };
+export { ToggleColorScheme }

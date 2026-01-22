@@ -1,5 +1,5 @@
-import { Layer, ManagedRuntime } from "effect";
+import { Layer, ManagedRuntime } from "effect"
 
-const MainLayer = Layer.empty;
+const MainLayer = Layer.empty
 
-export const RuntimeClient = ManagedRuntime.make(MainLayer);
+export const RuntimeClient = ManagedRuntime.make(MainLayer)

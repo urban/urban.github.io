@@ -4,7 +4,7 @@ export const SITE = {
   numOfArticles: 3,
   numOfWork: 3,
   numOfProjects: 3,
-} as const;
+} as const
 
 export const SOCIALS = [
   {
@@ -19,4 +19,4 @@ export const SOCIALS = [
     name: "twitter-x",
     href: "https://x.com/urbanfaubion",
   },
-] as const;
+] as const

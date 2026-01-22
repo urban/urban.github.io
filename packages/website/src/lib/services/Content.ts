@@ -1,38 +1,38 @@
-import { FileSystem, Path } from "@effect/platform";
-import { Array, Console, Data, DateTime, Effect, Order, pipe, Schema } from "effect";
-import matter from "gray-matter";
-import { glob } from "tinyglobby";
-import { VFile } from "vfile";
-import { CollectionEntry } from "../schemas";
-import { Mdx } from "./Mdx";
-import { Metadata } from "./Metadata";
+import { FileSystem, Path } from "@effect/platform"
+import { Array, Console, Data, DateTime, Effect, Order, pipe, Schema } from "effect"
+import matter from "gray-matter"
+import { glob } from "tinyglobby"
+import { VFile } from "vfile"
+import { CollectionEntry } from "../schemas"
+import { Mdx } from "./Mdx"
+import { Metadata } from "./Metadata"
 
 class ContentError extends Data.TaggedError("ContentError")<{
-  error: unknown;
+  error: unknown
 }> {}
 
 class FileGlobError extends Data.TaggedError("FileGlobError")<{
-  error: unknown;
+  error: unknown
 }> {}
 
 class Content extends Effect.Service<Content>()("service/Content", {
   dependencies: [Mdx.Default],
   effect: Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
-    const contentDir = "./content";
-    const mdx = yield* Mdx;
-    const metadata = yield* Metadata;
-    const currentDate = pipe(yield* DateTime.now, DateTime.toDate);
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const contentDir = "./content"
+    const mdx = yield* Mdx
+    const metadata = yield* Metadata
+    const currentDate = pipe(yield* DateTime.now, DateTime.toDate)
 
     const getCollection = (collection: "articles" | "work" | "projects") =>
       Effect.gen(function* () {
-        const isPathWithIndex = collection !== "work";
-        const pattern = isPathWithIndex ? "*/index.{md,mdx}" : "*.{md,mdx}";
+        const isPathWithIndex = collection !== "work"
+        const pattern = isPathWithIndex ? "*/index.{md,mdx}" : "*.{md,mdx}"
         const filepaths = yield* Effect.tryPromise({
           try: () => glob([path.join(contentDir, collection, pattern)]),
           catch: (error) => new FileGlobError({ error }),
-        }).pipe(Effect.tapError((error) => Console.log(error)));
+        }).pipe(Effect.tapError((error) => Console.log(error)))
 
         return yield* Effect.all(
           filepaths.map((filepath) =>
@@ -42,14 +42,14 @@ class Content extends Effect.Service<Content>()("service/Content", {
               Effect.map((rawSource) => {
                 const slug = isPathWithIndex
                   ? filepath.split(path.sep).slice(-2, -1)[0]
-                  : filepath.split(path.sep).slice(-1)[0];
-                const { content: source, data } = matter(rawSource);
+                  : filepath.split(path.sep).slice(-1)[0]
+                const { content: source, data } = matter(rawSource)
                 return {
                   source,
                   data,
                   slug,
                   filepath,
-                };
+                }
               }),
               //
               Effect.flatMap(Schema.decodeUnknown(CollectionEntry)),
@@ -65,8 +65,8 @@ class Content extends Effect.Service<Content>()("service/Content", {
               ),
             ),
           ),
-        );
-      });
+        )
+      })
 
     return {
       getCollection: (collection: "articles" | "projects" | "work") =>
@@ -119,8 +119,8 @@ class Content extends Effect.Service<Content>()("service/Content", {
             ),
           ),
         ),
-    };
+    }
   }),
 }) {}
 
-export { Content, ContentError };
+export { Content, ContentError }

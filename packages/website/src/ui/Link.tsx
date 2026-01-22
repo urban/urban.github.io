@@ -1,13 +1,13 @@
-import NextLink from "next/link";
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import NextLink from "next/link"
+import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
 
 type Props = {
-  children: ReactNode;
-  href: string;
-  external?: boolean;
-  underline?: boolean;
-};
+  children: ReactNode
+  href: string
+  external?: boolean
+  underline?: boolean
+}
 
 const Link = ({ href, external, underline = true, ...rest }: Props) => (
   <NextLink
@@ -19,6 +19,6 @@ const Link = ({ href, external, underline = true, ...rest }: Props) => (
     )}
     {...rest}
   />
-);
+)
 
-export { Link };
+export { Link }

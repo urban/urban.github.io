@@ -22,7 +22,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
 
 ```js
 !(function () {
-  var TEMPLATES = (window.TEMPLATES = window.TEMPLATES || {});
+  var TEMPLATES = (window.TEMPLATES = window.TEMPLATES || {})
 
   //  modal-layout
   TEMPLATES["modal-layout"] = Hogan.compile(
@@ -44,7 +44,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
                         </div> \
                       </section> \
                       ',
-  );
+  )
 
   //  foo-modal
   TEMPLATES["foo-modal"] = Hogan.compile(
@@ -55,7 +55,7 @@ To demonstrate the template inheritance implementation I have a slightly contriv
                         {{/ body }} \
                       {{/ modal-layout }} \
                       ",
-  );
+  )
 
   //  bar-modal
   TEMPLATES["bar-modal"] = Hogan.compile(
@@ -72,8 +72,8 @@ To demonstrate the template inheritance implementation I have a slightly contriv
                         {{/ footer }} \
                       {{/ modal-layout }} \
                       ',
-  );
-})();
+  )
+})()
 ```
 
 <div class="alert note">
@@ -106,22 +106,22 @@ The second listener is delegated to the document and controls the removal of the
       title: "Bar Modal",
       "class-names": "bar-modal",
     },
-  };
+  }
 
   // create modal
   $("#modal-menu").on("click", "a", function (event) {
-    event.preventDefault();
-    var modalName = $(this).data("modal-name");
-    var output = TEMPLATES[modalName].render(data[modalName], TEMPLATES);
-    $("body").append(output);
-  });
+    event.preventDefault()
+    var modalName = $(this).data("modal-name")
+    var output = TEMPLATES[modalName].render(data[modalName], TEMPLATES)
+    $("body").append(output)
+  })
 
   // remove modal
   $(document).on("click", "a[data-js-action='remove']", function (event) {
-    event.preventDefault();
-    var target = $(this).data("js-target");
-    $(target).remove();
-  });
+    event.preventDefault()
+    var target = $(this).data("js-target")
+    $(target).remove()
+  })
 </script>
 ```
 

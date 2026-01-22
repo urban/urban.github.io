@@ -367,7 +367,7 @@ Denote a code block by enclosing a section of valid code in triple backticks. Sy
 
 ```js
 function hello() {
-  console.log("hello world");
+  console.log("hello world")
 }
 ```
 

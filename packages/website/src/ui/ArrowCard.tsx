@@ -1,11 +1,11 @@
-import { Article, Project } from "@/lib/schemas";
-import NextLink from "next/link";
+import { Article, Project } from "@/lib/schemas"
+import NextLink from "next/link"
 
 type Props = {
-  collection: "articles" | "projects";
-  metadata: typeof Article.Type | typeof Project.Type;
-  slug: string;
-};
+  collection: "articles" | "projects"
+  metadata: typeof Article.Type | typeof Project.Type
+  slug: string
+}
 
 const ArrowCard = ({ collection, metadata, slug }: Props) => (
   <NextLink
@@ -34,6 +34,6 @@ const ArrowCard = ({ collection, metadata, slug }: Props) => (
       />
     </svg>
   </NextLink>
-);
+)
 
-export { ArrowCard };
+export { ArrowCard }

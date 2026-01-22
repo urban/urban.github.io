@@ -6,5 +6,5 @@ export default () => {
     >
       Relative Button
     </button>
-  );
-};
+  )
+}

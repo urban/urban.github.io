@@ -1,13 +1,13 @@
-import type { Metadata as NextMetadata } from "next";
-import { Container } from "@/ui/Container";
-import { Array, Effect, flow, Order } from "effect";
-import { Content } from "@/lib/services/Content";
-import { RuntimeServer } from "@/lib/RuntimeServer";
-import { ArrowCard } from "@/ui/ArrowCard";
-import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation";
+import type { Metadata as NextMetadata } from "next"
+import { Container } from "@/ui/Container"
+import { Array, Effect, flow, Order } from "effect"
+import { Content } from "@/lib/services/Content"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { ArrowCard } from "@/ui/ArrowCard"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 
 const main = Effect.gen(function* () {
-  const content = yield* Content;
+  const content = yield* Content
   return yield* content.getProjects().pipe(
     Effect.map(
       flow(
@@ -15,16 +15,16 @@ const main = Effect.gen(function* () {
         Array.sortBy(Order.reverse(Order.mapInput(Order.Date, ({ data }) => data.date))),
       ),
     ),
-  );
-});
+  )
+})
 
 export const metadata: NextMetadata = {
   title: "Projects",
   description: "A collection of my projects, with links to repositories and demos.",
-};
+}
 
 export default async function Page() {
-  const projects = await RuntimeServer.runPromise(main);
+  const projects = await RuntimeServer.runPromise(main)
   return (
     <>
       <PageNavigationAnimation />
@@ -41,5 +41,5 @@ export default async function Page() {
         </div>
       </Container>
     </>
-  );
+  )
 }

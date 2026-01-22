@@ -1,6 +1,6 @@
-import { Container } from "./Container";
-import { BackToTop } from "./BackToTop";
-import { ToggleColorScheme } from "./ToggleColorScheme";
+import { Container } from "./Container"
+import { BackToTop } from "./BackToTop"
+import { ToggleColorScheme } from "./ToggleColorScheme"
 
 function Footer({ siteName }: { siteName: string }) {
   return (
@@ -19,7 +19,7 @@ function Footer({ siteName }: { siteName: string }) {
         </div>
       </Container>
     </footer>
-  );
+  )
 }
 
-export { Footer };
+export { Footer }
