@@ -2,23 +2,18 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "rootDir": ".",
     "target": "ES2017",
-    "lib": ["DOM", "DOM.Iterable", "ES2017"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "noEmit": true,
-    "incremental": true,
-    "useDefineForClassFields": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "jsx": "preserve",
     "plugins": [
       {
-        "name": "next"
-      }
+        "name": "next",
+      },
     ],
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"],
+    },
   },
   "include": [
     "src",
@@ -27,7 +22,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
   ],
-  "exclude": ["node_modules", "scripts"]
+  "exclude": ["node_modules", "scripts"],
 }
