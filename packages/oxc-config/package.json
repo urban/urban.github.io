@@ -14,9 +14,6 @@
     "./package.json": "./package.json",
     "./oxlintrc.json": "./oxlintrc.json"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
-  },
   "tags": [
     "linting",
     "oxc"

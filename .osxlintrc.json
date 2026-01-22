@@ -1,19 +1,4 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "extends": ["./packages/oxc-config/oxlintrc.json"],
-  "ignorePatterns": [
-    "**/dist",
-    "**/build",
-    "**/docs",
-    "**/.tsbuildinfo",
-    "!scratchpad/**/*",
-    ".agents/**/*"
-  ],
-  "jsPlugins": [],
-  "overrides": [
-    {
-      "files": ["**/{test,dtslint,examples,benchmark,bundle,scripts,scratchpad}/**"],
-      "rules": {}
-    }
-  ]
+  "extends": ["./packages/oxc-config/oxlintrc.json"]
 }

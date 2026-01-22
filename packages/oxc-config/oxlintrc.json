@@ -20,6 +20,7 @@
     "import/no-self-import": "error",
     "import/no-empty-named-blocks": "error",
     // TypeScript cleanup
+    "typescript/no-explicit-any": "error",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unnecessary-type-constraint": "error",
     "typescript/no-useless-empty-export": "error",
@@ -34,37 +35,6 @@
     // Unicorn
     "unicorn/prefer-array-flat-map": "error",
     "unicorn/no-accessor-recursion": "error",
-    "oxc/no-map-spread": "off",
-    "eslint/object-shorthand": "off",
-    "eslint/no-unused-vars": "off",
-    "eslint/require-yield": "off",
-    "eslint/no-fallthrough": "off",
-    "eslint/no-await-in-loop": "off",
-    "unicorn/no-new-array": "off",
-    "unicorn/consistent-function-scoping": "off",
-    "unicorn/no-array-sort": "off",
-    "unicorn/no-array-reverse": "off",
-    "unicorn/require-post-message-target-origin": "off",
-    "unicorn/prefer-add-event-listener": "off",
-    "unicorn/prefer-set-has": "off",
-    "typescript/no-explicit-any": "off",
-    "typescript/no-empty-interface": "off",
-    "typescript/ban-ts-comment": "off",
-    "typescript/no-namespace": "off",
-    "typescript/no-non-null-assertion": "off",
-    "typescript/no-dynamic-delete": "off",
-    "typescript/no-invalid-void-type": "off",
-    "typescript/no-unsafe-function-type": "off",
-    "typescript/unified-signatures": "off",
-    "typescript/no-empty-object-type": "off",
-    "typescript/no-confusing-non-null-assertion": "off",
-    "typescript/array-type": [
-      "error",
-      {
-        "default": "generic",
-        "readonly": "generic"
-      }
-    ],
     "typescript/no-unused-vars": [
       "error",
       {

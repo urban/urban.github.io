@@ -9,7 +9,8 @@
     "composite": true,
     // Target modern JavaScript (ES2022+) whilst staying closely compatible with the Node.js module system.
     "target": "ES2022",
-    "module": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "moduleDetection": "force", // Treat every non-declaration file as a module.
     "verbatimModuleSyntax": true, // Only transform/eliminate type-only import/export statements.
     "allowJs": false, // If you touch this, a puppy dies.
