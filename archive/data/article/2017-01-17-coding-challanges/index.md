@@ -60,12 +60,12 @@ For example, given the following input, your function should return the
 commented out boolean.
 
 ```js
-isPalindrome("abc"); //=> false
-isPalindrome("xyz"); //=> false
-isPalindrome(""); //=> true
-isPalindrome("aba"); //=> true
-isPalindrome("aabbbaa"); //=> true
-isPalindrome("kayak"); //=> true
+isPalindrome("abc") //=> false
+isPalindrome("xyz") //=> false
+isPalindrome("") //=> true
+isPalindrome("aba") //=> true
+isPalindrome("aabbbaa") //=> true
+isPalindrome("kayak") //=> true
 ```
 
 #### Solution 1.1
@@ -75,10 +75,10 @@ The following is a solution that uses a while loop.
 ```js
 function isPalindrome(str) {
   while (str.length) {
-    if (str.charAt(0) != str.charAt(str.length - 1)) return false;
-    str = str.substr(1, str.length - 2);
+    if (str.charAt(0) != str.charAt(str.length - 1)) return false
+    str = str.substr(1, str.length - 2)
   }
-  return true;
+  return true
 }
 ```
 
@@ -108,11 +108,11 @@ are created.
 ```js
 function isPalindrome(s) {
   function run(str) {
-    if (str.length <= 1) return true;
-    if (str[0] != str[str.length - 1]) return false;
-    return run(str.slice(1, str.length - 1));
+    if (str.length <= 1) return true
+    if (str[0] != str[str.length - 1]) return false
+    return run(str.slice(1, str.length - 1))
   }
-  return run(String(s));
+  return run(String(s))
 }
 ```
 
@@ -127,41 +127,41 @@ By converting the value to a string in the setup function, we now get the
 following output from converting the input.
 
 ```js
-String("abc"); //=> 'abc'
-String([1, 2, 3]); //=> '123'
-String(undefined); //=> 'undefined'
+String("abc") //=> 'abc'
+String([1, 2, 3]) //=> '123'
+String(undefined) //=> 'undefined'
 ```
 
 This means we can now expand our test cases to accept all data types and
 structures.
 
 ```js
-isPalindrome("abc"); //=> false
-isPalindrome("xyz"); //=> false
-isPalindrome(""); //=> true
-isPalindrome("aba"); //=> true
-isPalindrome("aabbbaa"); //=> true
-isPalindrome("kayak"); //=> true
-isPalindrome(["a", "b", "c"]); //=> false
-isPalindrome(["a", "b", "a"]); //=> true
-isPalindrome([1, 2, 1]); //=> true
-isPalindrome(123); //=> false
-isPalindrome(12321); //=> true
-isPalindrome(undefined); //=> false
-isPalindrome(null); //=> false
+isPalindrome("abc") //=> false
+isPalindrome("xyz") //=> false
+isPalindrome("") //=> true
+isPalindrome("aba") //=> true
+isPalindrome("aabbbaa") //=> true
+isPalindrome("kayak") //=> true
+isPalindrome(["a", "b", "c"]) //=> false
+isPalindrome(["a", "b", "a"]) //=> true
+isPalindrome([1, 2, 1]) //=> true
+isPalindrome(123) //=> false
+isPalindrome(12321) //=> true
+isPalindrome(undefined) //=> false
+isPalindrome(null) //=> false
 ```
 
 We can then strip out whitespace with `replace(/\s/g, '')` in order to handle phrases such as "nurses run".
 
 ```js
-isPalindrome("nurses run"); //=> true
+isPalindrome("nurses run") //=> true
 ```
 
 I also took the opportunity to change how I am indexing the characters within the string. As of ECMAScript 5 you can treat strings as array-like objects so you can index characters numerically. This means the following two lines are equivalent.
 
 ```js
-"cat".charAt(1); //=> 'a'
-"cat"[1]; //=> 'a'
+"cat".charAt(1) //=> 'a'
+"cat"[1] //=> 'a'
 ```
 
 I prefer this recursive solutions to the `while` loop because it is "pure" and
@@ -181,17 +181,17 @@ structures such as Arrays.
 This solution using ECMAScript 2015 features and is conceptually different.
 
 ```js
-const stripWhitespace = (s) => s.replace(/\s/g, "");
+const stripWhitespace = (s) => s.replace(/\s/g, "")
 const splitEvenly = (s) => {
-  const center = Math.floor(s.length / 2);
-  return [s.slice(0, center + (s.length % 2)), s.slice(center)];
-};
-const reverseString = (s) => s.split("").reverse().join("");
+  const center = Math.floor(s.length / 2)
+  return [s.slice(0, center + (s.length % 2)), s.slice(center)]
+}
+const reverseString = (s) => s.split("").reverse().join("")
 
 const isPalindrome = (s) => {
-  const halves = splitEvenly(stripWhitespace(String(s)));
-  return halves[0] === reverseString(halves[1]);
-};
+  const halves = splitEvenly(stripWhitespace(String(s)))
+  return halves[0] === reverseString(halves[1])
+}
 ```
 
 <a href="http://ramdajs.com/repl/?v=0.24.1#?const%20stripWhitespace%20%3D%20s%20%3D%3E%20s.replace%28%2F%5Cs%2Fg%2C%20%27%27%29%0Aconst%20splitEvenly%20%3D%20s%20%3D%3E%20%7B%0A%20%20const%20center%20%3D%20Math.floor%28s.length%20%2F2%29%0A%20%20return%20%5B%0A%20%20%20%20s.slice%280%2C%20center%20%2B%20%28s.length%20%25%202%29%29%2C%0A%20%20%20%20s.slice%28center%29%0A%20%20%5D%0A%7D%0Aconst%20reverseString%20%3D%20s%20%3D%3E%20s.split%28%27%27%29.reverse%28%29.join%28%27%27%29%0A%0Aconst%20isPalindrome%20%3D%20s%20%3D%3E%20%7B%0A%20%20const%20halves%20%3D%20splitEvenly%28stripWhitespace%28String%28s%29%29%29%0A%20%20return%20halves%5B0%5D%20%3D%3D%3D%20reverseString%28halves%5B1%5D%29%0A%7D%0A%0AisPalindrome%28%27abc%27%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27xyz%27%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27%27%29%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aba%27%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aabbbaa%27%29%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27kayak%27%29%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%5B%27a%27%2C%20%27b%27%2C%20%27c%27%5D%29%20%2F%2F%3D%3E%20false%0AisPalindrome%28%5B%27a%27%2C%20%27b%27%2C%20%27a%27%5D%29%20%2F%2F%3D%3E%20true%0AisPalindrome%28%5B1%2C%202%2C%201%5D%29%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28123%29%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%2812321%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28undefined%29%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28null%29%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27nurses%20run%27%29%20%20%20%20%2F%2F%3D%3E%20true" target="_blank">Try in REPL</a>
@@ -204,14 +204,14 @@ const isPalindrome = (s) => {
 lifting</a>
 
 ```js
-const stripWhitespace = replace(/\s/g, "");
-const toList = compose(split(""), stripWhitespace, String);
-const coerceArray = unless(Array.isArray, toList);
-const middle = (x) => Math.floor(x.length / 2);
-const splitEqually = (xs) => splitAt(middle(xs), xs);
-const alignHalves = (a, b) => [a, reverse(b)];
-const equalPairs = zipWith(equals);
-const equalLists = all(equals(true));
+const stripWhitespace = replace(/\s/g, "")
+const toList = compose(split(""), stripWhitespace, String)
+const coerceArray = unless(Array.isArray, toList)
+const middle = (x) => Math.floor(x.length / 2)
+const splitEqually = (xs) => splitAt(middle(xs), xs)
+const alignHalves = (a, b) => [a, reverse(b)]
+const equalPairs = zipWith(equals)
+const equalLists = all(equals(true))
 
 const isPalindrome = compose(
   equalLists,
@@ -219,7 +219,7 @@ const isPalindrome = compose(
   apply(alignHalves),
   splitEqually,
   coerceArray,
-);
+)
 ```
 
 <a href="http://ramdajs.com/repl/?v=0.24.1#?const%20stripWhitespace%20%3D%20replace%28%2F%5Cs%2Fg%2C%20%27%27%29%0Aconst%20toList%20%3D%20compose%28%0A%20%20%20%20split%28%27%27%29%2C%0A%20%20%20%20stripWhitespace%2C%0A%20%20%20%20String%0A%20%20%29%0Aconst%20coerceArray%20%3D%20unless%28Array.isArray%2C%20toList%29%0Aconst%20middle%20%3D%20x%20%3D%3E%20Math.floor%28x.length%20%2F%202%29%0Aconst%20splitEqually%20%3D%20xs%20%3D%3E%20splitAt%28middle%28xs%29%2C%20xs%29%0Aconst%20alignHalves%20%3D%20%28a%2C%20b%29%20%3D%3E%20%5Ba%2C%20reverse%28b%29%5D%0Aconst%20equalPairs%20%3D%20zipWith%28equals%29%0Aconst%20equalLists%20%3D%20all%28equals%28true%29%29%0A%0Aconst%20isPalindrome%20%3D%20compose%28%0A%20%20equalLists%2C%0A%20%20apply%28equalPairs%29%2C%0A%20%20apply%28alignHalves%29%2C%0A%20%20splitEqually%2C%0A%20%20coerceArray%0A%29%0A%0AisPalindrome%28%27abc%27%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27xyz%27%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27%27%29%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aba%27%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27aabbbaa%27%29%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%27kayak%27%29%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28%5B%27a%27%2C%20%27b%27%2C%20%27c%27%5D%29%20%2F%2F%3D%3E%20false%0AisPalindrome%28%5B%27a%27%2C%20%27b%27%2C%20%27a%27%5D%29%20%2F%2F%3D%3E%20true%0AisPalindrome%28%5B1%2C%202%2C%201%5D%29%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28123%29%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%2812321%29%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20true%0AisPalindrome%28undefined%29%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28null%29%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%3D%3E%20false%0AisPalindrome%28%27nurses%20run%27%29%20%20%20%20%2F%2F%3D%3E%20true" target="_blank">Try in REPL</a>
@@ -236,10 +236,10 @@ commented out boolean.
 
 ```js
 function isPalindrome(xs) {
-  xs = String(xs).replace(/\s/g, "");
-  if (xs.length <= 1) return true;
-  if (xs[0] != xs[xs.length - 1]) return false;
-  return isPalindrome(xs.slice(1, xs.length - 1));
+  xs = String(xs).replace(/\s/g, "")
+  if (xs.length <= 1) return true
+  if (xs[0] != xs[xs.length - 1]) return false
+  return isPalindrome(xs.slice(1, xs.length - 1))
 }
 ```
 
@@ -255,21 +255,21 @@ This first solution uses a nested loop to iterate through all combinations. At e
 
 ```js
 function longestPalindrome(xs) {
-  xs = String(xs);
-  const len = xs.length;
-  if (len <= 1) return xs;
+  xs = String(xs)
+  const len = xs.length
+  if (len <= 1) return xs
 
-  let result = "";
+  let result = ""
   for (let i = 0; i <= xs.length; i++) {
-    if (/\s/.test(xs[i])) continue;
+    if (/\s/.test(xs[i])) continue
     for (let k = 0; k <= xs.length - i; k++) {
-      const str = xs.slice(i, k + i);
+      const str = xs.slice(i, k + i)
       if (isPalindrome(str) && str.length > result.length) {
-        result = str;
+        result = str
       }
     }
   }
-  return result;
+  return result
 }
 ```
 
@@ -279,26 +279,26 @@ Another solution would be to change how you test for finding a palindrome. Inste
 
 ```js
 function longestPalindrome(xs) {
-  const len = xs.length;
-  let result = "";
+  const len = xs.length
+  let result = ""
 
   function isPalindrome(left, right) {
     while (xs[left] === xs[right] && left >= 0 && right < len) {
-      left--;
-      right++;
+      left--
+      right++
     }
-    return xs.slice(left + 1, right);
+    return xs.slice(left + 1, right)
   }
 
   for (let i = 0; i < len - 1; i++) {
-    const local = i % 2 === 0 ? isPalindrome(i, i + 1) : isPalindrome(i, i);
+    const local = i % 2 === 0 ? isPalindrome(i, i + 1) : isPalindrome(i, i)
 
     if (local.length > result.length) {
-      result = local;
+      result = local
     }
   }
 
-  return result;
+  return result
 }
 ```
 

@@ -3,21 +3,21 @@ import {
   GithubLogoIcon,
   LinkedinLogoIcon,
   XLogoIcon,
-} from "@phosphor-icons/react/dist/ssr";
-import { Array, Effect, pipe, Record } from "effect";
-import type { Metadata } from "next";
-import { SITE, SOCIALS } from "@/lib/consts";
-import { RuntimeServer } from "@/lib/RuntimeServer";
-import { Content } from "@/lib/services/Content";
-import { Container } from "@/ui/Container";
-import { Link } from "@/ui/Link";
+} from "@phosphor-icons/react/dist/ssr"
+import { Array, Effect, pipe, Record } from "effect"
+import type { Metadata } from "next"
+import { SITE, SOCIALS } from "@/lib/consts"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import { Container } from "@/ui/Container"
+import { Link } from "@/ui/Link"
 // import { ArrowCard } from "@/ui/ArrowCard";
-import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation";
-import { PageTitle } from "@/ui/PageTitle";
-import { WorkList } from "@/ui/WorkList";
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
+import { PageTitle } from "@/ui/PageTitle"
+import { WorkList } from "@/ui/WorkList"
 
 const main = Effect.gen(function* () {
-  const content = yield* Content;
+  const content = yield* Content
 
   // const articles = yield* content.getArticles().pipe(
   //   Effect.map((articles) => articles.filter(({ data }) => !data.draft)),
@@ -27,25 +27,25 @@ const main = Effect.gen(function* () {
   //   .getProjects()
   //   .pipe(Effect.map(Array.take(SITE.numOfProjects)));
 
-  const work = yield* content.getWork().pipe(Effect.map(Array.take(SITE.numOfWork)));
+  const work = yield* content.getWork().pipe(Effect.map(Array.take(SITE.numOfWork)))
   const groupedWork = pipe(
     work,
     Array.groupBy((x) => x.data.company),
     Record.values,
-  );
+  )
 
   // return { articles, projects, work };
-  return { work: groupedWork };
-});
+  return { work: groupedWork }
+})
 
 export const metadata: Metadata = {
   title: "Home",
   description: "Urban Faubion's personal website.",
-};
+}
 
 export default async function Page() {
   // const { articles, projects, work } = await RuntimeServer.runPromise(main);
-  const { work } = await RuntimeServer.runPromise(main);
+  const { work } = await RuntimeServer.runPromise(main)
   return (
     <>
       <PageNavigationAnimation />
@@ -134,5 +134,5 @@ export default async function Page() {
         </div>
       </Container>
     </>
-  );
+  )
 }

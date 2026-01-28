@@ -20,7 +20,7 @@ export const SITE: Site = {
   NUM_POSTS_ON_HOMEPAGE: 3,
   NUM_WORKS_ON_HOMEPAGE: 2,
   NUM_PROJECTS_ON_HOMEPAGE: 3,
-};
+}
 ```
 
 | Field        | Req | Description                                          |
@@ -39,7 +39,7 @@ Customize your page metadata
 export const HOME: Metadata = {
   TITLE: "Home",
   DESCRIPTION: "Astro Nano is a minimal and lightweight blog and portfolio.",
-};
+}
 ```
 
 | Field       | Req | Description                                    |
@@ -65,7 +65,7 @@ export const SOCIALS: Socials = [
     NAME: "linkedin",
     HREF: "https://www.linkedin.com/in/markhorn-dev",
   },
-];
+]
 ```
 
 | Field | Req | Description                             |

@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { usePathname } from "next/navigation";
-import { Container } from "./Container";
-import { Link } from "./Link";
+import { usePathname } from "next/navigation"
+import { Container } from "./Container"
+import { Link } from "./Link"
 
 const Header = ({ siteName }: { siteName: string }) => {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return pathname === "/" ? null : (
     <header>
@@ -24,7 +24,7 @@ const Header = ({ siteName }: { siteName: string }) => {
         </div>
       </Container>
     </header>
-  );
-};
+  )
+}
 
-export { Header };
+export { Header }

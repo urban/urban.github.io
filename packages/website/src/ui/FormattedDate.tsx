@@ -1,6 +1,6 @@
 type Props = {
-  date: Date;
-};
+  date: Date
+}
 
 const FormattedDate = ({ date }: Props) => (
   <time dateTime={date.toISOString()}>
@@ -10,6 +10,6 @@ const FormattedDate = ({ date }: Props) => (
       year: "numeric",
     })}
   </time>
-);
+)
 
-export { FormattedDate };
+export { FormattedDate }

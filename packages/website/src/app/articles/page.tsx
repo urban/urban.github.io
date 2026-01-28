@@ -1,42 +1,42 @@
-import { Array, Effect, Order, pipe, Record } from "effect";
-import type { Metadata } from "next";
-import { RuntimeServer } from "@/lib/RuntimeServer";
-import { Content } from "@/lib/services/Content";
-import { ArrowCard } from "@/ui/ArrowCard";
-import { Container } from "@/ui/Container";
-import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation";
+import { Array, Effect, Order, pipe, Record } from "effect"
+import type { Metadata } from "next"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import { ArrowCard } from "@/ui/ArrowCard"
+import { Container } from "@/ui/Container"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 
 const main = Effect.gen(function* () {
-  const content = yield* Content;
-  const allArticles = yield* content.getArticles();
+  const content = yield* Content
+  const allArticles = yield* content.getArticles()
   const articlesMetadata = allArticles.map(({ data, slug }) => ({
     metadata: data,
     slug,
-  }));
+  }))
 
   const articles = pipe(
     articlesMetadata,
     Array.filter(({ metadata }) => !metadata.draft),
     Array.sortBy(Order.reverse(Order.mapInput(Order.Date, ({ metadata }) => metadata.updatedAt))),
     Array.groupBy(({ metadata }) => metadata.date.getFullYear().toString()),
-  );
+  )
 
   const years = pipe(
     articles,
     Record.keys,
     Array.sortBy(Order.reverse(Order.mapInput(Order.number, (a) => parseInt(a)))),
-  );
+  )
 
-  return { articles, years };
-});
+  return { articles, years }
+})
 
 export const metadata: Metadata = {
   title: "Articles",
   description: "A collection of articles on topics I am passionate about.",
-};
+}
 
 export default async function Page() {
-  const { articles, years } = await RuntimeServer.runPromise(main);
+  const { articles, years } = await RuntimeServer.runPromise(main)
   return (
     <>
       <PageNavigationAnimation />
@@ -66,5 +66,5 @@ export default async function Page() {
         </div>
       </Container>
     </>
-  );
+  )
 }

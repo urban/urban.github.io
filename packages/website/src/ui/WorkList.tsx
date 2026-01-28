@@ -1,19 +1,19 @@
-import type { Effect } from "effect";
-import type { Content } from "@/lib/services/Content";
-import { dateRange, dateTenure } from "@/lib/utils";
-import { Text } from "./Text";
+import type { Effect } from "effect"
+import type { Content } from "@/lib/services/Content"
+import { dateRange, dateTenure } from "@/lib/utils"
+import { Text } from "./Text"
 
-type Work = Effect.Effect.Success<ReturnType<typeof Content.Service.getWork>>[0];
+type Work = Effect.Effect.Success<ReturnType<typeof Content.Service.getWork>>[0]
 
 const WorkTransferOrPromotion = ({ children }: { children: React.ReactNode }) => (
   <div className="before:content-[' '] before:absolute before:-left-[calc(--spacing(7.25))] before:top-8 before:w-0.5 before:h-[calc(100%_-_1.5rem)] before:bg-gray-300 dark:before:bg-gray-500">
     {children}
   </div>
-);
+)
 
 const WorkPostion = () => (
   <span className="absolute block rounded-full h-2.5 w-2.5 top-2 -left-8 bg-gray-300 dark:bg-gray-500" />
-);
+)
 
 const WorkEntry = ({ entry, showCompany = true }: { entry: Work; showCompany?: boolean }) => (
   <>
@@ -27,7 +27,7 @@ const WorkEntry = ({ entry, showCompany = true }: { entry: Work; showCompany?: b
       <entry.Content />
     </article>
   </>
-);
+)
 
 const MultipleWorkEntries = ({ entries }: { entries: [Work, ...Work[]] }) => {
   return (
@@ -56,8 +56,8 @@ const MultipleWorkEntries = ({ entries }: { entries: [Work, ...Work[]] }) => {
         ))}
       </ul>
     </>
-  );
-};
+  )
+}
 
 const WorkList = ({ work }: { work: [Work, ...Work[]][] }) => (
   <ul className="flex flex-col py-4">
@@ -71,5 +71,5 @@ const WorkList = ({ work }: { work: [Work, ...Work[]][] }) => (
       </li>
     ))}
   </ul>
-);
-export { WorkList };
+)
+export { WorkList }

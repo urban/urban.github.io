@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import NextLink from "next/link";
-import { type MouseEventHandler, type ReactNode, useCallback } from "react";
+import NextLink from "next/link"
+import { type MouseEventHandler, type ReactNode, useCallback } from "react"
 
 type Props = {
-  children: ReactNode;
-  href: string;
-};
+  children: ReactNode
+  href: string
+}
 
 const BackToPrev = ({ children, href }: Props) => {
   const handleClick = useCallback<MouseEventHandler<HTMLAnchorElement>>((_event) => {
-    window.history.back();
-  }, []);
+    window.history.back()
+  }, [])
 
   return (
     <NextLink
@@ -38,7 +38,7 @@ const BackToPrev = ({ children, href }: Props) => {
       </svg>
       <div className="text-sm">{children}</div>
     </NextLink>
-  );
-};
+  )
+}
 
-export { BackToPrev };
+export { BackToPrev }

@@ -26,7 +26,8 @@
     "release": "echo \"No release script\" && exit 0",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "version": "changeset version && bun install"
+    "version": "changeset version && bun install",
+    "prepare": "husky"
   },
   "dependencies": {
     "@effect/platform": "0.94.1",
@@ -47,10 +48,21 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.29.8",
+    "husky": "9.1.7",
+    "lint-staged": "16.2.7",
     "oxfmt": "0.26.0",
     "oxlint": "1.41.0",
     "turbo": "2.7.5",
     "typescript": "catalog:"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "oxfmt",
+      "oxlint --fix"
+    ],
+    "*.{css,html,json,jsonc,md,mdx,yml,yaml}": [
+      "oxfmt"
+    ]
   },
   "engines": {
     "node": ">= 24.12.0"

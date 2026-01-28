@@ -1,30 +1,30 @@
-"use client";
+"use client"
 
-import { type MouseEventHandler, useCallback, useEffect } from "react";
+import { type MouseEventHandler, useCallback, useEffect } from "react"
 
 const BackToTop = () => {
   useEffect(() => {
     const onScroll = () => {
       if (window.scrollY > 0) {
-        document.documentElement.classList.add("scrolled");
+        document.documentElement.classList.add("scrolled")
       } else {
-        document.documentElement.classList.remove("scrolled");
+        document.documentElement.classList.remove("scrolled")
       }
-    };
+    }
 
-    document.addEventListener("scroll", onScroll);
+    document.addEventListener("scroll", onScroll)
     return () => {
-      document.removeEventListener("scroll", onScroll);
-    };
-  }, []);
+      document.removeEventListener("scroll", onScroll)
+    }
+  }, [])
 
   const handleClick = useCallback<MouseEventHandler<HTMLButtonElement>>((event) => {
-    event.preventDefault();
+    event.preventDefault()
     window.scrollTo({
       top: 0,
       behavior: "smooth",
-    });
-  }, []);
+    })
+  }, [])
 
   return (
     <button
@@ -50,7 +50,7 @@ const BackToTop = () => {
       </svg>
       <div className="text-sm">Back to top</div>
     </button>
-  );
-};
+  )
+}
 
-export { BackToTop };
+export { BackToTop }
