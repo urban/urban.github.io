@@ -6,17 +6,17 @@ This is a **Turborepo** monorepo using Bun workspaces. Common commands:
 
 ```bash
 # Install dependencies
-burn run install
+bun run install
 
 # Development
-burn run dev          # Start all apps in dev mode
-burn run build        # Build all packages/apps
-burn run serve        # Serve built static files
+bun run dev          # Start all apps in dev mode
+bun run build        # Build all packages/apps
+bun run serve        # Serve built static files
 
 # Testing & Linting
-burn run test         # Run tests across all packages
-burn run lint         # Lint all packages
-burn run typecheck    # TypeScript type checking
+bun run test         # Run tests across all packages
+bun run lint         # Lint all packages
+bun run typecheck    # TypeScript type checking
 ```
 
 ## Website Architecture
