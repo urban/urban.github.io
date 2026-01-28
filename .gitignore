@@ -31,3 +31,6 @@ coverage/
 .agents/
 .DS_Store
 tmp
+
+# Sandbox state dir
+/.sandbox/
