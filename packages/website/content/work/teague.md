@@ -7,4 +7,4 @@ dateStart: "02/01/2017"
 dateEnd: "03/01/2017"
 ---
 
-At Teague, I helped develop a mobile application and several in-car UI’s to usability test an autonomous vehicle service.
+- Developed mobile and in-car UI’s for testing an autonomous vehicle service.

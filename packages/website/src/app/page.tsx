@@ -59,16 +59,25 @@ export default async function Page() {
           <section className="border-b border-gray-300 dark:border-gray-500">
             <article className="py-4">
               <p className="animate">
-                Hello, my name is Urban. I am a Senior Engineering Manager specializing in front-end
-                development and design systems. I bridge design and engineering to build
-                high-performing teams, modernize UI platforms, and foster clarity, trust, and
-                collaboration. I&apos;m known for driving organizational change, elevating developer
-                experience, and inspiring teams to deliver elegant, scalable solutions.
+                Hello, my name is Urban. I am an Engineering Manager with deep experience owning and
+                evolving UI platforms, design systems, and shared frontend infrastructure used
+                across large, multi team organizations. I take responsibility for ambiguous, high
+                impact problems that sit at the intersection of product, design, and engineering,
+                and I turn them into durable systems that scale. My work has included leading major
+                platform migrations, defining frontend quality standards, and building shared
+                infrastructure that improves consistency, performance, and reliability.
               </p>
               <p className="animate">
-                <strong>Specialties</strong>: Software Engineering Management • Inclusive Team
-                Leadership • Organizational Transformation • Front-end Development • UI Architecture
-                • Design Systems • UX Design
+                I collaborate closely with designers, product leaders, and engineers to translate
+                user experience goals into clear technical direction, aligning stakeholders through
+                concrete proposals, architectural reviews, and shared ownership models. While I have
+                held engineering management roles, my impact has come from hands on technical
+                leadership, making hard architectural decisions, and building platforms that enable
+                other teams to move faster without sacrificing quality.
+              </p>
+              <p className="animate">
+                <strong>Specialties</strong>: Engineering Management • Software Development •
+                Front-end Development • User Experience (UX) • Design Systems
               </p>
             </article>
           </section>

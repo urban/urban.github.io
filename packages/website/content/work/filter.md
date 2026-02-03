@@ -7,4 +7,4 @@ dateStart: "10/01/2008"
 dateEnd: "12/01/2008"
 ---
 
-As a Senior Developer, I helped redesign and develop the Filter website.
+- Developed the Filter website and an interactive portfolio visualization using Three.js.

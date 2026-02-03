@@ -7,4 +7,5 @@ dateStart: "03/01/2017"
 dateEnd: "06/01/2018"
 ---
 
-At Korn Ferry, we are creating a B2C product that helps people advance their career with personalized, expert coaching. As both a designer and developer, I’ve focused on redesigning the product into a platform while modernizing our technology stack and streamline our development practices.
+- Modernized a B2C career coaching platform using React and Next.js, introducing a reusable design system to improve collaboration and delivery speed.
+- Developed a mobile application in Swift using The Composable Architecture (TCA), applying functional and reactive programming concepts.

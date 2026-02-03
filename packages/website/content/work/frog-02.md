@@ -7,4 +7,5 @@ dateStart: "04/01/2014"
 dateEnd: "02/01/2016"
 ---
 
-At frog, I serve as both a project lead and an individual contributor creating high quality, award winning software products. I continue to provide the same services I did as a Senior Design Technologies but also participate in design research, facilitating client workshops, client training and business development.
+- Led cross-disciplinary teams building design systems and frontend architectures for enterprise clients including GE, Daimler and more.
+- Conducted in field design research in Africa and South East Asia and prototyped a new comms app for the Niki Foundation.
