@@ -34,3 +34,5 @@ tmp
 
 # Sandbox state dir
 /.sandbox/
+
+/.repos/
