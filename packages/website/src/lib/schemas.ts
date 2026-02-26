@@ -19,15 +19,15 @@ export const Work = Schema.Struct({
 export const Article = Schema.Struct({
   title: Schema.String,
   description: Schema.String,
-  date: Schema.Date,
-  updatedAt: Schema.Date,
+  date: DateFromString,
+  updatedAt: DateFromString,
   draft: Schema.optional(Schema.Boolean),
 })
 
 export const Project = Schema.Struct({
   title: Schema.String,
   description: Schema.String,
-  date: Schema.Date,
+  date: DateFromString,
   draft: Schema.optional(Schema.Boolean),
   demoURL: Schema.optional(Schema.String),
   repoURL: Schema.optional(Schema.String),

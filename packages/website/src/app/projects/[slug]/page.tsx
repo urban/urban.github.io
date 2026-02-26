@@ -12,9 +12,8 @@ import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 const main = (pathSlug: string) =>
   Effect.gen(function* () {
     const content = yield* Content
-    return yield* content
-      .getProjects()
-      .pipe(Effect.flatMap(Array.findFirst(({ slug }) => slug === pathSlug)))
+    const projects = yield* content.getProjects()
+    return yield* Array.findFirst(projects, ({ slug }) => slug === pathSlug)
   })
 
 const mainAll = Effect.gen(function* () {

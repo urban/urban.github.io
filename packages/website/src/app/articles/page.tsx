@@ -17,14 +17,14 @@ const main = Effect.gen(function* () {
   const articles = pipe(
     articlesMetadata,
     Array.filter(({ metadata }) => !metadata.draft),
-    Array.sortBy(Order.reverse(Order.mapInput(Order.Date, ({ metadata }) => metadata.updatedAt))),
+    Array.sortBy(Order.flip(Order.mapInput(Order.Date, ({ metadata }) => metadata.updatedAt))),
     Array.groupBy(({ metadata }) => metadata.date.getFullYear().toString()),
   )
 
   const years = pipe(
     articles,
     Record.keys,
-    Array.sortBy(Order.reverse(Order.mapInput(Order.number, (a) => parseInt(a)))),
+    Array.sortBy(Order.flip(Order.mapInput(Order.Number, (a) => parseInt(a)))),
   )
 
   return { articles, years }

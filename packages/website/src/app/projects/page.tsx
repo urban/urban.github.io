@@ -12,7 +12,7 @@ const main = Effect.gen(function* () {
     Effect.map(
       flow(
         Array.filter(({ data }) => !data.draft),
-        Array.sortBy(Order.reverse(Order.mapInput(Order.Date, ({ data }) => data.date))),
+        Array.sortBy(Order.flip(Order.mapInput(Order.Date, ({ data }) => data.date))),
       ),
     ),
   )
