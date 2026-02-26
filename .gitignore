@@ -30,7 +30,7 @@ coverage/
 # Misc
 .agents/
 .DS_Store
-tmp
+/.tmp
 
 # Sandbox state dir
 /.sandbox/
