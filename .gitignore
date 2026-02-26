@@ -34,3 +34,6 @@ tmp
 
 # Sandbox state dir
 /.sandbox/
+
+# Repos for AI reference
+/.repos/

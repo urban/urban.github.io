@@ -1,15 +1,16 @@
-import { Path } from "@effect/platform"
-import { NodeContext } from "@effect/platform-node"
-import { Effect, Layer, Schema } from "effect"
+import { NodeServices } from "@effect/platform-node"
+import { Effect, Layer, Path, Schema, ServiceMap } from "effect"
 import type { Root } from "hast"
 import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
 import { VFileData } from "../schemas"
 import { WebsiteConfig } from "./WebsiteConfig"
 
-export class LocalImagePlugin extends Effect.Service<LocalImagePlugin>()("LocalImagePlugin", {
-  // dependencies: [NodeContext.layer],
-  effect: Effect.gen(function* () {
+export class LocalImagePlugin extends ServiceMap.Service<
+  LocalImagePlugin,
+  () => (tree: Root, file: VFile) => void
+>()("LocalImagePlugin", {
+  make: Effect.gen(function* () {
     const path = yield* Path.Path
     const config = yield* WebsiteConfig
     const contentDir = config.contentDir
@@ -33,5 +34,7 @@ export class LocalImagePlugin extends Effect.Service<LocalImagePlugin>()("LocalI
         }
       })
     }
-  }).pipe(Effect.provide(Layer.mergeAll(NodeContext.layer, WebsiteConfig.layer))),
-}) {}
+  }).pipe(Effect.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer))),
+}) {
+  static readonly layer = Layer.effect(this)(this.make)
+}

@@ -4,10 +4,9 @@
   "private": true,
   "workspaces": {
     "catalog": {
-      "@effect/platform": "^0.77.4",
-      "@effect/platform-node": "^0.73.4",
-      "effect": "^3.13.4",
-      "typescript": "5.9.2"
+      "@effect/platform-node": "4.0.0-beta.13",
+      "effect": "4.0.0-beta.13",
+      "typescript": "^5.9.3"
     },
     "packages": [
       "scratchpad",
@@ -33,7 +32,7 @@
   "dependencies": {},
   "devDependencies": {
     "@changesets/cli": "2.29.8",
-    "@effect/language-service": "0.57.1",
+    "@effect/language-service": "^0.76.0",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
     "oxfmt": "0.26.0",

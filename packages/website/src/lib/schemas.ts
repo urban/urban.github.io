@@ -1,12 +1,19 @@
-import { Schema } from "effect"
+import { Schema, SchemaGetter } from "effect"
+
+const DateFromString = Schema.Date.pipe(
+  Schema.encodeTo(Schema.String, {
+    decode: SchemaGetter.Date(),
+    encode: SchemaGetter.String(),
+  }),
+)
 
 export const Work = Schema.Struct({
   company: Schema.String,
   role: Schema.String,
   location: Schema.String,
-  locationType: Schema.Literal("On-Site", "Remote", "Hybrid"),
-  dateStart: Schema.Date,
-  dateEnd: Schema.Union(Schema.Date, Schema.Literal("Present")),
+  locationType: Schema.Literals(["On-Site", "Remote", "Hybrid"]),
+  dateStart: DateFromString,
+  dateEnd: Schema.Union([DateFromString, Schema.Literal("Present")]),
 })
 
 export const Article = Schema.Struct({
@@ -28,7 +35,7 @@ export const Project = Schema.Struct({
 
 export const CollectionEntry = Schema.Struct({
   source: Schema.String,
-  data: Schema.Record({ key: Schema.String, value: Schema.Unknown }),
+  data: Schema.Record(Schema.String, Schema.Unknown),
   filepath: Schema.String,
   slug: Schema.String,
 })

@@ -1,6 +1,5 @@
-import { FileSystem, Path } from "@effect/platform"
-import { NodeContext } from "@effect/platform-node"
-import { Array, Console, Data, Effect, Layer, pipe } from "effect"
+import { NodeServices } from "@effect/platform-node"
+import { Array, Console, Data, Effect, FileSystem, Layer, Path, pipe } from "effect"
 import { glob } from "tinyglobby"
 import { WebsiteConfig } from "../src/lib/services/WebsiteConfig"
 
@@ -38,6 +37,6 @@ const program = Effect.gen(function* () {
 
 await program.pipe(
   Effect.tapError(Effect.logError),
-  Effect.provide(Layer.mergeAll(NodeContext.layer, WebsiteConfig.layer)),
+  Effect.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer)),
   Effect.runPromise,
 )

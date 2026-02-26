@@ -1,4 +1,4 @@
-import { Effect, Data } from "effect"
+import { Effect, Layer, Schema, ServiceMap } from "effect"
 import { compile, run } from "@mdx-js/mdx"
 import * as runtime from "react/jsx-runtime"
 import rehypeUnwrapImages from "rehype-unwrap-images"
@@ -10,14 +10,13 @@ import type { MDXModule } from "mdx/types"
 import type { VFile } from "vfile"
 import rehypeShiki from "@shikijs/rehype"
 
-export class MdxError extends Data.TaggedError("MdxError")<{
-  error: unknown
-  type: "compile" | "run"
-}> {}
+export class MdxError extends Schema.TaggedErrorClass<MdxError>()("MdxError", {
+  error: Schema.Unknown,
+  type: Schema.Literals(["compile", "run"]),
+}) {}
 
-export class Mdx extends Effect.Service<Mdx>()("Mdx", {
-  dependencies: [HeadingsPlugin.Default, LocalImagePlugin.Default],
-  effect: Effect.gen(function* () {
+export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
+  make: Effect.gen(function* () {
     const headings = yield* HeadingsPlugin
     const localImagePlugin = yield* LocalImagePlugin
 
@@ -56,5 +55,7 @@ export class Mdx extends Effect.Service<Mdx>()("Mdx", {
           catch: (error) => new MdxError({ error, type: "run" }),
         }).pipe(Effect.tapError(Effect.logError)),
     }
-  }),
-}) {}
+  }).pipe(Effect.provide(Layer.mergeAll(HeadingsPlugin.layer, LocalImagePlugin.layer))),
+}) {
+  static readonly layer = Layer.effect(this)(this.make)
+}
