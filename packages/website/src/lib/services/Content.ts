@@ -1,5 +1,16 @@
-import { FileSystem, Path } from "@effect/platform"
-import { Array, Console, Data, DateTime, Effect, Order, pipe, Schema } from "effect"
+import {
+  Array,
+  Console,
+  DateTime,
+  Effect,
+  FileSystem,
+  Layer,
+  Order,
+  Path,
+  pipe,
+  Schema,
+  ServiceMap,
+} from "effect"
 import matter from "gray-matter"
 import { glob } from "tinyglobby"
 import { VFile } from "vfile"
@@ -7,17 +18,16 @@ import { CollectionEntry } from "../schemas"
 import { Mdx } from "./Mdx"
 import { Metadata } from "./Metadata"
 
-class ContentError extends Data.TaggedError("ContentError")<{
-  error: unknown
-}> {}
+export class ContentError extends Schema.TaggedErrorClass<ContentError>()("ContentError", {
+  error: Schema.Unknown,
+}) {}
 
-class FileGlobError extends Data.TaggedError("FileGlobError")<{
-  error: unknown
-}> {}
+class FileGlobError extends Schema.TaggedErrorClass<FileGlobError>()("FileGlobError", {
+  error: Schema.Unknown,
+}) {}
 
-class Content extends Effect.Service<Content>()("service/Content", {
-  dependencies: [Mdx.Default],
-  effect: Effect.gen(function* () {
+export class Content extends ServiceMap.Service<Content>()("service/Content", {
+  make: Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
     const contentDir = "./content"
@@ -52,7 +62,7 @@ class Content extends Effect.Service<Content>()("service/Content", {
                 }
               }),
               //
-              Effect.flatMap(Schema.decodeUnknown(CollectionEntry)),
+              Effect.flatMap(Schema.decodeUnknownEffect(CollectionEntry)),
               // Compile MDX
               Effect.flatMap((data) =>
                 mdx.compile(new VFile({ data: { filepath }, value: data.source })).pipe(
@@ -111,7 +121,7 @@ class Content extends Effect.Service<Content>()("service/Content", {
           Effect.mapError((error) => new ContentError({ error })),
           Effect.map(
             Array.sortBy(
-              Order.reverse(
+              Order.flip(
                 Order.mapInput(Order.Date, ({ data }) =>
                   data.dateEnd === "Present" ? currentDate : data.dateEnd,
                 ),
@@ -121,6 +131,6 @@ class Content extends Effect.Service<Content>()("service/Content", {
         ),
     }
   }),
-}) {}
-
-export { Content, ContentError }
+}) {
+  static readonly layer = Layer.effect(this)(this.make)
+}

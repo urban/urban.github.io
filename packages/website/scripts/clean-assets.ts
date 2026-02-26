@@ -1,6 +1,5 @@
-import { FileSystem } from "@effect/platform"
-import { NodeContext } from "@effect/platform-node"
-import { Effect, Layer } from "effect"
+import { NodeServices } from "@effect/platform-node"
+import { Effect, FileSystem, Layer } from "effect"
 import { WebsiteConfig } from "../src/lib/services/WebsiteConfig"
 
 const program = Effect.gen(function* () {
@@ -15,6 +14,6 @@ const program = Effect.gen(function* () {
 
 await program.pipe(
   Effect.tapError(Effect.logError),
-  Effect.provide(Layer.mergeAll(NodeContext.layer, WebsiteConfig.layer)),
+  Effect.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer)),
   Effect.runPromise,
 )

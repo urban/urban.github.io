@@ -1,19 +1,21 @@
-import { Data, Effect, Schema } from "effect"
+import { Effect, Layer, Schema, ServiceMap } from "effect"
 import { Article, Project, Work } from "@/lib/schemas"
 import { CollectionEntry } from "@/lib/schemas"
 
-class MetadataError extends Data.TaggedError("MetadataError")<{
-  error: unknown
-}> {}
+export class MetadataError extends Schema.TaggedErrorClass<MetadataError>()("MetadataError", {
+  error: Schema.Unknown,
+}) {}
 
-class Metadata extends Effect.Service<Metadata>()("service/Metadata", {
-  dependencies: [],
-  sync: () => {
+export class Metadata extends ServiceMap.Service<Metadata>()("service/Metadata", {
+  make: Effect.sync(() => {
     const decode =
-      <A, I, R>(schema: Schema.Schema<A, I, R>) =>
+      <S extends Schema.Top & { readonly DecodingServices: never }>(schema: S) =>
       (data: (typeof CollectionEntry.Type)["data"]) =>
-        Schema.decodeUnknown(schema)(data).pipe(
-          Effect.mapError((error) => new MetadataError({ error })),
+        Schema.decodeEffect(schema)(data).pipe(
+          Effect.mapError((error) => {
+            console.log(error)
+            return new MetadataError({ error: error.message })
+          }),
         )
 
     return {
@@ -21,7 +23,7 @@ class Metadata extends Effect.Service<Metadata>()("service/Metadata", {
       project: decode(Project),
       work: decode(Work),
     }
-  },
-}) {}
-
-export { Metadata, MetadataError }
+  }),
+}) {
+  static readonly layer = Layer.effect(this)(this.make)
+}
