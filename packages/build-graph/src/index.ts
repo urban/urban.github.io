@@ -6,3 +6,4 @@ export {
   runWithArgs,
   type BuildGraphInput,
 } from "./cli/main"
+export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/discover"
