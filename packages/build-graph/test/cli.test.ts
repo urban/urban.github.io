@@ -81,3 +81,19 @@ test("validates that to is a directory when it already exists", async () => {
   const snapshotPath = join(toFile, GRAPH_SNAPSHOT_FILE_NAME)
   await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
 })
+
+test("fails before writing snapshot when frontmatter is invalid", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+
+  await writeFile(
+    join(from, "invalid.md"),
+    `---\ncreated: 2026-02-27\nupdated: 2026-02-27\n---\n# invalid\n`,
+  )
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isFailure(result)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+})

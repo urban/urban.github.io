@@ -2,6 +2,7 @@ import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
 import { discoverMarkdownFiles } from "../core/discover"
+import { validateDiscoveredMarkdownFiles } from "../core/validate"
 
 export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"
 export const GRAPH_SNAPSHOT_BACKUP_FILE_NAME = `${GRAPH_SNAPSHOT_FILE_NAME}.bak`
@@ -58,6 +59,8 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   yield* ensureDirectory("from", from)
   const markdownFiles = yield* discoverMarkdownFiles(from)
   yield* Console.log(`Discovered ${markdownFiles.length} Markdown file(s)`)
+  const validatedNotes = yield* validateDiscoveredMarkdownFiles(markdownFiles)
+  yield* Console.log(`Validated frontmatter for ${validatedNotes.length} Markdown file(s)`)
 
   const toExists = yield* fs.exists(to)
   if (toExists) {
