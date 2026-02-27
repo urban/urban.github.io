@@ -144,3 +144,88 @@ test("fails before writing snapshot when wikilink resolution is ambiguous", asyn
   const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
   await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
 })
+
+test("writes placeholder nodes and unresolved diagnostics for unresolved wikilinks", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+
+  await writeFile(
+    join(from, "source.md"),
+    [
+      "---",
+      "permalink: /source",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "---",
+      "[[missing/note]] [[target]]",
+      "",
+    ].join("\n"),
+  )
+  await writeFile(
+    join(from, "target.md"),
+    [
+      "---",
+      "permalink: /target",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "---",
+      "# target",
+      "",
+    ].join("\n"),
+  )
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(result)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  const snapshot = JSON.parse(await readFile(snapshotPath, "utf8"))
+
+  expect(snapshot).toEqual({
+    nodes: [
+      {
+        id: "placeholder:missing/note",
+        kind: "placeholder",
+        unresolvedTarget: "missing/note",
+      },
+      {
+        id: "source.md",
+        kind: "note",
+        relativePath: "source.md",
+        permalink: "/source",
+      },
+      {
+        id: "target.md",
+        kind: "note",
+        relativePath: "target.md",
+        permalink: "/target",
+      },
+    ],
+    edges: [
+      {
+        sourceNodeId: "source.md",
+        targetNodeId: "placeholder:missing/note",
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[missing/note]]",
+        target: "missing/note",
+        resolutionStrategy: "unresolved",
+      },
+      {
+        sourceNodeId: "source.md",
+        targetNodeId: "target.md",
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[target]]",
+        target: "target",
+        resolutionStrategy: "path",
+      },
+    ],
+    diagnostics: [
+      {
+        type: "unresolved-wikilink",
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[missing/note]]",
+        target: "missing/note",
+        placeholderNodeId: "placeholder:missing/note",
+      },
+    ],
+  })
+})

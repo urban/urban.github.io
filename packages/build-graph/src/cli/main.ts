@@ -1,6 +1,7 @@
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
+import { buildGraphSnapshot, serializeGraphSnapshot } from "../core/build"
 import { discoverMarkdownFiles } from "../core/discover"
 import { parseWikilinks } from "../core/parse"
 import {
@@ -15,12 +16,6 @@ export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"
 export const GRAPH_SNAPSHOT_BACKUP_FILE_NAME = `${GRAPH_SNAPSHOT_FILE_NAME}.bak`
 const CLI_VERSION = "0.0.0"
 
-const EMPTY_GRAPH_SNAPSHOT = {
-  nodes: [],
-  edges: [],
-  diagnostics: [],
-}
-
 export type BuildGraphInput = {
   readonly from: string
   readonly to: string
@@ -32,8 +27,6 @@ export class BuildGraphCliValidationError extends Schema.TaggedErrorClass<BuildG
     message: Schema.String,
   },
 ) {}
-
-const serializeSnapshot = () => `${JSON.stringify(EMPTY_GRAPH_SNAPSHOT, null, 2)}\n`
 
 const ensureDirectory = Effect.fn("buildGraphCli.ensureDirectory")(function* (
   label: "from" | "to",
@@ -86,6 +79,10 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   yield* Console.log(
     `Resolved ${resolutionSummary.resolvedCount} wikilink(s) via v1 path/filename/alias matching`,
   )
+  const snapshot = buildGraphSnapshot(validatedNotes, resolverV1Index, parsedWikilinks)
+  if (snapshot.diagnostics.length > 0) {
+    yield* Console.log(`Recorded ${snapshot.diagnostics.length} unresolved wikilink diagnostic(s)`)
+  }
 
   const toExists = yield* fs.exists(to)
   if (toExists) {
@@ -104,7 +101,7 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
     yield* Console.log(`Backed up ${snapshotPath} to ${backupPath}`)
   }
 
-  yield* fs.writeFileString(snapshotPath, serializeSnapshot())
+  yield* fs.writeFileString(snapshotPath, serializeGraphSnapshot(snapshot))
   yield* Console.log(`Wrote ${snapshotPath}`)
 })
 

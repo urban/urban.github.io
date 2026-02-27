@@ -6,6 +6,16 @@ export {
   runWithArgs,
   type BuildGraphInput,
 } from "./cli/main"
+export {
+  buildGraphSnapshot,
+  serializeGraphSnapshot,
+  type GraphSnapshot,
+  type GraphSnapshotEdge,
+  type GraphSnapshotNode,
+  type GraphSnapshotNoteNode,
+  type GraphSnapshotPlaceholderNode,
+  type UnresolvedWikilinkDiagnostic,
+} from "./core/build"
 export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/discover"
 export { parseWikilinks, type ParsedWikilink } from "./core/parse"
 export {
