@@ -1,0 +1,60 @@
+import { afterEach, expect, test } from "bun:test"
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { Effect, Exit } from "effect"
+import { GRAPH_SNAPSHOT_FILE_NAME, runWithArgs } from "../src/cli/main"
+
+const tempDirectories = new Set<string>()
+
+const makeTempDirectory = async () => {
+  const directory = await mkdtemp(join(tmpdir(), "build-graph-"))
+  tempDirectories.add(directory)
+  return directory
+}
+
+afterEach(async () => {
+  for (const directory of tempDirectories) {
+    await rm(directory, { recursive: true, force: true })
+  }
+  tempDirectories.clear()
+})
+
+test("writes a deterministic blank graph snapshot", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(result)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  const snapshot = await readFile(snapshotPath, "utf8")
+
+  expect(snapshot).toBe(`{\n  "nodes": [],\n  "edges": [],\n  "diagnostics": []\n}\n`)
+})
+
+test("validates that from is an existing directory", async () => {
+  const fromRoot = await makeTempDirectory()
+  const missingFrom = join(fromRoot, "missing")
+  const to = await makeTempDirectory()
+
+  const result = await Effect.runPromiseExit(runWithArgs([missingFrom, to]))
+  expect(Exit.isFailure(result)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+})
+
+test("validates that to is a directory when it already exists", async () => {
+  const from = await makeTempDirectory()
+  const toRoot = await makeTempDirectory()
+  const toFile = join(toRoot, "not-a-directory.txt")
+
+  await writeFile(toFile, "hello")
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, toFile]))
+  expect(Exit.isFailure(result)).toBeTrue()
+
+  const snapshotPath = join(toFile, GRAPH_SNAPSHOT_FILE_NAME)
+  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+})
