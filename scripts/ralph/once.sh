@@ -63,6 +63,7 @@ prd_issues_file="$(mktemp -t prd-issue.XXXXXX.md)"
 trap 'rm -f "$prd_issues_file"' EXIT
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 prompt_file="$script_dir/prompt-once.md"
+prompt_file_yolo="$script_dir/prompt-once-yolo.md"
 
 if [ ! -f "$prompt_file" ]; then
   echo "Error: Prompt file not found: $prompt_file" >&2
@@ -87,7 +88,7 @@ if [[ "$git_index_real" != "$repo_root_real/"* ]]; then
 fi
 
 if [ "$yolo" = true ]; then
-  codex exec --dangerously-bypass-approvals-and-sandbox "@$prd_issues_file @progress.txt @$prompt_file"
+  codex exec --dangerously-bypass-approvals-and-sandbox "@$prd_issues_file @progress.txt @$prompt_file_yolo"
 else
   # In some worktree layouts, git metadata (for example `.git/index`) is
   # outside the checkout path. In workspace-write sandbox mode, git write
