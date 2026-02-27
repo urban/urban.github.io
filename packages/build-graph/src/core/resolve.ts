@@ -51,6 +51,8 @@ export type WikilinkResolutionSummaryV1 = {
 
 const normalizeAlias = (value: string): string => value.trim().toLowerCase()
 
+const normalizeAlias = (value: string): string => value.trim().toLowerCase()
+
 const removeMarkdownExtension = (value: string) =>
   value.endsWith(MARKDOWN_EXTENSION) ? value.slice(0, -MARKDOWN_EXTENSION.length) : value
 
