@@ -3,7 +3,11 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect, Exit } from "effect"
-import { GRAPH_SNAPSHOT_FILE_NAME, runWithArgs } from "../src/cli/main"
+import {
+  GRAPH_SNAPSHOT_BACKUP_FILE_NAME,
+  GRAPH_SNAPSHOT_FILE_NAME,
+  runWithArgs,
+} from "../src/cli/main"
 
 const tempDirectories = new Set<string>()
 
@@ -31,6 +35,25 @@ test("writes a deterministic blank graph snapshot", async () => {
   const snapshot = await readFile(snapshotPath, "utf8")
 
   expect(snapshot).toBe(`{\n  "nodes": [],\n  "edges": [],\n  "diagnostics": []\n}\n`)
+})
+
+test("backs up an existing snapshot before overwrite", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  const previousSnapshot = `{\n  "nodes": [{ "id": "old" }],\n  "edges": [],\n  "diagnostics": []\n}\n`
+
+  await writeFile(snapshotPath, previousSnapshot)
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(result)).toBeTrue()
+
+  const backupPath = join(to, GRAPH_SNAPSHOT_BACKUP_FILE_NAME)
+  const backupSnapshot = await readFile(backupPath, "utf8")
+  const currentSnapshot = await readFile(snapshotPath, "utf8")
+
+  expect(backupSnapshot).toBe(previousSnapshot)
+  expect(currentSnapshot).toBe(`{\n  "nodes": [],\n  "edges": [],\n  "diagnostics": []\n}\n`)
 })
 
 test("validates that from is an existing directory", async () => {

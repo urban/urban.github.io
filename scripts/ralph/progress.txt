@@ -2,3 +2,4 @@
 # This file tracks autonomous task completions
 
 - 2026-02-27: Completed build-graph Slice 1 (issue #9): created packages/build-graph CLI with from/to validation and deterministic blank graph-snapshot.json write, added tests, and passed bun run typecheck + bun run test. Attempted to comment on GitHub issue #9 but network access to api.github.com is blocked in this environment.
+- 2026-02-27: Completed build-graph Slice 2 (issue #10): added backup-on-overwrite in the CLI by copying existing `to/graph-snapshot.json` to `to/graph-snapshot.json.bak` before writing a new snapshot; added CLI test coverage for backup behavior; exported backup filename constant from package entrypoint; passed `TURBO_CACHE_DIR=/tmp/turbo-cache bun run typecheck` and `TURBO_CACHE_DIR=/tmp/turbo-cache bun run test`. Attempted to comment on GitHub issue #10 but network access to api.github.com is blocked in this environment.

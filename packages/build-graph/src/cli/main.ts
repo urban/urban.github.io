@@ -3,6 +3,7 @@ import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
 
 export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"
+export const GRAPH_SNAPSHOT_BACKUP_FILE_NAME = `${GRAPH_SNAPSHOT_FILE_NAME}.bak`
 const CLI_VERSION = "0.0.0"
 
 const EMPTY_GRAPH_SNAPSHOT = {
@@ -63,6 +64,15 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   }
 
   const snapshotPath = path.join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  const snapshotExists = yield* fs.exists(snapshotPath)
+
+  if (snapshotExists) {
+    const backupPath = path.join(to, GRAPH_SNAPSHOT_BACKUP_FILE_NAME)
+    const existingSnapshot = yield* fs.readFileString(snapshotPath)
+    yield* fs.writeFileString(backupPath, existingSnapshot)
+    yield* Console.log(`Backed up ${snapshotPath} to ${backupPath}`)
+  }
+
   yield* fs.writeFileString(snapshotPath, serializeSnapshot())
   yield* Console.log(`Wrote ${snapshotPath}`)
 })
