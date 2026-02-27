@@ -64,5 +64,4 @@ gh issue list --search "is:open in:body \"#${issue_number}\"" \
   | awk -v id="$issue_number" '$1 != id { print }' >"$prd_issues_file"
 echo "PRD issue file: $prd_issues_file"
 
-# codex exec -a never --sandbox workspace-write "@$prd_issues_file @progress.txt @$prompt_file"
-codex exec -a never --sandbox workspace-write "@$prd_issues_file @progress.txt @$prompt_file"
+codex -a never exec --sandbox workspace-write "@$prd_issues_file @progress.txt @$prompt_file"
