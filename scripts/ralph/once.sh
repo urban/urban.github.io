@@ -10,12 +10,18 @@ print_help() {
   echo "  <github-prd-issue-number-or-url>  Issue number (e.g. 123) or full GitHub issue URL"
   echo ""
   echo "Options:"
+  echo "  --yolo                             Use dangerous Codex mode (bypass approvals and sandbox)"
   echo "  -h, --help                         Show this help"
 }
 
+yolo=false
 positionals=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --yolo)
+      yolo=true
+      shift
+      ;;
     -h|--help)
       print_help
       exit 0
@@ -42,6 +48,10 @@ command -v gh >/dev/null 2>&1 || {
   echo "Error: GitHub CLI (gh) is required." >&2
   exit 1
 }
+command -v git >/dev/null 2>&1 || {
+  echo "Error: git is required." >&2
+  exit 1
+}
 command -v codex >/dev/null 2>&1 || {
   echo "Error: Codex CLI is required." >&2
   exit 1
@@ -64,4 +74,27 @@ gh issue list --search "is:open in:body \"#${issue_number}\"" \
   | awk -v id="$issue_number" '$1 != id { print }' >"$prd_issues_file"
 echo "PRD issue file: $prd_issues_file"
 
-codex -a never exec --sandbox workspace-write "@$prd_issues_file @progress.txt @$prompt_file"
+git_writes_likely_blocked=false
+repo_root="$(git rev-parse --show-toplevel)"
+repo_root_real="$(cd "$repo_root" && pwd -P)"
+git_index_path="$(git rev-parse --git-path index)"
+if [[ "$git_index_path" != /* ]]; then
+  git_index_path="$repo_root_real/$git_index_path"
+fi
+git_index_real="$(cd "$(dirname "$git_index_path")" && pwd -P)/$(basename "$git_index_path")"
+if [[ "$git_index_real" != "$repo_root_real/"* ]]; then
+  git_writes_likely_blocked=true
+fi
+
+if [ "$yolo" = true ]; then
+  codex exec --dangerously-bypass-approvals-and-sandbox "@$prd_issues_file @progress.txt @$prompt_file"
+else
+  # In some worktree layouts, git metadata (for example `.git/index`) is
+  # outside the checkout path. In workspace-write sandbox mode, git write
+  # operations are likely blocked in that case.
+  if [ "$git_writes_likely_blocked" = true ]; then
+    echo "Warning: Git metadata appears to be outside the checkout path." >&2
+    echo "Warning: sandboxed Codex may be unable to run git write commands." >&2
+  fi
+  codex -a never exec --sandbox workspace-write "@$prd_issues_file @progress.txt @$prompt_file"
+fi
