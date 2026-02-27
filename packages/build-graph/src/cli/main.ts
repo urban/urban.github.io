@@ -73,7 +73,9 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
         : count,
     0,
   )
-  yield* Console.log(`Resolved ${resolvedWikilinkCount} wikilink(s) via v1 path/filename matching`)
+  yield* Console.log(
+    `Resolved ${resolvedWikilinkCount} wikilink(s) via v1 path/filename/alias matching`,
+  )
 
   const toExists = yield* fs.exists(to)
   if (toExists) {

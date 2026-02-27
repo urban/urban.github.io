@@ -5,10 +5,11 @@ const MARKDOWN_EXTENSION = ".md"
 export type WikilinkResolverV1Index = {
   readonly byPath: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
   readonly byFilename: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
+  readonly byAlias: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
 }
 
 export type WikilinkResolutionV1 = {
-  readonly strategy: "path" | "filename" | "unresolved"
+  readonly strategy: "path" | "filename" | "alias" | "unresolved"
   readonly candidates: ReadonlyArray<ValidatedMarkdownFile>
 }
 
@@ -32,6 +33,8 @@ const normalizePathLike = (value: string): string =>
     .filter((segment) => segment.length > 0)
     .join("/")
     .toLowerCase()
+
+const normalizeAlias = (value: string): string => value.trim().toLowerCase()
 
 const removeMarkdownExtension = (value: string) =>
   value.endsWith(MARKDOWN_EXTENSION) ? value.slice(0, -MARKDOWN_EXTENSION.length) : value
@@ -73,6 +76,7 @@ export const buildWikilinkResolverV1Index = (
   )
   const byPath = new Map<string, Array<ValidatedMarkdownFile>>()
   const byFilename = new Map<string, Array<ValidatedMarkdownFile>>()
+  const byAlias = new Map<string, Array<ValidatedMarkdownFile>>()
 
   for (const note of sortedNotes) {
     const normalizedRelativePath = normalizePathLike(note.relativePath)
@@ -96,11 +100,23 @@ export const buildWikilinkResolverV1Index = (
     if (filenameWithoutExtension !== normalizedFilename) {
       addCandidate(byFilename, filenameWithoutExtension, note)
     }
+
+    const normalizedAliases = new Set<string>()
+    for (const alias of note.frontmatter.aliases) {
+      const normalizedAlias = normalizeAlias(alias)
+      if (normalizedAlias.length === 0 || normalizedAliases.has(normalizedAlias)) {
+        continue
+      }
+
+      normalizedAliases.add(normalizedAlias)
+      addCandidate(byAlias, normalizedAlias, note)
+    }
   }
 
   return {
     byPath: sortCandidateMap(byPath),
     byFilename: sortCandidateMap(byFilename),
+    byAlias: sortCandidateMap(byAlias),
   }
 }
 
@@ -133,6 +149,14 @@ export const resolveWikilinkTargetV1 = (
     return {
       strategy: "filename",
       candidates: filenameCandidates,
+    }
+  }
+
+  const aliasCandidates = index.byAlias.get(normalizeAlias(target))
+  if (aliasCandidates !== undefined && aliasCandidates.length > 0) {
+    return {
+      strategy: "alias",
+      candidates: aliasCandidates,
     }
   }
 
