@@ -8,7 +8,9 @@ export {
 } from "./cli/main"
 export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/discover"
 export {
+  BuildGraphDuplicatePermalinkError,
   BuildGraphFrontmatterValidationError,
+  type DuplicatePermalinkDiagnostic,
   validateDiscoveredMarkdownFiles,
   type FrontmatterValidationDiagnostic,
   type ValidatedMarkdownFile,

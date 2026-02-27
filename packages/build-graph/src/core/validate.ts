@@ -17,6 +17,15 @@ export type FrontmatterValidationDiagnostic = Schema.Schema.Type<
   typeof FrontmatterValidationDiagnosticSchema
 >
 
+const DuplicatePermalinkDiagnosticSchema = Schema.Struct({
+  permalink: Schema.String,
+  relativePaths: Schema.Array(Schema.String),
+})
+
+export type DuplicatePermalinkDiagnostic = Schema.Schema.Type<
+  typeof DuplicatePermalinkDiagnosticSchema
+>
+
 export type ValidatedMarkdownFile = DiscoveredMarkdownFile & {
   readonly body: string
   readonly frontmatter: NoteFrontmatter
@@ -30,8 +39,28 @@ export class BuildGraphFrontmatterValidationError extends Schema.TaggedErrorClas
   },
 ) {}
 
+export class BuildGraphDuplicatePermalinkError extends Schema.TaggedErrorClass<BuildGraphDuplicatePermalinkError>()(
+  "BuildGraphDuplicatePermalinkError",
+  {
+    message: Schema.String,
+    diagnostics: Schema.Array(DuplicatePermalinkDiagnosticSchema),
+  },
+) {}
+
 const decodeRawFrontmatter = Schema.decodeUnknownSync(RawNoteFrontmatterSchema)
 const decodeNoteFrontmatter = Schema.decodeUnknownSync(NoteFrontmatterSchema)
+
+const compareStrings = (left: string, right: string) => {
+  if (left < right) {
+    return -1
+  }
+
+  if (left > right) {
+    return 1
+  }
+
+  return 0
+}
 
 const normalizeDateValue = (value: unknown): unknown =>
   value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString().slice(0, 10) : value
@@ -62,6 +91,41 @@ const formatFrontmatterDiagnostics = (
   [
     `Frontmatter validation failed for ${diagnostics.length} file(s):`,
     ...diagnostics.map(({ relativePath, message }) => `- ${relativePath}: ${message}`),
+  ].join("\n")
+
+const collectDuplicatePermalinkDiagnostics = (
+  validatedFiles: ReadonlyArray<ValidatedMarkdownFile>,
+): Array<DuplicatePermalinkDiagnostic> => {
+  const relativePathsByPermalink = new Map<string, Array<string>>()
+
+  for (const file of validatedFiles) {
+    const existing = relativePathsByPermalink.get(file.frontmatter.permalink)
+    if (existing === undefined) {
+      relativePathsByPermalink.set(file.frontmatter.permalink, [file.relativePath])
+      continue
+    }
+
+    existing.push(file.relativePath)
+  }
+
+  return [...relativePathsByPermalink.entries()]
+    .filter(([, relativePaths]) => relativePaths.length > 1)
+    .map(([permalink, relativePaths]) => ({
+      permalink,
+      relativePaths: [...relativePaths].sort(compareStrings),
+    }))
+    .sort((left, right) => compareStrings(left.permalink, right.permalink))
+}
+
+const formatDuplicatePermalinkDiagnostics = (
+  diagnostics: ReadonlyArray<DuplicatePermalinkDiagnostic>,
+): string =>
+  [
+    `Duplicate permalink validation failed for ${diagnostics.length} permalink group(s):`,
+    ...diagnostics.map(
+      ({ permalink, relativePaths }) =>
+        `- ${permalink}: ${relativePaths.map((relativePath) => `"${relativePath}"`).join(", ")}`,
+    ),
   ].join("\n")
 
 const validateFrontmatter = (frontmatter: unknown): NoteFrontmatter =>
@@ -117,6 +181,14 @@ export const validateDiscoveredMarkdownFiles = Effect.fn(
     return yield* new BuildGraphFrontmatterValidationError({
       message: formatFrontmatterDiagnostics(diagnostics),
       diagnostics,
+    })
+  }
+
+  const duplicatePermalinkDiagnostics = collectDuplicatePermalinkDiagnostics(validatedFiles)
+  if (duplicatePermalinkDiagnostics.length > 0) {
+    return yield* new BuildGraphDuplicatePermalinkError({
+      message: formatDuplicatePermalinkDiagnostics(duplicatePermalinkDiagnostics),
+      diagnostics: duplicatePermalinkDiagnostics,
     })
   }
 

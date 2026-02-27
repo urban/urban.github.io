@@ -6,6 +6,7 @@ import { join } from "node:path"
 import { Effect, Option, Result } from "effect"
 import { discoverMarkdownFiles } from "../src/core/discover"
 import {
+  BuildGraphDuplicatePermalinkError,
   BuildGraphFrontmatterValidationError,
   validateDiscoveredMarkdownFiles,
 } from "../src/core/validate"
@@ -82,4 +83,43 @@ test("aggregates frontmatter validation diagnostics across files", async () => {
   ])
   expect(error.message).toContain("a-missing-permalink.md")
   expect(error.message).toContain("nested/b-invalid-updated.md")
+})
+
+test("fails with duplicate permalink diagnostics", async () => {
+  const from = await makeTempDirectory()
+
+  await mkdir(join(from, "nested"), { recursive: true })
+  await writeFile(
+    join(from, "a.md"),
+    `---\npermalink: /shared\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# a\n`,
+  )
+  await writeFile(
+    join(from, "nested", "b.md"),
+    `---\npermalink: /shared\ncreated: 2026-02-03\nupdated: 2026-02-04\n---\n# b\n`,
+  )
+
+  const result = await Effect.runPromise(
+    Effect.gen(function* () {
+      const discovered = yield* discoverMarkdownFiles(from)
+      return yield* validateDiscoveredMarkdownFiles(discovered)
+    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+  )
+
+  expect(Result.isFailure(result)).toBeTrue()
+  const error = Option.getOrThrow(Result.getFailure(result))
+  expect(error).toBeInstanceOf(BuildGraphDuplicatePermalinkError)
+
+  if (!(error instanceof BuildGraphDuplicatePermalinkError)) {
+    throw new Error("Expected BuildGraphDuplicatePermalinkError")
+  }
+
+  expect(error.diagnostics).toEqual([
+    {
+      permalink: "/shared",
+      relativePaths: ["a.md", "nested/b.md"],
+    },
+  ])
+  expect(error.message).toContain("/shared")
+  expect(error.message).toContain("a.md")
+  expect(error.message).toContain("nested/b.md")
 })
