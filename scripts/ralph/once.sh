@@ -64,7 +64,10 @@ trap 'rm -f "$prd_issues_file"' EXIT
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 prompt_file="$script_dir/prompt-once.md"
 prompt_file_yolo="$script_dir/prompt-once-yolo.md"
+<<<<<<< HEAD
 progress_file="$script_dir/progress.txt"
+=======
+>>>>>>> 832d766 (Use dedicated YOLO prompt for unsafe once.sh runs)
 
 if [ ! -f "$prompt_file" ]; then
   echo "Error: Prompt file not found: $prompt_file" >&2
