@@ -10,9 +10,15 @@ export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/disco
 export { parseWikilinks, type ParsedWikilink } from "./core/parse"
 export {
   buildWikilinkResolverV1Index,
+  BuildGraphAmbiguousWikilinkResolutionError,
+  formatAmbiguousWikilinkResolutionDiagnostics,
   resolveWikilinkTargetV1,
+  summarizeWikilinkResolutionsV1,
+  type AmbiguousWikilinkResolutionDiagnostic,
+  type ParsedWikilinkWithSource,
   type WikilinkResolutionV1,
   type WikilinkResolverV1Index,
+  type WikilinkResolutionSummaryV1,
 } from "./core/resolve"
 export {
   BuildGraphDuplicatePermalinkError,

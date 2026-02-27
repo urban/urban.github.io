@@ -1,3 +1,5 @@
+import { Schema } from "effect"
+import type { ParsedWikilink } from "./parse"
 import type { ValidatedMarkdownFile } from "./validate"
 
 const MARKDOWN_EXTENSION = ".md"
@@ -11,6 +13,39 @@ export type WikilinkResolverV1Index = {
 export type WikilinkResolutionV1 = {
   readonly strategy: "path" | "filename" | "alias" | "unresolved"
   readonly candidates: ReadonlyArray<ValidatedMarkdownFile>
+}
+
+const AmbiguousWikilinkResolutionDiagnosticSchema = Schema.Struct({
+  sourceRelativePath: Schema.String,
+  rawWikilink: Schema.String,
+  target: Schema.String,
+  strategy: Schema.Union([
+    Schema.Literal("path"),
+    Schema.Literal("filename"),
+    Schema.Literal("alias"),
+  ]),
+  candidateRelativePaths: Schema.Array(Schema.String),
+})
+
+export type AmbiguousWikilinkResolutionDiagnostic = Schema.Schema.Type<
+  typeof AmbiguousWikilinkResolutionDiagnosticSchema
+>
+
+export class BuildGraphAmbiguousWikilinkResolutionError extends Schema.TaggedErrorClass<BuildGraphAmbiguousWikilinkResolutionError>()(
+  "BuildGraphAmbiguousWikilinkResolutionError",
+  {
+    message: Schema.String,
+    diagnostics: Schema.Array(AmbiguousWikilinkResolutionDiagnosticSchema),
+  },
+) {}
+
+export type ParsedWikilinkWithSource = ParsedWikilink & {
+  readonly sourceRelativePath: string
+}
+
+export type WikilinkResolutionSummaryV1 = {
+  readonly resolvedCount: number
+  readonly ambiguousDiagnostics: ReadonlyArray<AmbiguousWikilinkResolutionDiagnostic>
 }
 
 const compareStrings = (left: string, right: string) => {
@@ -162,3 +197,47 @@ export const resolveWikilinkTargetV1 = (
 
   return { strategy: "unresolved", candidates: noMatch }
 }
+
+export const summarizeWikilinkResolutionsV1 = (
+  index: WikilinkResolverV1Index,
+  wikilinks: ReadonlyArray<ParsedWikilinkWithSource>,
+): WikilinkResolutionSummaryV1 => {
+  let resolvedCount = 0
+  const ambiguousDiagnostics: Array<AmbiguousWikilinkResolutionDiagnostic> = []
+
+  for (const wikilink of wikilinks) {
+    const resolution = resolveWikilinkTargetV1(index, wikilink.target)
+
+    if (resolution.candidates.length === 1) {
+      resolvedCount += 1
+    }
+
+    if (resolution.strategy === "unresolved" || resolution.candidates.length <= 1) {
+      continue
+    }
+
+    ambiguousDiagnostics.push({
+      sourceRelativePath: wikilink.sourceRelativePath,
+      rawWikilink: wikilink.raw,
+      target: wikilink.target,
+      strategy: resolution.strategy,
+      candidateRelativePaths: resolution.candidates.map((candidate) => candidate.relativePath),
+    })
+  }
+
+  return {
+    resolvedCount,
+    ambiguousDiagnostics,
+  }
+}
+
+export const formatAmbiguousWikilinkResolutionDiagnostics = (
+  diagnostics: ReadonlyArray<AmbiguousWikilinkResolutionDiagnostic>,
+): string =>
+  [
+    `Ambiguous wikilink resolution failed for ${diagnostics.length} wikilink(s):`,
+    ...diagnostics.map(
+      ({ sourceRelativePath, rawWikilink, strategy, candidateRelativePaths }) =>
+        `- ${sourceRelativePath}: ${rawWikilink} matched ${candidateRelativePaths.length} candidates via ${strategy}: ${candidateRelativePaths.map((relativePath) => `"${relativePath}"`).join(", ")}`,
+    ),
+  ].join("\n")

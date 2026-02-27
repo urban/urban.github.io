@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test"
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect, Exit } from "effect"
@@ -109,6 +109,33 @@ test("fails before writing snapshot when duplicate permalinks exist", async () =
   await writeFile(
     join(from, "b.md"),
     `---\npermalink: /same\ncreated: 2026-02-27\nupdated: 2026-02-27\n---\n# b\n`,
+  )
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isFailure(result)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+})
+
+test("fails before writing snapshot when wikilink resolution is ambiguous", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+
+  await mkdir(join(from, "a"), { recursive: true })
+  await mkdir(join(from, "z"), { recursive: true })
+
+  await writeFile(
+    join(from, "source.md"),
+    `---\npermalink: /source\ncreated: 2026-02-27\nupdated: 2026-02-27\n---\n[[foo]]\n`,
+  )
+  await writeFile(
+    join(from, "a", "foo.md"),
+    `---\npermalink: /a/foo\ncreated: 2026-02-27\nupdated: 2026-02-27\n---\n# a\n`,
+  )
+  await writeFile(
+    join(from, "z", "foo.md"),
+    `---\npermalink: /z/foo\ncreated: 2026-02-27\nupdated: 2026-02-27\n---\n# z\n`,
   )
 
   const result = await Effect.runPromiseExit(runWithArgs([from, to]))

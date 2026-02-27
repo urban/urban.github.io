@@ -3,7 +3,12 @@ import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
 import { discoverMarkdownFiles } from "../core/discover"
 import { parseWikilinks } from "../core/parse"
-import { buildWikilinkResolverV1Index, resolveWikilinkTargetV1 } from "../core/resolve"
+import {
+  buildWikilinkResolverV1Index,
+  BuildGraphAmbiguousWikilinkResolutionError,
+  formatAmbiguousWikilinkResolutionDiagnostics,
+  summarizeWikilinkResolutionsV1,
+} from "../core/resolve"
 import { validateDiscoveredMarkdownFiles } from "../core/validate"
 
 export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"
@@ -63,18 +68,23 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   yield* Console.log(`Discovered ${markdownFiles.length} Markdown file(s)`)
   const validatedNotes = yield* validateDiscoveredMarkdownFiles(markdownFiles)
   yield* Console.log(`Validated frontmatter for ${validatedNotes.length} Markdown file(s)`)
-  const parsedWikilinks = validatedNotes.flatMap((note) => parseWikilinks(note.body))
+  const parsedWikilinks = validatedNotes.flatMap((note) =>
+    parseWikilinks(note.body).map((wikilink) => ({
+      ...wikilink,
+      sourceRelativePath: note.relativePath,
+    })),
+  )
   yield* Console.log(`Parsed ${parsedWikilinks.length} wikilink(s)`)
   const resolverV1Index = buildWikilinkResolverV1Index(validatedNotes)
-  const resolvedWikilinkCount = parsedWikilinks.reduce(
-    (count, wikilink) =>
-      resolveWikilinkTargetV1(resolverV1Index, wikilink.target).candidates.length > 0
-        ? count + 1
-        : count,
-    0,
-  )
+  const resolutionSummary = summarizeWikilinkResolutionsV1(resolverV1Index, parsedWikilinks)
+  if (resolutionSummary.ambiguousDiagnostics.length > 0) {
+    return yield* new BuildGraphAmbiguousWikilinkResolutionError({
+      message: formatAmbiguousWikilinkResolutionDiagnostics(resolutionSummary.ambiguousDiagnostics),
+      diagnostics: resolutionSummary.ambiguousDiagnostics,
+    })
+  }
   yield* Console.log(
-    `Resolved ${resolvedWikilinkCount} wikilink(s) via v1 path/filename/alias matching`,
+    `Resolved ${resolutionSummary.resolvedCount} wikilink(s) via v1 path/filename/alias matching`,
   )
 
   const toExists = yield* fs.exists(to)

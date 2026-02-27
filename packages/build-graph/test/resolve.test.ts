@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test"
-import { buildWikilinkResolverV1Index, resolveWikilinkTargetV1 } from "../src/core/resolve"
+import {
+  buildWikilinkResolverV1Index,
+  resolveWikilinkTargetV1,
+  summarizeWikilinkResolutionsV1,
+  type ParsedWikilinkWithSource,
+} from "../src/core/resolve"
 import type { ValidatedMarkdownFile } from "../src/core/validate"
 
 const createValidatedNote = (
@@ -17,6 +22,16 @@ const createValidatedNote = (
     aliases: [...aliases],
     published: true,
   },
+})
+
+const createWikilinkWithSource = (
+  sourceRelativePath: string,
+  target: string,
+): ParsedWikilinkWithSource => ({
+  sourceRelativePath,
+  raw: `[[${target}]]`,
+  target,
+  displayText: undefined,
 })
 
 test("uses case-insensitive path matching before filename matching", () => {
@@ -107,4 +122,30 @@ test("returns unresolved when no candidate matches path, filename, or alias", ()
 
   expect(result.strategy).toBe("unresolved")
   expect(result.candidates).toEqual([])
+})
+
+test("summarizes resolved counts while excluding unresolved and ambiguous matches", () => {
+  const notes = [
+    createValidatedNote("a/foo.md", "/a/foo"),
+    createValidatedNote("z/foo.md", "/z/foo"),
+    createValidatedNote("docs/guide.md", "/docs/guide"),
+  ]
+
+  const index = buildWikilinkResolverV1Index(notes)
+  const summary = summarizeWikilinkResolutionsV1(index, [
+    createWikilinkWithSource("source.md", "foo"),
+    createWikilinkWithSource("source.md", "guide"),
+    createWikilinkWithSource("source.md", "missing"),
+  ])
+
+  expect(summary.resolvedCount).toBe(1)
+  expect(summary.ambiguousDiagnostics).toEqual([
+    {
+      sourceRelativePath: "source.md",
+      rawWikilink: "[[foo]]",
+      target: "foo",
+      strategy: "filename",
+      candidateRelativePaths: ["a/foo.md", "z/foo.md"],
+    },
+  ])
 })
