@@ -7,6 +7,7 @@ export {
   type BuildGraphInput,
 } from "./cli/main"
 export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/discover"
+export { parseWikilinks, type ParsedWikilink } from "./core/parse"
 export {
   BuildGraphDuplicatePermalinkError,
   BuildGraphFrontmatterValidationError,

@@ -2,6 +2,7 @@ import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
 import { discoverMarkdownFiles } from "../core/discover"
+import { parseWikilinks } from "../core/parse"
 import { validateDiscoveredMarkdownFiles } from "../core/validate"
 
 export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"
@@ -61,6 +62,11 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   yield* Console.log(`Discovered ${markdownFiles.length} Markdown file(s)`)
   const validatedNotes = yield* validateDiscoveredMarkdownFiles(markdownFiles)
   yield* Console.log(`Validated frontmatter for ${validatedNotes.length} Markdown file(s)`)
+  const parsedWikilinkCount = validatedNotes.reduce(
+    (count, note) => count + parseWikilinks(note.body).length,
+    0,
+  )
+  yield* Console.log(`Parsed ${parsedWikilinkCount} wikilink(s)`)
 
   const toExists = yield* fs.exists(to)
   if (toExists) {
