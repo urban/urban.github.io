@@ -1,2 +1,4 @@
 # Ralph Auto Progress Log
 # This file tracks autonomous task completions
+
+- 2026-02-27: Completed build-graph Slice 1 (issue #9): created packages/build-graph CLI with from/to validation and deterministic blank graph-snapshot.json write, added tests, and passed bun run typecheck + bun run test. Attempted to comment on GitHub issue #9 but network access to api.github.com is blocked in this environment.
