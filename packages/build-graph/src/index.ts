@@ -9,6 +9,12 @@ export {
 export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/discover"
 export { parseWikilinks, type ParsedWikilink } from "./core/parse"
 export {
+  buildWikilinkResolverV1Index,
+  resolveWikilinkTargetV1,
+  type WikilinkResolutionV1,
+  type WikilinkResolverV1Index,
+} from "./core/resolve"
+export {
   BuildGraphDuplicatePermalinkError,
   BuildGraphFrontmatterValidationError,
   type DuplicatePermalinkDiagnostic,
