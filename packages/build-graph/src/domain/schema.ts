@@ -2,10 +2,42 @@ import { Schema } from "effect"
 
 const ISO_DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 
+const isLeapYear = (year: number): boolean =>
+  year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+
+const daysInMonth = (year: number, month: number): number => {
+  if (month === 2) {
+    return isLeapYear(year) ? 29 : 28
+  }
+
+  return [4, 6, 9, 11].includes(month) ? 30 : 31
+}
+
+const isValidIsoDateOnly = (value: string): boolean => {
+  if (!ISO_DATE_ONLY.test(value)) {
+    return false
+  }
+
+  const [yearRaw, monthRaw, dayRaw] = value.split("-")
+  const year = Number.parseInt(yearRaw, 10)
+  const month = Number.parseInt(monthRaw, 10)
+  const day = Number.parseInt(dayRaw, 10)
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+    return false
+  }
+
+  if (month < 1 || month > 12) {
+    return false
+  }
+
+  return day >= 1 && day <= daysInMonth(year, month)
+}
+
 export const IsoDateOnlyString = Schema.String.pipe(
-  Schema.refine((value): value is string => ISO_DATE_ONLY.test(value), {
+  Schema.refine((value): value is string => isValidIsoDateOnly(value), {
     identifier: "IsoDateOnlyString",
-    description: "ISO date-only string in YYYY-MM-DD format",
+    description: "Semantically valid ISO date-only string in YYYY-MM-DD format",
   }),
 )
 

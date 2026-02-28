@@ -51,19 +51,59 @@ export class BuildGraphDuplicatePermalinkError extends Schema.TaggedErrorClass<B
 const decodeRawFrontmatter = Schema.decodeUnknownSync(RawNoteFrontmatterSchema)
 const decodeNoteFrontmatter = Schema.decodeUnknownSync(NoteFrontmatterSchema)
 
-const normalizeDateValue = (value: unknown): unknown =>
-  value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString().slice(0, 10) : value
+const stripInlineComment = (value: string): string => value.replace(/\s+#.*$/, "").trim()
 
-const normalizeDateFields = (frontmatter: unknown): unknown => {
+const stripOuterQuotes = (value: string): string => {
+  if (value.length < 2) {
+    return value
+  }
+
+  const first = value[0]
+  const last = value[value.length - 1]
+  if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+    return value.slice(1, -1)
+  }
+
+  return value
+}
+
+const extractFrontmatterDateLiteral = (
+  rawFrontmatter: string | undefined,
+  key: "created" | "updated",
+): string | undefined => {
+  if (rawFrontmatter === undefined) {
+    return undefined
+  }
+
+  const pattern = new RegExp(`^\\s*${key}\\s*:\\s*(.+?)\\s*$`, "m")
+  const match = pattern.exec(rawFrontmatter)
+  if (match === null) {
+    return undefined
+  }
+
+  return stripOuterQuotes(stripInlineComment(match[1].trim()))
+}
+
+const normalizeDateValue = (value: unknown, literal: string | undefined): unknown => {
+  if (!(value instanceof Date) || Number.isNaN(value.getTime())) {
+    return value
+  }
+
+  return literal ?? value.toISOString().slice(0, 10)
+}
+
+const normalizeDateFields = (frontmatter: unknown, rawFrontmatter?: string): unknown => {
   if (frontmatter === null || typeof frontmatter !== "object" || Array.isArray(frontmatter)) {
     return frontmatter
   }
 
+  const createdLiteral = extractFrontmatterDateLiteral(rawFrontmatter, "created")
+  const updatedLiteral = extractFrontmatterDateLiteral(rawFrontmatter, "updated")
   const value = frontmatter as Record<string, unknown>
   return {
     ...value,
-    created: normalizeDateValue(value.created),
-    updated: normalizeDateValue(value.updated),
+    created: normalizeDateValue(value.created, createdLiteral),
+    updated: normalizeDateValue(value.updated, updatedLiteral),
   }
 }
 
@@ -117,9 +157,11 @@ const formatDuplicatePermalinkDiagnostics = (
     ),
   ].join("\n")
 
-const validateFrontmatter = (frontmatter: unknown): NoteFrontmatter =>
+const validateFrontmatter = (frontmatter: unknown, rawFrontmatter?: string): NoteFrontmatter =>
   decodeNoteFrontmatter(
-    normalizeRawNoteFrontmatter(decodeRawFrontmatter(normalizeDateFields(frontmatter))),
+    normalizeRawNoteFrontmatter(
+      decodeRawFrontmatter(normalizeDateFields(frontmatter, rawFrontmatter)),
+    ),
   )
 
 export const validateDiscoveredMarkdownFiles = Effect.fn(
@@ -146,7 +188,7 @@ export const validateDiscoveredMarkdownFiles = Effect.fn(
 
     const parsedFile = Option.getOrThrow(Result.getSuccess(parsedResult))
     const frontmatterResult = yield* Effect.try({
-      try: () => validateFrontmatter(parsedFile.data),
+      try: () => validateFrontmatter(parsedFile.data, parsedFile.matter),
       catch: toErrorMessage,
     }).pipe(Effect.result)
 

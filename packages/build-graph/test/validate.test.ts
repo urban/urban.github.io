@@ -48,6 +48,55 @@ test("validates frontmatter and defaults published to true", async () => {
   expect(validatedFiles[0].frontmatter.published).toBeTrue()
 })
 
+test("accepts semantically valid leap-day dates", async () => {
+  const from = await makeTempDirectory()
+
+  await writeFile(
+    join(from, "note.md"),
+    `---\npermalink: /note\ncreated: 2024-02-29\nupdated: 2024-03-01\n---\n# note\n`,
+  )
+
+  const result = await Effect.runPromise(
+    Effect.gen(function* () {
+      const discovered = yield* discoverMarkdownFiles(from)
+      return yield* validateDiscoveredMarkdownFiles(discovered)
+    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+  )
+
+  expect(Result.isSuccess(result)).toBeTrue()
+  const validatedFiles = Option.getOrThrow(Result.getSuccess(result))
+  expect(validatedFiles).toHaveLength(1)
+  expect(validatedFiles[0].frontmatter.created).toBe("2024-02-29")
+})
+
+test("rejects semantically invalid calendar dates in YYYY-MM-DD form", async () => {
+  const from = await makeTempDirectory()
+
+  await writeFile(
+    join(from, "invalid-date.md"),
+    `---\npermalink: /invalid\ncreated: 2025-02-29\nupdated: 2026-02-30\n---\n# invalid\n`,
+  )
+
+  const result = await Effect.runPromise(
+    Effect.gen(function* () {
+      const discovered = yield* discoverMarkdownFiles(from)
+      return yield* validateDiscoveredMarkdownFiles(discovered)
+    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+  )
+
+  expect(Result.isFailure(result)).toBeTrue()
+  const error = Option.getOrThrow(Result.getFailure(result))
+  expect(error).toBeInstanceOf(BuildGraphFrontmatterValidationError)
+
+  if (!(error instanceof BuildGraphFrontmatterValidationError)) {
+    throw new Error("Expected BuildGraphFrontmatterValidationError")
+  }
+
+  expect(error.diagnostics).toHaveLength(1)
+  expect(error.diagnostics[0]?.relativePath).toBe("invalid-date.md")
+  expect(error.message).toContain("invalid-date.md")
+})
+
 test("aggregates frontmatter validation diagnostics across files", async () => {
   const from = await makeTempDirectory()
 
