@@ -1,0 +1,36 @@
+import { afterEach, expect, test } from "bun:test"
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { Effect, Exit } from "effect"
+import { runWithArgs } from "../src/cli/main"
+
+const tempDirectories = new Set<string>()
+
+const makeTempDirectory = async () => {
+  const directory = await mkdtemp(join(tmpdir(), "graph-view-"))
+  tempDirectories.add(directory)
+  return directory
+}
+
+afterEach(async () => {
+  for (const directory of tempDirectories) {
+    await rm(directory, { recursive: true, force: true })
+  }
+  tempDirectories.clear()
+})
+
+test("writes baseline graph markdown from a snapshot file", async () => {
+  const fromRoot = await makeTempDirectory()
+  const toRoot = await makeTempDirectory()
+  const from = join(fromRoot, "graph-snapshot.json")
+  const to = join(toRoot, "docs", "graph.md")
+
+  await writeFile(from, '{ "nodes": [], "edges": [], "diagnostics": [] }\n')
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(result)).toBeTrue()
+
+  const markdown = await readFile(to, "utf8")
+  expect(markdown).toBe("## Graph\n\n```mermaid\ngraph LR\n```\n")
+})
