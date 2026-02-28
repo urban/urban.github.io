@@ -1,6 +1,10 @@
 import { expect, test } from "bun:test"
 import { buildGraphSnapshot } from "../src/core/build"
-import { buildWikilinkResolverV1Index, type ParsedWikilinkWithSource } from "../src/core/resolve"
+import {
+  buildWikilinkResolverV1Index,
+  BuildGraphAmbiguousWikilinkResolutionError,
+  type ParsedWikilinkWithSource,
+} from "../src/core/resolve"
 import type { ValidatedMarkdownFile } from "../src/core/validate"
 
 const createValidatedNote = (relativePath: string, permalink: string): ValidatedMarkdownFile => ({
@@ -73,4 +77,34 @@ test("creates and reuses placeholder nodes for unresolved wikilinks", () => {
       placeholderNodeId: "placeholder:missing/path",
     },
   ])
+})
+
+test("fails with ambiguity diagnostics when wikilink resolution is ambiguous", () => {
+  const notes = [
+    createValidatedNote("source.md", "/source"),
+    createValidatedNote("a/foo.md", "/a/foo"),
+    createValidatedNote("z/foo.md", "/z/foo"),
+  ]
+
+  const resolverV1Index = buildWikilinkResolverV1Index(notes)
+
+  try {
+    buildGraphSnapshot(notes, resolverV1Index, [createWikilinkWithSource("source.md", "foo")])
+    throw new Error("Expected BuildGraphAmbiguousWikilinkResolutionError")
+  } catch (error) {
+    expect(error).toBeInstanceOf(BuildGraphAmbiguousWikilinkResolutionError)
+    if (!(error instanceof BuildGraphAmbiguousWikilinkResolutionError)) {
+      throw error
+    }
+
+    expect(error.diagnostics).toEqual([
+      {
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[foo]]",
+        target: "foo",
+        strategy: "filename",
+        candidateRelativePaths: ["a/foo.md", "z/foo.md"],
+      },
+    ])
+  }
 })
