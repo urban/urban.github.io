@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node"
 import { afterEach, expect, test } from "bun:test"
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises"
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect } from "effect"
@@ -42,4 +42,38 @@ test("discovers markdown files recursively with stable normalized sorting", asyn
     "root.md",
     "z/z-note.md",
   ])
+})
+
+test("skips symlinked entries that resolve outside the discovery root", async () => {
+  const from = await makeTempDirectory()
+  const outside = await makeTempDirectory()
+
+  await mkdir(join(from, "notes"), { recursive: true })
+  await mkdir(join(outside, "external"), { recursive: true })
+  await writeFile(join(from, "notes", "inside.md"), "# inside")
+  await writeFile(join(outside, "outside.md"), "# outside")
+  await writeFile(join(outside, "external", "nested.md"), "# nested")
+  await symlink(join(outside, "outside.md"), join(from, "outside-link.md"), "file")
+  await symlink(join(outside, "external"), join(from, "external-link"), "dir")
+
+  const discovered = await Effect.runPromise(
+    discoverMarkdownFiles(from).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  expect(discovered.map((file) => file.relativePath)).toEqual(["notes/inside.md"])
+})
+
+test("handles symlink cycles without recursion or duplicate files", async () => {
+  const from = await makeTempDirectory()
+
+  await mkdir(join(from, "docs"), { recursive: true })
+  await writeFile(join(from, "docs", "note.md"), "# note")
+  await symlink(join(from, "docs"), join(from, "alias"), "dir")
+  await symlink(from, join(from, "docs", "loop"), "dir")
+
+  const discovered = await Effect.runPromise(
+    discoverMarkdownFiles(from).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  expect(discovered.map((file) => file.relativePath)).toEqual(["docs/note.md"])
 })
