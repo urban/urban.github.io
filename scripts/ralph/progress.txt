@@ -1,3 +1,4 @@
 # Ralph Auto Progress Log
 # This file tracks autonomous task completions
 2026-02-28T15:38:03-08:00 | Task 28 complete | Added packages/graph-view tracer-bullet package with baseline graph LR Mermaid->Markdown render pipeline, CLI from/to file flow, tests, and passing bun run typecheck + bun run test.
+2026-02-28T15:42:48-08:00 | Task 29 complete | Implemented Mermaid rendering for sorted note nodes and unlabeled note-to-note edges in graph-view, with deterministic render tests and updated CLI/Markdown coverage.
