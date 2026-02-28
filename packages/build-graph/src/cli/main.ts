@@ -1,7 +1,7 @@
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
-import { buildGraphSnapshot, serializeGraphSnapshot } from "../core/build"
+import { buildGraphSnapshot } from "../core/build"
 import { discoverMarkdownFiles } from "../core/discover"
 import { parseWikilinks } from "../core/parse"
 import {
@@ -10,6 +10,7 @@ import {
   formatAmbiguousWikilinkResolutionDiagnostics,
   summarizeWikilinkResolutionsV1,
 } from "../core/resolve"
+import { serializeGraphSnapshot } from "../core/snapshot"
 import { validateDiscoveredMarkdownFiles } from "../core/validate"
 
 export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"

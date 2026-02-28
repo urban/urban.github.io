@@ -2,14 +2,16 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { Effect, Exit } from "effect"
+import { Effect, Exit, Schema } from "effect"
 import {
   GRAPH_SNAPSHOT_BACKUP_FILE_NAME,
   GRAPH_SNAPSHOT_FILE_NAME,
   runWithArgs,
 } from "../src/cli/main"
+import { GraphSnapshotSchema } from "../src/domain/schema"
 
 const tempDirectories = new Set<string>()
+const decodeGraphSnapshot = Schema.decodeUnknownSync(GraphSnapshotSchema)
 
 const makeTempDirectory = async () => {
   const directory = await mkdtemp(join(tmpdir(), "build-graph-"))
@@ -35,6 +37,51 @@ test("writes a deterministic blank graph snapshot", async () => {
   const snapshot = await readFile(snapshotPath, "utf8")
 
   expect(snapshot).toBe(`{\n  "nodes": [],\n  "edges": [],\n  "diagnostics": []\n}\n`)
+})
+
+test("writes byte-identical snapshots for unchanged input across runs", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+
+  await writeFile(
+    join(from, "source.md"),
+    [
+      "---",
+      "permalink: /source",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "---",
+      "[[target]] [[missing/note]]",
+      "",
+    ].join("\n"),
+  )
+  await writeFile(
+    join(from, "target.md"),
+    [
+      "---",
+      "permalink: /target",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "---",
+      "# target",
+      "",
+    ].join("\n"),
+  )
+
+  const firstResult = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(firstResult)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  const firstSnapshot = await readFile(snapshotPath, "utf8")
+
+  const secondResult = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(secondResult)).toBeTrue()
+
+  const secondSnapshot = await readFile(snapshotPath, "utf8")
+  const backupSnapshot = await readFile(join(to, GRAPH_SNAPSHOT_BACKUP_FILE_NAME), "utf8")
+
+  expect(secondSnapshot).toBe(firstSnapshot)
+  expect(backupSnapshot).toBe(firstSnapshot)
 })
 
 test("backs up an existing snapshot before overwrite", async () => {
@@ -228,4 +275,6 @@ test("writes placeholder nodes and unresolved diagnostics for unresolved wikilin
       },
     ],
   })
+
+  expect(decodeGraphSnapshot(snapshot)).toEqual(snapshot)
 })

@@ -1,9 +1,17 @@
-import { Graph, Schema } from "effect"
+import { Graph } from "effect"
+import type {
+  GraphSnapshot,
+  GraphSnapshotEdge,
+  GraphSnapshotNode,
+  GraphSnapshotResolutionStrategy,
+  UnresolvedWikilinkDiagnostic,
+} from "../domain/schema"
 import {
   resolveWikilinkTargetV1,
   type ParsedWikilinkWithSource,
   type WikilinkResolverV1Index,
 } from "./resolve"
+import { normalizeGraphSnapshot } from "./snapshot"
 import type { ValidatedMarkdownFile } from "./validate"
 
 const compareStrings = (left: string, right: string) => {
@@ -32,66 +40,11 @@ const toPlaceholderNodeId = (target: string): string => {
   return `placeholder:${normalizedTarget.length > 0 ? normalizedTarget : "unknown"}`
 }
 
-const GraphSnapshotNoteNodeSchema = Schema.Struct({
-  id: Schema.String,
-  kind: Schema.Literal("note"),
-  relativePath: Schema.String,
-  permalink: Schema.String,
-})
-
-const GraphSnapshotPlaceholderNodeSchema = Schema.Struct({
-  id: Schema.String,
-  kind: Schema.Literal("placeholder"),
-  unresolvedTarget: Schema.String,
-})
-
-const GraphSnapshotEdgeSchema = Schema.Struct({
-  sourceNodeId: Schema.String,
-  targetNodeId: Schema.String,
-  sourceRelativePath: Schema.String,
-  rawWikilink: Schema.String,
-  target: Schema.String,
-  displayText: Schema.optional(Schema.String),
-  resolutionStrategy: Schema.Union([
-    Schema.Literal("path"),
-    Schema.Literal("filename"),
-    Schema.Literal("alias"),
-    Schema.Literal("unresolved"),
-  ]),
-})
-
-const UnresolvedWikilinkDiagnosticSchema = Schema.Struct({
-  type: Schema.Literal("unresolved-wikilink"),
-  sourceRelativePath: Schema.String,
-  rawWikilink: Schema.String,
-  target: Schema.String,
-  placeholderNodeId: Schema.String,
-})
-
-const GraphSnapshotSchema = Schema.Struct({
-  nodes: Schema.Array(
-    Schema.Union([GraphSnapshotNoteNodeSchema, GraphSnapshotPlaceholderNodeSchema]),
-  ),
-  edges: Schema.Array(GraphSnapshotEdgeSchema),
-  diagnostics: Schema.Array(UnresolvedWikilinkDiagnosticSchema),
-})
-
-export type GraphSnapshotNoteNode = Schema.Schema.Type<typeof GraphSnapshotNoteNodeSchema>
-export type GraphSnapshotPlaceholderNode = Schema.Schema.Type<
-  typeof GraphSnapshotPlaceholderNodeSchema
->
-export type GraphSnapshotNode = GraphSnapshotNoteNode | GraphSnapshotPlaceholderNode
-export type GraphSnapshotEdge = Schema.Schema.Type<typeof GraphSnapshotEdgeSchema>
-export type UnresolvedWikilinkDiagnostic = Schema.Schema.Type<
-  typeof UnresolvedWikilinkDiagnosticSchema
->
-export type GraphSnapshot = Schema.Schema.Type<typeof GraphSnapshotSchema>
-
 const createWikilinkEdge = (
   sourceNodeId: string,
   targetNodeId: string,
   wikilink: ParsedWikilinkWithSource,
-  resolutionStrategy: "path" | "filename" | "alias" | "unresolved",
+  resolutionStrategy: GraphSnapshotResolutionStrategy,
 ): GraphSnapshotEdge =>
   wikilink.displayText === undefined
     ? {
@@ -111,31 +64,6 @@ const createWikilinkEdge = (
         displayText: wikilink.displayText,
         resolutionStrategy,
       }
-
-const normalizeSnapshot = (snapshot: GraphSnapshot): GraphSnapshot => ({
-  nodes: [...snapshot.nodes].sort((left, right) => compareStrings(left.id, right.id)),
-  edges: [...snapshot.edges].sort((left, right) => {
-    const sourceComparison = compareStrings(left.sourceNodeId, right.sourceNodeId)
-    if (sourceComparison !== 0) {
-      return sourceComparison
-    }
-
-    const targetComparison = compareStrings(left.targetNodeId, right.targetNodeId)
-    if (targetComparison !== 0) {
-      return targetComparison
-    }
-
-    return compareStrings(left.rawWikilink, right.rawWikilink)
-  }),
-  diagnostics: [...snapshot.diagnostics].sort((left, right) => {
-    const sourceComparison = compareStrings(left.sourceRelativePath, right.sourceRelativePath)
-    if (sourceComparison !== 0) {
-      return sourceComparison
-    }
-
-    return compareStrings(left.rawWikilink, right.rawWikilink)
-  }),
-})
 
 export const buildGraphSnapshot = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
@@ -254,12 +182,9 @@ export const buildGraphSnapshot = (
     }
   })
 
-  return normalizeSnapshot({
+  return normalizeGraphSnapshot({
     nodes: [...graph.nodes.values()],
     edges: [...graph.edges.values()].map((edge) => edge.data),
     diagnostics,
   })
 }
-
-export const serializeGraphSnapshot = (snapshot: GraphSnapshot): string =>
-  `${JSON.stringify(snapshot, null, 2)}\n`

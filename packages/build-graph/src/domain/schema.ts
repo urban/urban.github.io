@@ -29,6 +29,69 @@ export const NoteFrontmatterSchema = Schema.Struct({
 
 export type NoteFrontmatter = Schema.Schema.Type<typeof NoteFrontmatterSchema>
 
+export const GraphSnapshotResolutionStrategySchema = Schema.Union([
+  Schema.Literal("path"),
+  Schema.Literal("filename"),
+  Schema.Literal("alias"),
+  Schema.Literal("unresolved"),
+])
+
+export const GraphSnapshotNoteNodeSchema = Schema.Struct({
+  id: Schema.String,
+  kind: Schema.Literal("note"),
+  relativePath: Schema.String,
+  permalink: Schema.String,
+})
+
+export const GraphSnapshotPlaceholderNodeSchema = Schema.Struct({
+  id: Schema.String,
+  kind: Schema.Literal("placeholder"),
+  unresolvedTarget: Schema.String,
+})
+
+export const GraphSnapshotNodeSchema = Schema.Union([
+  GraphSnapshotNoteNodeSchema,
+  GraphSnapshotPlaceholderNodeSchema,
+])
+
+export const GraphSnapshotEdgeSchema = Schema.Struct({
+  sourceNodeId: Schema.String,
+  targetNodeId: Schema.String,
+  sourceRelativePath: Schema.String,
+  rawWikilink: Schema.String,
+  target: Schema.String,
+  displayText: Schema.optional(Schema.String),
+  resolutionStrategy: GraphSnapshotResolutionStrategySchema,
+})
+
+export const UnresolvedWikilinkDiagnosticSchema = Schema.Struct({
+  type: Schema.Literal("unresolved-wikilink"),
+  sourceRelativePath: Schema.String,
+  rawWikilink: Schema.String,
+  target: Schema.String,
+  placeholderNodeId: Schema.String,
+})
+
+export const GraphSnapshotSchema = Schema.Struct({
+  nodes: Schema.Array(GraphSnapshotNodeSchema),
+  edges: Schema.Array(GraphSnapshotEdgeSchema),
+  diagnostics: Schema.Array(UnresolvedWikilinkDiagnosticSchema),
+})
+
+export type GraphSnapshotResolutionStrategy = Schema.Schema.Type<
+  typeof GraphSnapshotResolutionStrategySchema
+>
+export type GraphSnapshotNoteNode = Schema.Schema.Type<typeof GraphSnapshotNoteNodeSchema>
+export type GraphSnapshotPlaceholderNode = Schema.Schema.Type<
+  typeof GraphSnapshotPlaceholderNodeSchema
+>
+export type GraphSnapshotNode = Schema.Schema.Type<typeof GraphSnapshotNodeSchema>
+export type GraphSnapshotEdge = Schema.Schema.Type<typeof GraphSnapshotEdgeSchema>
+export type UnresolvedWikilinkDiagnostic = Schema.Schema.Type<
+  typeof UnresolvedWikilinkDiagnosticSchema
+>
+export type GraphSnapshot = Schema.Schema.Type<typeof GraphSnapshotSchema>
+
 export const normalizeRawNoteFrontmatter = (frontmatter: RawNoteFrontmatter): NoteFrontmatter => ({
   permalink: frontmatter.permalink,
   created: frontmatter.created,
