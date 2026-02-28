@@ -58,6 +58,11 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   const path = yield* Path.Path
 
   yield* ensureDirectory("from", from)
+  const toExistsAtStart = yield* fs.exists(to)
+  if (toExistsAtStart) {
+    yield* ensureDirectory("to", to)
+  }
+
   const markdownFiles = yield* discoverMarkdownFiles(from)
   yield* Console.log(`Discovered ${markdownFiles.length} Markdown file(s)`)
   const validatedNotes = yield* validateDiscoveredMarkdownFiles(markdownFiles)
@@ -85,10 +90,7 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
     yield* Console.log(`Recorded ${snapshot.diagnostics.length} unresolved wikilink diagnostic(s)`)
   }
 
-  const toExists = yield* fs.exists(to)
-  if (toExists) {
-    yield* ensureDirectory("to", to)
-  } else {
+  if (!toExistsAtStart) {
     yield* fs.makeDirectory(to, { recursive: true })
   }
 

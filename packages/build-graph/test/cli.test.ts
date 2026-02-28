@@ -2,8 +2,9 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { Effect, Exit, Schema } from "effect"
+import { Effect, Exit, Option, Result, Schema } from "effect"
 import {
+  BuildGraphCliValidationError,
   GRAPH_SNAPSHOT_BACKUP_FILE_NAME,
   GRAPH_SNAPSHOT_FILE_NAME,
   runWithArgs,
@@ -124,6 +125,35 @@ test("validates that to is a directory when it already exists", async () => {
 
   const result = await Effect.runPromiseExit(runWithArgs([from, toFile]))
   expect(Exit.isFailure(result)).toBeTrue()
+
+  const snapshotPath = join(toFile, GRAPH_SNAPSHOT_FILE_NAME)
+  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+})
+
+test("fails fast on invalid to directory before frontmatter validation", async () => {
+  const from = await makeTempDirectory()
+  const toRoot = await makeTempDirectory()
+  const toFile = join(toRoot, "not-a-directory.txt")
+
+  await writeFile(toFile, "hello")
+  await writeFile(
+    join(from, "invalid.md"),
+    `---\ncreated: 2026-02-27\nupdated: 2026-02-27\n---\n# invalid\n`,
+  )
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, toFile]))
+  expect(Exit.isFailure(result)).toBeTrue()
+
+  if (!Exit.isFailure(result)) {
+    throw new Error("Expected CLI execution to fail")
+  }
+
+  const firstError = Option.getOrThrow(Result.getSuccess(Exit.findError(result)))
+  expect(firstError).toBeInstanceOf(BuildGraphCliValidationError)
+  if (!(firstError instanceof BuildGraphCliValidationError)) {
+    throw new Error("Expected BuildGraphCliValidationError")
+  }
+  expect(firstError.message).toContain("Invalid to directory")
 
   const snapshotPath = join(toFile, GRAPH_SNAPSHOT_FILE_NAME)
   await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
