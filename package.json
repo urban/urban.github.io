@@ -4,8 +4,8 @@
   "private": true,
   "workspaces": {
     "catalog": {
-      "@effect/platform-node": "4.0.0-beta.18",
-      "effect": "4.0.0-beta.18",
+      "@effect/platform-node": "4.0.0-beta.20",
+      "effect": "4.0.0-beta.20",
       "typescript": "^5.9.3"
     },
     "packages": [
