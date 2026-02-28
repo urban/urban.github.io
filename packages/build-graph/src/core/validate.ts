@@ -7,6 +7,7 @@ import {
   type NoteFrontmatter,
 } from "../domain/schema"
 import type { DiscoveredMarkdownFile } from "./discover"
+import { compareStrings } from "./helpers"
 
 const FrontmatterValidationDiagnosticSchema = Schema.Struct({
   relativePath: Schema.String,
@@ -49,18 +50,6 @@ export class BuildGraphDuplicatePermalinkError extends Schema.TaggedErrorClass<B
 
 const decodeRawFrontmatter = Schema.decodeUnknownSync(RawNoteFrontmatterSchema)
 const decodeNoteFrontmatter = Schema.decodeUnknownSync(NoteFrontmatterSchema)
-
-const compareStrings = (left: string, right: string) => {
-  if (left < right) {
-    return -1
-  }
-
-  if (left > right) {
-    return 1
-  }
-
-  return 0
-}
 
 const normalizeDateValue = (value: unknown): unknown =>
   value instanceof Date && !Number.isNaN(value.getTime()) ? value.toISOString().slice(0, 10) : value

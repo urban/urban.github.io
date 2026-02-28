@@ -1,5 +1,6 @@
 import { Schema } from "effect"
 import type { ParsedWikilink } from "./parse"
+import { compareStrings, normalizePathLike } from "./helpers"
 import type { ValidatedMarkdownFile } from "./validate"
 
 const MARKDOWN_EXTENSION = ".md"
@@ -47,27 +48,6 @@ export type WikilinkResolutionSummaryV1 = {
   readonly resolvedCount: number
   readonly ambiguousDiagnostics: ReadonlyArray<AmbiguousWikilinkResolutionDiagnostic>
 }
-
-const compareStrings = (left: string, right: string) => {
-  if (left < right) {
-    return -1
-  }
-
-  if (left > right) {
-    return 1
-  }
-
-  return 0
-}
-
-const normalizePathLike = (value: string): string =>
-  value
-    .trim()
-    .replaceAll("\\", "/")
-    .split("/")
-    .filter((segment) => segment.length > 0)
-    .join("/")
-    .toLowerCase()
 
 const normalizeAlias = (value: string): string => value.trim().toLowerCase()
 

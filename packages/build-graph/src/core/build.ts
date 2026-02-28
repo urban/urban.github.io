@@ -6,6 +6,7 @@ import type {
   GraphSnapshotResolutionStrategy,
   UnresolvedWikilinkDiagnostic,
 } from "../domain/schema"
+import { compareStrings, normalizePathLike } from "./helpers"
 import {
   resolveWikilinkTargetV1,
   type ParsedWikilinkWithSource,
@@ -14,29 +15,8 @@ import {
 import { normalizeGraphSnapshot } from "./snapshot"
 import type { ValidatedMarkdownFile } from "./validate"
 
-const compareStrings = (left: string, right: string) => {
-  if (left < right) {
-    return -1
-  }
-
-  if (left > right) {
-    return 1
-  }
-
-  return 0
-}
-
-const normalizeTargetForPlaceholder = (value: string): string =>
-  value
-    .trim()
-    .replaceAll("\\", "/")
-    .split("/")
-    .filter((segment) => segment.length > 0)
-    .join("/")
-    .toLowerCase()
-
 const toPlaceholderNodeId = (target: string): string => {
-  const normalizedTarget = normalizeTargetForPlaceholder(target)
+  const normalizedTarget = normalizePathLike(target)
   return `placeholder:${normalizedTarget.length > 0 ? normalizedTarget : "unknown"}`
 }
 
@@ -135,7 +115,7 @@ export const buildGraphSnapshot = (
         continue
       }
 
-      const normalizedTarget = normalizeTargetForPlaceholder(wikilink.target)
+      const normalizedTarget = normalizePathLike(wikilink.target)
       const existingPlaceholder = placeholderByNormalizedTarget.get(normalizedTarget)
       if (existingPlaceholder !== undefined) {
         Graph.addEdge(

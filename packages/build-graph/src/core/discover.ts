@@ -1,20 +1,9 @@
 import { Effect, FileSystem, Path } from "effect"
+import { compareStrings } from "./helpers"
 
 export type DiscoveredMarkdownFile = {
   readonly absolutePath: string
   readonly relativePath: string
-}
-
-const compareStrings = (left: string, right: string) => {
-  if (left < right) {
-    return -1
-  }
-
-  if (left > right) {
-    return 1
-  }
-
-  return 0
 }
 
 const isMarkdownFile = (path: Path.Path, filePath: string) =>

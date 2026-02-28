@@ -1,19 +1,8 @@
 import { Schema } from "effect"
 import { GraphSnapshotSchema, type GraphSnapshot } from "../domain/schema"
+import { compareStrings } from "./helpers"
 
 const decodeGraphSnapshot = Schema.decodeUnknownSync(GraphSnapshotSchema)
-
-const compareStrings = (left: string, right: string) => {
-  if (left < right) {
-    return -1
-  }
-
-  if (left > right) {
-    return 1
-  }
-
-  return 0
-}
 
 export const normalizeGraphSnapshot = (snapshot: GraphSnapshot): GraphSnapshot => ({
   nodes: [...snapshot.nodes].sort((left, right) => {
