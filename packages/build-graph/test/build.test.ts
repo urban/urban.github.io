@@ -8,7 +8,6 @@ import {
 import type { ValidatedMarkdownFile } from "../src/core/validate"
 
 const createValidatedNote = (relativePath: string, permalink: string): ValidatedMarkdownFile => ({
-  absolutePath: `/notes/${relativePath}`,
   relativePath,
   body: "",
   frontmatter: {

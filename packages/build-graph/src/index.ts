@@ -8,7 +8,7 @@ export {
 } from "./cli/main"
 export { buildGraphSnapshot } from "./core/build"
 export { normalizeGraphSnapshot, serializeGraphSnapshot } from "./core/snapshot"
-export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./core/discover"
+export { discoverMarkdownFiles, type DiscoveredMarkdownFile } from "./cli/discover"
 export { parseWikilinks, type ParsedWikilink } from "./core/parse"
 export {
   buildWikilinkResolverV1Index,
@@ -26,8 +26,9 @@ export {
   BuildGraphDuplicatePermalinkError,
   BuildGraphFrontmatterValidationError,
   type DuplicatePermalinkDiagnostic,
-  validateDiscoveredMarkdownFiles,
+  validateMarkdownSources,
   type FrontmatterValidationDiagnostic,
+  type MarkdownSourceFile,
   type ValidatedMarkdownFile,
 } from "./core/validate"
 export {

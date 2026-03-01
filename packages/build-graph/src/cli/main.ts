@@ -1,8 +1,8 @@
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Console, Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
+import { discoverMarkdownFiles } from "./discover"
 import { buildGraphSnapshot } from "../core/build"
-import { discoverMarkdownFiles } from "../core/discover"
 import { parseWikilinks } from "../core/parse"
 import {
   buildWikilinkResolverV1Index,
@@ -11,7 +11,7 @@ import {
   summarizeWikilinkResolutionsV1,
 } from "../core/resolve"
 import { serializeGraphSnapshot } from "../core/snapshot"
-import { validateDiscoveredMarkdownFiles } from "../core/validate"
+import { validateMarkdownSources, type MarkdownSourceFile } from "../core/validate"
 
 export const GRAPH_SNAPSHOT_FILE_NAME = "graph-snapshot.json"
 export const GRAPH_SNAPSHOT_BACKUP_FILE_NAME = `${GRAPH_SNAPSHOT_FILE_NAME}.bak`
@@ -50,6 +50,22 @@ const ensureDirectory = Effect.fn("buildGraphCli.ensureDirectory")(function* (
   }
 })
 
+const loadMarkdownSources = Effect.fn("buildGraphCli.loadMarkdownSources")(function* (
+  markdownFiles: ReadonlyArray<{ readonly absolutePath: string; readonly relativePath: string }>,
+) {
+  const fs = yield* FileSystem.FileSystem
+  const markdownSources: Array<MarkdownSourceFile> = []
+
+  for (const file of markdownFiles) {
+    markdownSources.push({
+      relativePath: file.relativePath,
+      source: yield* fs.readFileString(file.absolutePath),
+    })
+  }
+
+  return markdownSources
+})
+
 export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* ({
   from,
   to,
@@ -65,7 +81,8 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
 
   const markdownFiles = yield* discoverMarkdownFiles(from)
   yield* Console.log(`Discovered ${markdownFiles.length} Markdown file(s)`)
-  const validatedNotes = yield* validateDiscoveredMarkdownFiles(markdownFiles)
+  const markdownSources = yield* loadMarkdownSources(markdownFiles)
+  const validatedNotes = yield* validateMarkdownSources(markdownSources)
   yield* Console.log(`Validated frontmatter for ${validatedNotes.length} Markdown file(s)`)
   const parsedWikilinks = validatedNotes.flatMap((note) =>
     parseWikilinks(note.body).map((wikilink) => ({

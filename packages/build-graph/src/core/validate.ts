@@ -1,4 +1,4 @@
-import { Effect, FileSystem, Option, Result, Schema } from "effect"
+import { Effect, Option, Result, Schema } from "effect"
 import matter from "gray-matter"
 import {
   NoteFrontmatterSchema,
@@ -6,7 +6,6 @@ import {
   normalizeRawNoteFrontmatter,
   type NoteFrontmatter,
 } from "../domain/schema"
-import type { DiscoveredMarkdownFile } from "./discover"
 import { compareStrings } from "./helpers"
 
 const FrontmatterValidationDiagnosticSchema = Schema.Struct({
@@ -27,7 +26,13 @@ export type DuplicatePermalinkDiagnostic = Schema.Schema.Type<
   typeof DuplicatePermalinkDiagnosticSchema
 >
 
-export type ValidatedMarkdownFile = DiscoveredMarkdownFile & {
+export type MarkdownSourceFile = {
+  readonly relativePath: string
+  readonly source: string
+}
+
+export type ValidatedMarkdownFile = {
+  readonly relativePath: string
   readonly body: string
   readonly frontmatter: NoteFrontmatter
 }
@@ -164,17 +169,15 @@ const validateFrontmatter = (frontmatter: unknown, rawFrontmatter?: string): Not
     ),
   )
 
-export const validateDiscoveredMarkdownFiles = Effect.fn(
-  "buildGraph.validateDiscoveredMarkdownFiles",
-)(function* (markdownFiles: ReadonlyArray<DiscoveredMarkdownFile>) {
-  const fs = yield* FileSystem.FileSystem
+export const validateMarkdownSources = Effect.fn("buildGraph.validateMarkdownSources")(function* (
+  markdownFiles: ReadonlyArray<MarkdownSourceFile>,
+) {
   const diagnostics: Array<FrontmatterValidationDiagnostic> = []
   const validatedFiles: Array<ValidatedMarkdownFile> = []
 
   for (const file of markdownFiles) {
-    const source = yield* fs.readFileString(file.absolutePath)
     const parsedResult = yield* Effect.try({
-      try: () => matter(source),
+      try: () => matter(file.source),
       catch: toErrorMessage,
     }).pipe(Effect.result)
 

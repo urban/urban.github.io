@@ -12,7 +12,6 @@ const createValidatedNote = (
   permalink: string,
   aliases: ReadonlyArray<string> = [],
 ): ValidatedMarkdownFile => ({
-  absolutePath: `/notes/${relativePath}`,
   relativePath,
   body: "",
   frontmatter: {

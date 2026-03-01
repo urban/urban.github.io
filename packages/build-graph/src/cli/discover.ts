@@ -1,5 +1,5 @@
 import { Effect, FileSystem, Path } from "effect"
-import { compareStrings } from "./helpers"
+import { compareStrings } from "../core/helpers"
 
 export type DiscoveredMarkdownFile = {
   readonly absolutePath: string
