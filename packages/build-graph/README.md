@@ -96,6 +96,104 @@ Example unresolved placeholder node id:
 
 - `placeholder:missing/note`
 
+## v1 to v2 Migration Guide
+
+v2 is a hard cutover on snapshot contract shape. CLI usage does not change.
+
+Field mapping:
+
+- `nodes` -> unchanged in v2.
+- `edges` -> unchanged in v2.
+- `diagnostics` -> unchanged in v2.
+- `schemaVersion` -> new required field, always `"2"`.
+- `indexes.nodesById` -> new required lookup map of `node.id` to node.
+- `indexes.edgesBySourceNodeId` -> new required lookup map of `edge.sourceNodeId` to edges.
+- `indexes.edgesByTargetNodeId` -> new required lookup map of `edge.targetNodeId` to edges.
+
+Consumer checklist:
+
+- accept and validate `schemaVersion: "2"` at read boundary.
+- keep existing `nodes`/`edges`/`diagnostics` parsing logic.
+- optionally switch hot-path lookups to required `indexes`.
+- remove assumptions that snapshot root has only three arrays.
+
+Before (v1 shape):
+
+```json
+{
+  "nodes": [
+    { "id": "source.md", "kind": "note", "relativePath": "source.md", "permalink": "/source" }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "source.md",
+      "targetNodeId": "target.md",
+      "sourceRelativePath": "source.md",
+      "rawWikilink": "[[target]]",
+      "target": "target",
+      "resolutionStrategy": "path"
+    }
+  ],
+  "diagnostics": []
+}
+```
+
+After (v2 shape):
+
+```json
+{
+  "schemaVersion": "2",
+  "nodes": [
+    { "id": "source.md", "kind": "note", "relativePath": "source.md", "permalink": "/source" }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "source.md",
+      "targetNodeId": "target.md",
+      "sourceRelativePath": "source.md",
+      "rawWikilink": "[[target]]",
+      "target": "target",
+      "resolutionStrategy": "path"
+    }
+  ],
+  "diagnostics": [],
+  "indexes": {
+    "nodesById": {
+      "source.md": {
+        "id": "source.md",
+        "kind": "note",
+        "relativePath": "source.md",
+        "permalink": "/source"
+      }
+    },
+    "edgesBySourceNodeId": {
+      "source.md": [
+        {
+          "sourceNodeId": "source.md",
+          "targetNodeId": "target.md",
+          "sourceRelativePath": "source.md",
+          "rawWikilink": "[[target]]",
+          "target": "target",
+          "resolutionStrategy": "path"
+        }
+      ]
+    },
+    "edgesByTargetNodeId": {
+      "target.md": [
+        {
+          "sourceNodeId": "source.md",
+          "targetNodeId": "target.md",
+          "sourceRelativePath": "source.md",
+          "rawWikilink": "[[target]]",
+          "target": "target",
+          "resolutionStrategy": "path"
+        }
+      ]
+    }
+  }
+}
+```
+
 ## Public API (Curated v2)
 
 Supported exports from `@urban/build-graph`:
