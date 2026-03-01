@@ -63,14 +63,6 @@ command -v gh >/dev/null 2>&1 || {
   echo "Error: GitHub CLI (gh) is required." >&2
   exit 1
 }
-command -v docker >/dev/null 2>&1 || {
-  echo "Error: Docker CLI is required." >&2
-  exit 1
-}
-docker sandbox --help >/dev/null 2>&1 || {
-  echo "Error: Docker sandbox command is required (docker sandbox ...)." >&2
-  exit 1
-}
 command -v git >/dev/null 2>&1 || {
   echo "Error: git is required." >&2
   exit 1
@@ -106,7 +98,7 @@ echo "PRD issue file: $prd_issues_file"
 for ((i=1; i<=iterations; i++)); do
   echo "Iteration $i"
   echo "--------------------------------"
-  result=$(docker sandbox run codex exec --dangerously-bypass-approvals-and-sandbox "@$prd_issues_file @$progress_file @$prompt_file")
+  result=$(codex exec --dangerously-bypass-approvals-and-sandbox "@$prd_issues_file @$progress_file @$prompt_file")
 
   echo "$result"
 
