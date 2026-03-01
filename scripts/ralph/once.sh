@@ -102,6 +102,8 @@ else
   if [ "$git_writes_likely_blocked" = true ]; then
     echo "Warning: Git metadata appears to be outside the checkout path." >&2
     echo "Warning: sandboxed Codex may be unable to run git write commands." >&2
+    codex -a never exec --sandbox workspace-write "@$prd_issues_file @$progress_file @$prompt_file"
+  else
+    codex -a never exec --sandbox workspace-write "@$prd_issues_file @$progress_file @$prompt_file_yolo"
   fi
-  codex -a never exec --sandbox workspace-write "@$prd_issues_file @$progress_file @$prompt_file"
 fi
