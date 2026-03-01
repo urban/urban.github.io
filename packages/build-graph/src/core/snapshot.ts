@@ -51,6 +51,31 @@ const groupEdgesByNodeId = (
   return toSortedRecord([...grouped.entries()])
 }
 
+const assertUniqueNodeIds = (nodes: ReadonlyArray<GraphSnapshotNode>): void => {
+  const seenNodeIds = new Set<string>()
+  for (const node of nodes) {
+    if (seenNodeIds.has(node.id)) {
+      throw new Error(`Duplicate node id in snapshot nodes: ${node.id}`)
+    }
+    seenNodeIds.add(node.id)
+  }
+}
+
+const assertEdgesReferenceExistingNodes = (
+  nodes: ReadonlyArray<GraphSnapshotNode>,
+  edges: ReadonlyArray<GraphSnapshotEdge>,
+): void => {
+  const nodeIds = new Set(nodes.map((node) => node.id))
+  for (const edge of edges) {
+    if (!nodeIds.has(edge.sourceNodeId)) {
+      throw new Error(`Edge references missing source node id: ${edge.sourceNodeId}`)
+    }
+    if (!nodeIds.has(edge.targetNodeId)) {
+      throw new Error(`Edge references missing target node id: ${edge.targetNodeId}`)
+    }
+  }
+}
+
 export const normalizeGraphSnapshot = (snapshot: GraphSnapshotArrays): GraphSnapshot => {
   const nodes = [...snapshot.nodes].sort((left, right) => {
     const idComparison = compareStrings(left.id, right.id)
@@ -113,6 +138,9 @@ export const normalizeGraphSnapshot = (snapshot: GraphSnapshotArrays): GraphSnap
 
     return compareStrings(left.placeholderNodeId, right.placeholderNodeId)
   })
+
+  assertUniqueNodeIds(nodes)
+  assertEdgesReferenceExistingNodes(nodes, edges)
 
   return {
     schemaVersion: "2",

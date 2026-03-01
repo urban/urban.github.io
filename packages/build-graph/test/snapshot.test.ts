@@ -71,6 +71,21 @@ test("serializes deterministic, byte-stable snapshots", () => {
   expect(Object.keys(snapshot.indexes.nodesById)).toEqual(["a.md", "placeholder:missing", "z.md"])
   expect(Object.keys(snapshot.indexes.edgesBySourceNodeId)).toEqual(["a.md", "z.md"])
   expect(Object.keys(snapshot.indexes.edgesByTargetNodeId)).toEqual(["placeholder:missing", "z.md"])
+  expect(snapshot.nodes.map((node) => snapshot.indexes.nodesById[node.id])).toEqual([
+    ...snapshot.nodes,
+  ])
+  expect(snapshot.indexes.edgesBySourceNodeId["a.md"]).toEqual(
+    snapshot.edges.filter((edge) => edge.sourceNodeId === "a.md"),
+  )
+  expect(snapshot.indexes.edgesBySourceNodeId["z.md"]).toEqual(
+    snapshot.edges.filter((edge) => edge.sourceNodeId === "z.md"),
+  )
+  expect(snapshot.indexes.edgesByTargetNodeId["placeholder:missing"]).toEqual(
+    snapshot.edges.filter((edge) => edge.targetNodeId === "placeholder:missing"),
+  )
+  expect(snapshot.indexes.edgesByTargetNodeId["z.md"]).toEqual(
+    snapshot.edges.filter((edge) => edge.targetNodeId === "z.md"),
+  )
 })
 
 test("enforces snapshot contract shape via schema", () => {
@@ -92,4 +107,56 @@ test("enforces snapshot contract shape via schema", () => {
   }
 
   expect(() => serializeGraphSnapshot(invalidSnapshot)).toThrow()
+})
+
+test("fails when node ids are duplicated and indexes cannot stay identity-consistent", () => {
+  const duplicateNodeIdsSnapshot = {
+    nodes: [
+      {
+        id: "dup.md",
+        kind: "note",
+        relativePath: "dup.md",
+        permalink: "/dup-a",
+      },
+      {
+        id: "dup.md",
+        kind: "placeholder",
+        unresolvedTarget: "dup",
+      },
+    ],
+    edges: [],
+    diagnostics: [],
+  }
+
+  expect(() => serializeGraphSnapshot(duplicateNodeIdsSnapshot)).toThrow(
+    "Duplicate node id in snapshot nodes: dup.md",
+  )
+})
+
+test("fails when an edge references a missing node id", () => {
+  const missingNodeReferenceSnapshot = {
+    nodes: [
+      {
+        id: "a.md",
+        kind: "note",
+        relativePath: "a.md",
+        permalink: "/a",
+      },
+    ],
+    edges: [
+      {
+        sourceNodeId: "a.md",
+        targetNodeId: "missing.md",
+        sourceRelativePath: "a.md",
+        rawWikilink: "[[missing]]",
+        target: "missing",
+        resolutionStrategy: "unresolved",
+      },
+    ],
+    diagnostics: [],
+  }
+
+  expect(() => serializeGraphSnapshot(missingNodeReferenceSnapshot)).toThrow(
+    "Edge references missing target node id: missing.md",
+  )
 })
