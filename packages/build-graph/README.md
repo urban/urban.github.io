@@ -96,6 +96,32 @@ Example unresolved placeholder node id:
 
 - `placeholder:missing/note`
 
+## Public API (Curated v2)
+
+Supported exports from `@urban/build-graph`:
+
+- `runWithArgs` (CLI entry for programmatic execution).
+- `validateMarkdownSources`.
+- `parseWikilinks`.
+- `buildWikilinkResolverV1Index`.
+- `resolveWikilinkTargetV1`.
+- `summarizeWikilinkResolutionsV1`.
+- `formatAmbiguousWikilinkResolutionDiagnostics`.
+- `buildGraphSnapshot`.
+- `normalizeGraphSnapshot`.
+- `serializeGraphSnapshot`.
+- `GraphSnapshotSchema`.
+- Tagged errors:
+  - `BuildGraphFrontmatterValidationError`
+  - `BuildGraphDuplicatePermalinkError`
+  - `BuildGraphAmbiguousWikilinkResolutionError`
+
+Not part of the curated public surface:
+
+- CLI internals/constants (`buildGraphCommand`, `runBuildGraph`, snapshot file-name constants).
+- Filesystem discovery internals (`discoverMarkdownFiles`).
+- Low-level domain helper schemas/types that are implementation details.
+
 ## Determinism
 
 The output is normalized and sorted, so unchanged input produces byte-identical snapshots across runs.
