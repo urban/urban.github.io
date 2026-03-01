@@ -63,7 +63,9 @@ const snapshotWithNotesAndEdges: GraphSnapshot = {
 test("renders note nodes and unlabeled note-to-note edges with graph LR", () => {
   const mermaid = renderMermaidFromSnapshot(snapshotWithNotesAndEdges)
 
-  expect(mermaid).toBe('graph LR\n  n0["notes/a.md"]\n  n1["notes/z.md"]\n  n0 --> n1\n  n1 --> n0')
+  expect(mermaid).toBe(
+    'graph LR\n  n0["notes/a.md"]\n  n1["notes/z.md"]\n  n2["unresolved:missing"]\n  n0 --> n1\n  n1 --> n0\n  n1 --> n2\n  classDef unresolved fill:#fff4e5,stroke:#d97706,color:#7c2d12,stroke-width:1px\n  class n2 unresolved',
+  )
   expect(mermaid.includes("|")).toBeFalse()
 })
 

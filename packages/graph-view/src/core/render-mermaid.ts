@@ -19,13 +19,27 @@ export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
       return compareStrings(left.permalink, right.permalink)
     })
 
-  const noteNodeIds = new Set(noteNodes.map((node) => node.id))
-  const noteNodeMermaidIds = new Map(
-    noteNodes.map((node, index) => [node.id, `n${index}`] as const),
+  const placeholderNodes = snapshot.nodes
+    .filter((node) => node.kind === "placeholder")
+    .sort((left, right) => {
+      const idComparison = compareStrings(left.id, right.id)
+      if (idComparison !== 0) {
+        return idComparison
+      }
+
+      return compareStrings(left.unresolvedTarget, right.unresolvedTarget)
+    })
+
+  const renderedNodes = [...noteNodes, ...placeholderNodes]
+  const renderedNodeIds = new Set(renderedNodes.map((node) => node.id))
+  const nodeMermaidIds = new Map(
+    renderedNodes.map((node, index) => [node.id, `n${index}`] as const),
   )
 
   const edgeLines = snapshot.edges
-    .filter((edge) => noteNodeIds.has(edge.sourceNodeId) && noteNodeIds.has(edge.targetNodeId))
+    .filter(
+      (edge) => renderedNodeIds.has(edge.sourceNodeId) && renderedNodeIds.has(edge.targetNodeId),
+    )
     .sort((left, right) => {
       const sourceComparison = compareStrings(left.sourceNodeId, right.sourceNodeId)
       if (sourceComparison !== 0) {
@@ -60,14 +74,31 @@ export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
       return compareStrings(left.displayText ?? "", right.displayText ?? "")
     })
     .map((edge) => {
-      const sourceId = noteNodeMermaidIds.get(edge.sourceNodeId)!
-      const targetId = noteNodeMermaidIds.get(edge.targetNodeId)!
+      const sourceId = nodeMermaidIds.get(edge.sourceNodeId)!
+      const targetId = nodeMermaidIds.get(edge.targetNodeId)!
       return `  ${sourceId} --> ${targetId}`
     })
 
-  const nodeLines = noteNodes.map(
+  const noteNodeLines = noteNodes.map(
     (node, index) => `  n${index}[${JSON.stringify(node.relativePath)}]`,
   )
+  const placeholderNodeLines = placeholderNodes.map(
+    (node, index) =>
+      `  n${noteNodes.length + index}[${JSON.stringify(`unresolved:${node.unresolvedTarget}`)}]`,
+  )
+  const placeholderClassLines = placeholderNodes.map(
+    (_, index) => `  class n${noteNodes.length + index} unresolved`,
+  )
+  const hasPlaceholderNodes = placeholderNodes.length > 0
 
-  return ["graph LR", ...nodeLines, ...edgeLines].join("\n")
+  return [
+    "graph LR",
+    ...noteNodeLines,
+    ...placeholderNodeLines,
+    ...edgeLines,
+    ...(hasPlaceholderNodes
+      ? ["  classDef unresolved fill:#fff4e5,stroke:#d97706,color:#7c2d12,stroke-width:1px"]
+      : []),
+    ...placeholderClassLines,
+  ].join("\n")
 }
