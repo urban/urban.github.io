@@ -6,3 +6,4 @@
 2026-03-01T04:23:42+00:00 | Task 31 complete | Added strict graph-view decode layer for GraphSnapshot object/JSON string input with schema validation, wired CLI to decode before rendering, added decode + CLI invalid-input tests, and verified bun run typecheck + bun run test.
 2026-03-01T04:26:09Z | Task 32 complete | Hardened graph-view CLI path validation for from/to paths, added typed CLI read/write validation errors, expanded CLI failure-path coverage, and verified bun run typecheck + bun run test.
 2026-03-01T04:28:37Z | Task 33 complete | Finalized graph-view deterministic Mermaid rendering with locale-independent ordering, expanded stable public API exports/schemas, added deterministic reordering coverage + public API surface test, and verified bun run typecheck + bun run test.
+2026-03-01T04:29:56Z | Task 28 complete | Closed GitHub issue #28 as already implemented (commit 25e1f8a), re-verified with bun run typecheck + bun run test.
