@@ -1,6 +1,16 @@
 import type { GraphSnapshot } from "../domain/schema"
 
-const compareStrings = (left: string, right: string): number => left.localeCompare(right)
+const compareStrings = (left: string, right: string): number => {
+  if (left < right) {
+    return -1
+  }
+
+  if (left > right) {
+    return 1
+  }
+
+  return 0
+}
 
 export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
   const noteNodes = snapshot.nodes

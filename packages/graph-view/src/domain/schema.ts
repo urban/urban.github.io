@@ -1,40 +1,64 @@
-export type GraphSnapshotResolutionStrategy = "path" | "filename" | "alias" | "unresolved"
+import { Schema } from "effect"
 
-export type GraphSnapshotNoteNode = {
-  readonly id: string
-  readonly kind: "note"
-  readonly relativePath: string
-  readonly permalink: string
-}
+export const GraphSnapshotResolutionStrategySchema = Schema.Union([
+  Schema.Literal("path"),
+  Schema.Literal("filename"),
+  Schema.Literal("alias"),
+  Schema.Literal("unresolved"),
+])
+export type GraphSnapshotResolutionStrategy = Schema.Schema.Type<
+  typeof GraphSnapshotResolutionStrategySchema
+>
 
-export type GraphSnapshotPlaceholderNode = {
-  readonly id: string
-  readonly kind: "placeholder"
-  readonly unresolvedTarget: string
-}
+export const GraphSnapshotNoteNodeSchema = Schema.Struct({
+  id: Schema.String,
+  kind: Schema.Literal("note"),
+  relativePath: Schema.String,
+  permalink: Schema.String,
+})
+export type GraphSnapshotNoteNode = Schema.Schema.Type<typeof GraphSnapshotNoteNodeSchema>
 
-export type GraphSnapshotNode = GraphSnapshotNoteNode | GraphSnapshotPlaceholderNode
+export const GraphSnapshotPlaceholderNodeSchema = Schema.Struct({
+  id: Schema.String,
+  kind: Schema.Literal("placeholder"),
+  unresolvedTarget: Schema.String,
+})
+export type GraphSnapshotPlaceholderNode = Schema.Schema.Type<
+  typeof GraphSnapshotPlaceholderNodeSchema
+>
 
-export type GraphSnapshotEdge = {
-  readonly sourceNodeId: string
-  readonly targetNodeId: string
-  readonly sourceRelativePath: string
-  readonly rawWikilink: string
-  readonly target: string
-  readonly displayText?: string
-  readonly resolutionStrategy: GraphSnapshotResolutionStrategy
-}
+export const GraphSnapshotNodeSchema = Schema.Union([
+  GraphSnapshotNoteNodeSchema,
+  GraphSnapshotPlaceholderNodeSchema,
+])
+export type GraphSnapshotNode = Schema.Schema.Type<typeof GraphSnapshotNodeSchema>
 
-export type UnresolvedWikilinkDiagnostic = {
-  readonly type: "unresolved-wikilink"
-  readonly sourceRelativePath: string
-  readonly rawWikilink: string
-  readonly target: string
-  readonly placeholderNodeId: string
-}
+export const GraphSnapshotEdgeSchema = Schema.Struct({
+  sourceNodeId: Schema.String,
+  targetNodeId: Schema.String,
+  sourceRelativePath: Schema.String,
+  rawWikilink: Schema.String,
+  target: Schema.String,
+  displayText: Schema.optional(Schema.String),
+  resolutionStrategy: GraphSnapshotResolutionStrategySchema,
+})
+export type GraphSnapshotEdge = Schema.Schema.Type<typeof GraphSnapshotEdgeSchema>
 
-export type GraphSnapshot = {
-  readonly nodes: ReadonlyArray<GraphSnapshotNode>
-  readonly edges: ReadonlyArray<GraphSnapshotEdge>
-  readonly diagnostics: ReadonlyArray<UnresolvedWikilinkDiagnostic>
-}
+export const UnresolvedWikilinkDiagnosticSchema = Schema.Struct({
+  type: Schema.Literal("unresolved-wikilink"),
+  sourceRelativePath: Schema.String,
+  rawWikilink: Schema.String,
+  target: Schema.String,
+  placeholderNodeId: Schema.String,
+})
+export type UnresolvedWikilinkDiagnostic = Schema.Schema.Type<
+  typeof UnresolvedWikilinkDiagnosticSchema
+>
+
+export const GraphSnapshotSchema = Schema.Struct({
+  nodes: Schema.Array(GraphSnapshotNodeSchema),
+  edges: Schema.Array(GraphSnapshotEdgeSchema),
+  diagnostics: Schema.Array(UnresolvedWikilinkDiagnosticSchema),
+})
+
+export type GraphSnapshot = Schema.Schema.Type<typeof GraphSnapshotSchema>

@@ -75,3 +75,24 @@ test("renders deterministic mermaid text for unchanged input", () => {
 
   expect(first).toBe(second)
 })
+
+test("renders deterministic mermaid text regardless of node and edge input order", () => {
+  const reorderedSnapshot: GraphSnapshot = {
+    nodes: [
+      snapshotWithNotesAndEdges.nodes[2],
+      snapshotWithNotesAndEdges.nodes[0],
+      snapshotWithNotesAndEdges.nodes[1],
+    ],
+    edges: [
+      snapshotWithNotesAndEdges.edges[2],
+      snapshotWithNotesAndEdges.edges[0],
+      snapshotWithNotesAndEdges.edges[1],
+    ],
+    diagnostics: snapshotWithNotesAndEdges.diagnostics,
+  }
+
+  const first = renderMermaidFromSnapshot(snapshotWithNotesAndEdges)
+  const second = renderMermaidFromSnapshot(reorderedSnapshot)
+
+  expect(first).toBe(second)
+})
