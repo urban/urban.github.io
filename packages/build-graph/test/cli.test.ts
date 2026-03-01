@@ -37,7 +37,9 @@ test("writes a deterministic blank graph snapshot", async () => {
   const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
   const snapshot = await readFile(snapshotPath, "utf8")
 
-  expect(snapshot).toBe(`{\n  "nodes": [],\n  "edges": [],\n  "diagnostics": []\n}\n`)
+  expect(snapshot).toBe(
+    `{\n  "schemaVersion": "2",\n  "nodes": [],\n  "edges": [],\n  "diagnostics": [],\n  "indexes": {\n    "nodesById": {},\n    "edgesBySourceNodeId": {},\n    "edgesByTargetNodeId": {}\n  }\n}\n`,
+  )
 })
 
 test("writes byte-identical snapshots for unchanged input across runs", async () => {
@@ -101,7 +103,9 @@ test("backs up an existing snapshot before overwrite", async () => {
   const currentSnapshot = await readFile(snapshotPath, "utf8")
 
   expect(backupSnapshot).toBe(previousSnapshot)
-  expect(currentSnapshot).toBe(`{\n  "nodes": [],\n  "edges": [],\n  "diagnostics": []\n}\n`)
+  expect(currentSnapshot).toBe(
+    `{\n  "schemaVersion": "2",\n  "nodes": [],\n  "edges": [],\n  "diagnostics": [],\n  "indexes": {\n    "nodesById": {},\n    "edgesBySourceNodeId": {},\n    "edgesByTargetNodeId": {}\n  }\n}\n`,
+  )
 })
 
 test("validates that from is an existing directory", async () => {
@@ -258,6 +262,7 @@ test("writes placeholder nodes and unresolved diagnostics for unresolved wikilin
   const snapshot = JSON.parse(await readFile(snapshotPath, "utf8"))
 
   expect(snapshot).toEqual({
+    schemaVersion: "2",
     nodes: [
       {
         id: "placeholder:missing/note",
@@ -304,6 +309,69 @@ test("writes placeholder nodes and unresolved diagnostics for unresolved wikilin
         placeholderNodeId: "placeholder:missing/note",
       },
     ],
+    indexes: {
+      nodesById: {
+        "placeholder:missing/note": {
+          id: "placeholder:missing/note",
+          kind: "placeholder",
+          unresolvedTarget: "missing/note",
+        },
+        "source.md": {
+          id: "source.md",
+          kind: "note",
+          relativePath: "source.md",
+          permalink: "/source",
+        },
+        "target.md": {
+          id: "target.md",
+          kind: "note",
+          relativePath: "target.md",
+          permalink: "/target",
+        },
+      },
+      edgesBySourceNodeId: {
+        "source.md": [
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "placeholder:missing/note",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[missing/note]]",
+            target: "missing/note",
+            resolutionStrategy: "unresolved",
+          },
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "target.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[target]]",
+            target: "target",
+            resolutionStrategy: "path",
+          },
+        ],
+      },
+      edgesByTargetNodeId: {
+        "placeholder:missing/note": [
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "placeholder:missing/note",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[missing/note]]",
+            target: "missing/note",
+            resolutionStrategy: "unresolved",
+          },
+        ],
+        "target.md": [
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "target.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[target]]",
+            target: "target",
+            resolutionStrategy: "path",
+          },
+        ],
+      },
+    },
   })
 
   expect(decodeGraphSnapshot(snapshot)).toEqual(snapshot)

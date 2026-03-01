@@ -1,8 +1,12 @@
 import { expect, test } from "bun:test"
+import { Schema } from "effect"
 import { serializeGraphSnapshot } from "../src/core/snapshot"
-import type { GraphSnapshot } from "../src/domain/schema"
+import { GraphSnapshotSchema, type GraphSnapshot } from "../src/domain/schema"
+
+const decodeGraphSnapshot = Schema.decodeUnknownSync(GraphSnapshotSchema)
 
 const makeUnsortedSnapshot = (): GraphSnapshot => ({
+  schemaVersion: "2",
   nodes: [
     {
       id: "z.md",
@@ -50,6 +54,11 @@ const makeUnsortedSnapshot = (): GraphSnapshot => ({
       placeholderNodeId: "placeholder:missing",
     },
   ],
+  indexes: {
+    nodesById: {},
+    edgesBySourceNodeId: {},
+    edgesByTargetNodeId: {},
+  },
 })
 
 test("serializes deterministic, byte-stable snapshots", () => {
@@ -57,9 +66,11 @@ test("serializes deterministic, byte-stable snapshots", () => {
   const second = serializeGraphSnapshot(makeUnsortedSnapshot())
 
   expect(first).toBe(second)
-  expect(first).toBe(
-    `{\n  "nodes": [\n    {\n      "id": "a.md",\n      "kind": "note",\n      "relativePath": "a.md",\n      "permalink": "/a"\n    },\n    {\n      "id": "placeholder:missing",\n      "kind": "placeholder",\n      "unresolvedTarget": "missing"\n    },\n    {\n      "id": "z.md",\n      "kind": "note",\n      "relativePath": "z.md",\n      "permalink": "/z"\n    }\n  ],\n  "edges": [\n    {\n      "sourceNodeId": "a.md",\n      "targetNodeId": "z.md",\n      "sourceRelativePath": "a.md",\n      "rawWikilink": "[[z|Z]]",\n      "target": "z",\n      "displayText": "Z",\n      "resolutionStrategy": "path"\n    },\n    {\n      "sourceNodeId": "z.md",\n      "targetNodeId": "placeholder:missing",\n      "sourceRelativePath": "z.md",\n      "rawWikilink": "[[missing]]",\n      "target": "missing",\n      "resolutionStrategy": "unresolved"\n    }\n  ],\n  "diagnostics": [\n    {\n      "type": "unresolved-wikilink",\n      "sourceRelativePath": "z.md",\n      "rawWikilink": "[[missing]]",\n      "target": "missing",\n      "placeholderNodeId": "placeholder:missing"\n    }\n  ]\n}\n`,
-  )
+  const snapshot = decodeGraphSnapshot(JSON.parse(first))
+  expect(snapshot.schemaVersion).toBe("2")
+  expect(Object.keys(snapshot.indexes.nodesById)).toEqual(["a.md", "placeholder:missing", "z.md"])
+  expect(Object.keys(snapshot.indexes.edgesBySourceNodeId)).toEqual(["a.md", "z.md"])
+  expect(Object.keys(snapshot.indexes.edgesByTargetNodeId)).toEqual(["placeholder:missing", "z.md"])
 })
 
 test("enforces snapshot contract shape via schema", () => {
@@ -72,7 +83,13 @@ test("enforces snapshot contract shape via schema", () => {
     ],
     edges: [],
     diagnostics: [],
-  } as unknown as GraphSnapshot
+    schemaVersion: "2",
+    indexes: {
+      nodesById: {},
+      edgesBySourceNodeId: {},
+      edgesByTargetNodeId: {},
+    },
+  }
 
   expect(() => serializeGraphSnapshot(invalidSnapshot)).toThrow()
 })
