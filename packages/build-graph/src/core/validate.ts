@@ -37,6 +37,16 @@ export type ValidatedMarkdownFile = {
   readonly frontmatter: NoteFrontmatter
 }
 
+type FrontmatterParseOutcome =
+  | {
+      readonly _tag: "diagnostic"
+      readonly diagnostic: FrontmatterValidationDiagnostic
+    }
+  | {
+      readonly _tag: "validated"
+      readonly validatedFile: ValidatedMarkdownFile
+    }
+
 export class BuildGraphFrontmatterValidationError extends Schema.TaggedErrorClass<BuildGraphFrontmatterValidationError>()(
   "BuildGraphFrontmatterValidationError",
   {
@@ -169,46 +179,64 @@ const validateFrontmatter = (frontmatter: unknown, rawFrontmatter?: string): Not
     ),
   )
 
+const validateMarkdownSource = Effect.fn("buildGraph.validateMarkdownSource")(function* (
+  file: MarkdownSourceFile,
+): Effect.fn.Return<FrontmatterParseOutcome> {
+  const parsedResult = yield* Effect.try({
+    try: () => matter(file.source),
+    catch: toErrorMessage,
+  }).pipe(Effect.result)
+
+  if (Result.isFailure(parsedResult)) {
+    return {
+      _tag: "diagnostic",
+      diagnostic: {
+        relativePath: file.relativePath,
+        message: Option.getOrThrow(Result.getFailure(parsedResult)),
+      },
+    }
+  }
+
+  const parsedFile = Option.getOrThrow(Result.getSuccess(parsedResult))
+  const frontmatterResult = yield* Effect.try({
+    try: () => validateFrontmatter(parsedFile.data, parsedFile.matter),
+    catch: toErrorMessage,
+  }).pipe(Effect.result)
+
+  if (Result.isFailure(frontmatterResult)) {
+    return {
+      _tag: "diagnostic",
+      diagnostic: {
+        relativePath: file.relativePath,
+        message: Option.getOrThrow(Result.getFailure(frontmatterResult)),
+      },
+    }
+  }
+
+  const frontmatter = Option.getOrThrow(Result.getSuccess(frontmatterResult))
+  return {
+    _tag: "validated",
+    validatedFile: {
+      ...file,
+      body: parsedFile.content,
+      frontmatter,
+    },
+  }
+})
+
 export const validateMarkdownSources = Effect.fn("buildGraph.validateMarkdownSources")(function* (
   markdownFiles: ReadonlyArray<MarkdownSourceFile>,
 ) {
   const diagnostics: Array<FrontmatterValidationDiagnostic> = []
   const validatedFiles: Array<ValidatedMarkdownFile> = []
 
-  for (const file of markdownFiles) {
-    const parsedResult = yield* Effect.try({
-      try: () => matter(file.source),
-      catch: toErrorMessage,
-    }).pipe(Effect.result)
-
-    if (Result.isFailure(parsedResult)) {
-      diagnostics.push({
-        relativePath: file.relativePath,
-        message: Option.getOrThrow(Result.getFailure(parsedResult)),
-      })
+  const outcomes = yield* Effect.forEach(markdownFiles, validateMarkdownSource)
+  for (const outcome of outcomes) {
+    if (outcome._tag === "diagnostic") {
+      diagnostics.push(outcome.diagnostic)
       continue
     }
-
-    const parsedFile = Option.getOrThrow(Result.getSuccess(parsedResult))
-    const frontmatterResult = yield* Effect.try({
-      try: () => validateFrontmatter(parsedFile.data, parsedFile.matter),
-      catch: toErrorMessage,
-    }).pipe(Effect.result)
-
-    if (Result.isFailure(frontmatterResult)) {
-      diagnostics.push({
-        relativePath: file.relativePath,
-        message: Option.getOrThrow(Result.getFailure(frontmatterResult)),
-      })
-      continue
-    }
-
-    const frontmatter = Option.getOrThrow(Result.getSuccess(frontmatterResult))
-    validatedFiles.push({
-      ...file,
-      body: parsedFile.content,
-      frontmatter,
-    })
+    validatedFiles.push(outcome.validatedFile)
   }
 
   if (diagnostics.length > 0) {

@@ -96,21 +96,6 @@ export const buildGraphSnapshot = (
       }
 
       const resolution = resolveWikilinkTargetV1(resolverV1Index, wikilink.target)
-      if (resolution.strategy !== "unresolved" && resolution.candidates.length > 1) {
-        const diagnostic = {
-          sourceRelativePath: wikilink.sourceRelativePath,
-          rawWikilink: wikilink.raw,
-          target: wikilink.target,
-          strategy: resolution.strategy,
-          candidateRelativePaths: resolution.candidates.map((candidate) => candidate.relativePath),
-        } as const
-
-        throw new BuildGraphAmbiguousWikilinkResolutionError({
-          message: formatAmbiguousWikilinkResolutionDiagnostics([diagnostic]),
-          diagnostics: [diagnostic],
-        })
-      }
-
       if (resolution.candidates.length === 1) {
         const targetRelativePath = resolution.candidates[0]?.relativePath
         if (targetRelativePath === undefined) {

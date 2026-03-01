@@ -11,6 +11,7 @@ export const compareStrings = (left: string, right: string) => {
 }
 
 export const normalizePathLike = (value: string): string =>
+  // Keep lightweight manual normalization to preserve current v1/v2 matching semantics exactly.
   value
     .trim()
     .replaceAll("\\", "/")
