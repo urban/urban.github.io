@@ -1,8 +1,8 @@
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
-import { Effect, FileSystem, Path } from "effect"
+import { Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
+import { decodeGraphSnapshot } from "../core/decode"
 import { renderMarkdownFromSnapshot } from "../core/render-markdown"
-import type { GraphSnapshot } from "../domain/schema"
 
 const CLI_VERSION = "0.0.0"
 
@@ -11,18 +11,118 @@ export type GraphViewInput = {
   readonly to: string
 }
 
+export class GraphViewCliValidationError extends Schema.TaggedErrorClass<GraphViewCliValidationError>()(
+  "GraphViewCliValidationError",
+  {
+    message: Schema.String,
+  },
+) {}
+
+export class GraphViewCliReadError extends Schema.TaggedErrorClass<GraphViewCliReadError>()(
+  "GraphViewCliReadError",
+  {
+    path: Schema.String,
+    message: Schema.String,
+    error: Schema.Unknown,
+  },
+) {}
+
+export class GraphViewCliWriteError extends Schema.TaggedErrorClass<GraphViewCliWriteError>()(
+  "GraphViewCliWriteError",
+  {
+    path: Schema.String,
+    message: Schema.String,
+    error: Schema.Unknown,
+  },
+) {}
+
+const ensureFile = Effect.fn("graphViewCli.ensureFile")(function* (path: string) {
+  const fs = yield* FileSystem.FileSystem
+  const exists = yield* fs.exists(path)
+
+  if (!exists) {
+    return yield* new GraphViewCliValidationError({
+      message: `Invalid from file: ${path} does not exist`,
+    })
+  }
+
+  const stat = yield* fs.stat(path)
+  if (stat.type !== "File") {
+    return yield* new GraphViewCliValidationError({
+      message: `Invalid from file: ${path} is not a file`,
+    })
+  }
+})
+
+const ensureOutputPath = Effect.fn("graphViewCli.ensureOutputPath")(function* (path: string) {
+  const fs = yield* FileSystem.FileSystem
+  const pathService = yield* Path.Path
+  const parentDirectory = pathService.dirname(path)
+  const parentExists = yield* fs.exists(parentDirectory)
+
+  if (parentExists) {
+    const parentStat = yield* fs.stat(parentDirectory)
+    if (parentStat.type !== "Directory") {
+      return yield* new GraphViewCliValidationError({
+        message: `Invalid to output directory: ${parentDirectory} is not a directory`,
+      })
+    }
+  }
+
+  const fileExists = yield* fs.exists(path)
+
+  if (fileExists) {
+    const outputStat = yield* fs.stat(path)
+    if (outputStat.type !== "File") {
+      return yield* new GraphViewCliValidationError({
+        message: `Invalid to output file: ${path} is not a file`,
+      })
+    }
+  }
+})
+
 export const runGraphView = Effect.fn("graphViewCli.runGraphView")(function* ({
   from,
   to,
 }: GraphViewInput) {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
-  const snapshotText = yield* fs.readFileString(from)
-  const snapshot = JSON.parse(snapshotText) as GraphSnapshot
+  yield* ensureFile(from)
+  yield* ensureOutputPath(to)
+
+  const snapshotText = yield* fs.readFileString(from).pipe(
+    Effect.mapError(
+      (error) =>
+        new GraphViewCliReadError({
+          path: from,
+          message: `Failed to read graph snapshot from ${from}`,
+          error,
+        }),
+    ),
+  )
+  const snapshot = yield* decodeGraphSnapshot(snapshotText)
   const markdown = renderMarkdownFromSnapshot(snapshot)
 
-  yield* fs.makeDirectory(path.dirname(to), { recursive: true })
-  yield* fs.writeFileString(to, markdown)
+  yield* fs.makeDirectory(path.dirname(to), { recursive: true }).pipe(
+    Effect.mapError(
+      (error) =>
+        new GraphViewCliWriteError({
+          path: to,
+          message: `Failed to prepare output directory for ${to}`,
+          error,
+        }),
+    ),
+  )
+  yield* fs.writeFileString(to, markdown).pipe(
+    Effect.mapError(
+      (error) =>
+        new GraphViewCliWriteError({
+          path: to,
+          message: `Failed to write graph markdown to ${to}`,
+          error,
+        }),
+    ),
+  )
 })
 
 export const graphViewCommand = Command.make(
