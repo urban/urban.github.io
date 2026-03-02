@@ -20,6 +20,28 @@ export class GraphVisualizerCliValidationError extends Schema.TaggedErrorClass<G
   },
 ) {}
 
+const GraphVisualizerCliFileSystemOperationSchema = Schema.Union([
+  Schema.Literal("exists"),
+  Schema.Literal("stat"),
+  Schema.Literal("readFile"),
+  Schema.Literal("makeDirectory"),
+  Schema.Literal("writeFile"),
+])
+
+type GraphVisualizerCliFileSystemOperation = Schema.Schema.Type<
+  typeof GraphVisualizerCliFileSystemOperationSchema
+>
+
+export class GraphVisualizerCliFileSystemError extends Schema.TaggedErrorClass<GraphVisualizerCliFileSystemError>()(
+  "GraphVisualizerCliFileSystemError",
+  {
+    message: Schema.String,
+    operation: GraphVisualizerCliFileSystemOperationSchema,
+    path: Schema.String,
+    cause: Schema.Unknown,
+  },
+) {}
+
 export class GraphVisualizerArtifactTooLargeError extends Schema.TaggedErrorClass<GraphVisualizerArtifactTooLargeError>()(
   "GraphVisualizerArtifactTooLargeError",
   {
@@ -32,6 +54,14 @@ export class GraphVisualizerArtifactTooLargeError extends Schema.TaggedErrorClas
 export const GRAPH_VISUALIZER_MAX_ARTIFACT_BYTES = 25 * 1024 * 1024
 
 const getUtf8ByteLength = (value: string): number => new TextEncoder().encode(value).length
+const toCliFileSystemError =
+  (operation: GraphVisualizerCliFileSystemOperation, path: string) => (cause: unknown) =>
+    new GraphVisualizerCliFileSystemError({
+      message: `Filesystem ${operation} failed for path: ${path}`,
+      operation,
+      path,
+      cause,
+    })
 
 export const ensureArtifactSizeWithinLimit = (
   html: string,
@@ -53,7 +83,7 @@ export const ensureArtifactSizeWithinLimit = (
 
 const ensureFile = Effect.fn("graphVisualizerCli.ensureFile")(function* (path: string) {
   const fs = yield* FileSystem.FileSystem
-  const exists = yield* fs.exists(path)
+  const exists = yield* fs.exists(path).pipe(Effect.mapError(toCliFileSystemError("exists", path)))
 
   if (!exists) {
     return yield* new GraphVisualizerCliValidationError({
@@ -61,7 +91,7 @@ const ensureFile = Effect.fn("graphVisualizerCli.ensureFile")(function* (path: s
     })
   }
 
-  const stat = yield* fs.stat(path)
+  const stat = yield* fs.stat(path).pipe(Effect.mapError(toCliFileSystemError("stat", path)))
   if (stat.type !== "File") {
     return yield* new GraphVisualizerCliValidationError({
       message: `Invalid from file: ${path} is not a file`,
@@ -73,10 +103,14 @@ const ensureOutputPath = Effect.fn("graphVisualizerCli.ensureOutputPath")(functi
   const fs = yield* FileSystem.FileSystem
   const pathService = yield* Path.Path
   const parentDirectory = pathService.dirname(path)
-  const parentExists = yield* fs.exists(parentDirectory)
+  const parentExists = yield* fs
+    .exists(parentDirectory)
+    .pipe(Effect.mapError(toCliFileSystemError("exists", parentDirectory)))
 
   if (parentExists) {
-    const parentStat = yield* fs.stat(parentDirectory)
+    const parentStat = yield* fs
+      .stat(parentDirectory)
+      .pipe(Effect.mapError(toCliFileSystemError("stat", parentDirectory)))
     if (parentStat.type !== "Directory") {
       return yield* new GraphVisualizerCliValidationError({
         message: `Invalid to output directory: ${parentDirectory} is not a directory`,
@@ -84,10 +118,14 @@ const ensureOutputPath = Effect.fn("graphVisualizerCli.ensureOutputPath")(functi
     }
   }
 
-  const fileExists = yield* fs.exists(path)
+  const fileExists = yield* fs
+    .exists(path)
+    .pipe(Effect.mapError(toCliFileSystemError("exists", path)))
 
   if (fileExists) {
-    const outputStat = yield* fs.stat(path)
+    const outputStat = yield* fs
+      .stat(path)
+      .pipe(Effect.mapError(toCliFileSystemError("stat", path)))
     if (outputStat.type !== "File") {
       return yield* new GraphVisualizerCliValidationError({
         message: `Invalid to output file: ${path} is not a file`,
@@ -107,15 +145,20 @@ export const runGraphVisualizer = Effect.fn("graphVisualizerCli.runGraphVisualiz
   yield* ensureFile(from)
   yield* ensureOutputPath(to)
 
-  const snapshotText = yield* fs.readFileString(from)
+  const snapshotText = yield* fs
+    .readFileString(from)
+    .pipe(Effect.mapError(toCliFileSystemError("readFile", from)))
   const snapshot = yield* decodeGraphSnapshot(snapshotText)
   const model = yield* buildGraphRenderModel(snapshot)
   const html = renderHtmlFromModel(model)
   const maxBytes = maxArtifactBytes ?? GRAPH_VISUALIZER_MAX_ARTIFACT_BYTES
   yield* ensureArtifactSizeWithinLimit(html, maxBytes)
 
-  yield* fs.makeDirectory(path.dirname(to), { recursive: true })
-  yield* fs.writeFileString(to, html)
+  const outputDirectory = path.dirname(to)
+  yield* fs
+    .makeDirectory(outputDirectory, { recursive: true })
+    .pipe(Effect.mapError(toCliFileSystemError("makeDirectory", outputDirectory)))
+  yield* fs.writeFileString(to, html).pipe(Effect.mapError(toCliFileSystemError("writeFile", to)))
 })
 
 export const graphVisualizerCommand = Command.make(
