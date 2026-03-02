@@ -9,6 +9,7 @@ const WIKILINK_PATTERN = /\[\[([^[\]|]+)(?:\|([^[\]|]+))?\]\]/g
 export const parseWikilinks = (markdownBody: string): Array<ParsedWikilink> => {
   const wikilinks: Array<ParsedWikilink> = []
 
+  // Keep regex-based parsing here for perf and strict grammar control over supported wikilink forms.
   for (const match of markdownBody.matchAll(WIKILINK_PATTERN)) {
     const index = match.index ?? 0
     if (index > 0 && markdownBody[index - 1] === "!") {

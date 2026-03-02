@@ -104,10 +104,20 @@ export const UnresolvedWikilinkDiagnosticSchema = Schema.Struct({
   placeholderNodeId: Schema.String,
 })
 
+export const GraphSnapshotSchemaVersionSchema = Schema.Literal("2")
+
+export const GraphSnapshotIndexesSchema = Schema.Struct({
+  nodesById: Schema.Record(Schema.String, GraphSnapshotNodeSchema),
+  edgesBySourceNodeId: Schema.Record(Schema.String, Schema.Array(GraphSnapshotEdgeSchema)),
+  edgesByTargetNodeId: Schema.Record(Schema.String, Schema.Array(GraphSnapshotEdgeSchema)),
+})
+
 export const GraphSnapshotSchema = Schema.Struct({
+  schemaVersion: GraphSnapshotSchemaVersionSchema,
   nodes: Schema.Array(GraphSnapshotNodeSchema),
   edges: Schema.Array(GraphSnapshotEdgeSchema),
   diagnostics: Schema.Array(UnresolvedWikilinkDiagnosticSchema),
+  indexes: GraphSnapshotIndexesSchema,
 })
 
 export type GraphSnapshotResolutionStrategy = Schema.Schema.Type<
@@ -122,6 +132,8 @@ export type GraphSnapshotEdge = Schema.Schema.Type<typeof GraphSnapshotEdgeSchem
 export type UnresolvedWikilinkDiagnostic = Schema.Schema.Type<
   typeof UnresolvedWikilinkDiagnosticSchema
 >
+export type GraphSnapshotSchemaVersion = Schema.Schema.Type<typeof GraphSnapshotSchemaVersionSchema>
+export type GraphSnapshotIndexes = Schema.Schema.Type<typeof GraphSnapshotIndexesSchema>
 export type GraphSnapshot = Schema.Schema.Type<typeof GraphSnapshotSchema>
 
 export const normalizeRawNoteFrontmatter = (frontmatter: RawNoteFrontmatter): NoteFrontmatter => ({

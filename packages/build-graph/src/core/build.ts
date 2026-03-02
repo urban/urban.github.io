@@ -6,14 +6,14 @@ import type {
   GraphSnapshotResolutionStrategy,
   UnresolvedWikilinkDiagnostic,
 } from "../domain/schema"
-import { compareStrings, normalizePathLike } from "./helpers"
+import { compareByRelativePath, normalizePathLike } from "./helpers"
 import {
+  buildWikilinkResolverIndex,
   BuildGraphAmbiguousWikilinkResolutionError,
   formatAmbiguousWikilinkResolutionDiagnostics,
-  resolveWikilinkTargetV1,
-  summarizeWikilinkResolutionsV1,
+  resolveWikilinkTarget,
+  summarizeWikilinkResolutions,
   type ParsedWikilinkWithSource,
-  type WikilinkResolverV1Index,
 } from "./resolve"
 import { normalizeGraphSnapshot } from "./snapshot"
 import type { ValidatedMarkdownFile } from "./validate"
@@ -50,10 +50,10 @@ const createWikilinkEdge = (
 
 export const buildGraphSnapshot = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
-  resolverV1Index: WikilinkResolverV1Index,
   wikilinks: ReadonlyArray<ParsedWikilinkWithSource>,
 ): GraphSnapshot => {
-  const resolutionSummary = summarizeWikilinkResolutionsV1(resolverV1Index, wikilinks)
+  const resolverIndex = buildWikilinkResolverIndex(notes)
+  const resolutionSummary = summarizeWikilinkResolutions(resolverIndex, wikilinks)
   if (resolutionSummary.ambiguousDiagnostics.length > 0) {
     throw new BuildGraphAmbiguousWikilinkResolutionError({
       message: formatAmbiguousWikilinkResolutionDiagnostics(resolutionSummary.ambiguousDiagnostics),
@@ -70,9 +70,7 @@ export const buildGraphSnapshot = (
   >()
 
   const graph = Graph.directed<GraphSnapshotNode, GraphSnapshotEdge>((mutable) => {
-    for (const note of [...notes].sort((left, right) =>
-      compareStrings(left.relativePath, right.relativePath),
-    )) {
+    for (const note of [...notes].sort(compareByRelativePath)) {
       const nodeId = note.relativePath
       const nodeIndex = Graph.addNode(mutable, {
         id: nodeId,
@@ -95,22 +93,7 @@ export const buildGraphSnapshot = (
         continue
       }
 
-      const resolution = resolveWikilinkTargetV1(resolverV1Index, wikilink.target)
-      if (resolution.strategy !== "unresolved" && resolution.candidates.length > 1) {
-        const diagnostic = {
-          sourceRelativePath: wikilink.sourceRelativePath,
-          rawWikilink: wikilink.raw,
-          target: wikilink.target,
-          strategy: resolution.strategy,
-          candidateRelativePaths: resolution.candidates.map((candidate) => candidate.relativePath),
-        } as const
-
-        throw new BuildGraphAmbiguousWikilinkResolutionError({
-          message: formatAmbiguousWikilinkResolutionDiagnostics([diagnostic]),
-          diagnostics: [diagnostic],
-        })
-      }
-
+      const resolution = resolveWikilinkTarget(resolverIndex, wikilink.target)
       if (resolution.candidates.length === 1) {
         const targetRelativePath = resolution.candidates[0]?.relativePath
         if (targetRelativePath === undefined) {

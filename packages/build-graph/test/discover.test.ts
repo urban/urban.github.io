@@ -4,7 +4,7 @@ import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect } from "effect"
-import { discoverMarkdownFiles } from "../src/core/discover"
+import { discoverMarkdownFiles } from "../src/cli/discover"
 
 const tempDirectories = new Set<string>()
 

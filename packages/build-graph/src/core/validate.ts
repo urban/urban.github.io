@@ -1,4 +1,4 @@
-import { Effect, FileSystem, Option, Result, Schema } from "effect"
+import { Effect, Option, Result, Schema } from "effect"
 import matter from "gray-matter"
 import {
   NoteFrontmatterSchema,
@@ -6,7 +6,6 @@ import {
   normalizeRawNoteFrontmatter,
   type NoteFrontmatter,
 } from "../domain/schema"
-import type { DiscoveredMarkdownFile } from "./discover"
 import { compareStrings } from "./helpers"
 
 const FrontmatterValidationDiagnosticSchema = Schema.Struct({
@@ -27,10 +26,26 @@ export type DuplicatePermalinkDiagnostic = Schema.Schema.Type<
   typeof DuplicatePermalinkDiagnosticSchema
 >
 
-export type ValidatedMarkdownFile = DiscoveredMarkdownFile & {
+export type MarkdownSourceFile = {
+  readonly relativePath: string
+  readonly source: string
+}
+
+export type ValidatedMarkdownFile = {
+  readonly relativePath: string
   readonly body: string
   readonly frontmatter: NoteFrontmatter
 }
+
+type FrontmatterParseOutcome =
+  | {
+      readonly _tag: "diagnostic"
+      readonly diagnostic: FrontmatterValidationDiagnostic
+    }
+  | {
+      readonly _tag: "validated"
+      readonly validatedFile: ValidatedMarkdownFile
+    }
 
 export class BuildGraphFrontmatterValidationError extends Schema.TaggedErrorClass<BuildGraphFrontmatterValidationError>()(
   "BuildGraphFrontmatterValidationError",
@@ -164,48 +179,64 @@ const validateFrontmatter = (frontmatter: unknown, rawFrontmatter?: string): Not
     ),
   )
 
-export const validateDiscoveredMarkdownFiles = Effect.fn(
-  "buildGraph.validateDiscoveredMarkdownFiles",
-)(function* (markdownFiles: ReadonlyArray<DiscoveredMarkdownFile>) {
-  const fs = yield* FileSystem.FileSystem
-  const diagnostics: Array<FrontmatterValidationDiagnostic> = []
-  const validatedFiles: Array<ValidatedMarkdownFile> = []
+const validateMarkdownSource = Effect.fn("buildGraph.validateMarkdownSource")(function* (
+  file: MarkdownSourceFile,
+): Effect.fn.Return<FrontmatterParseOutcome> {
+  const parsedResult = yield* Effect.try({
+    try: () => matter(file.source),
+    catch: toErrorMessage,
+  }).pipe(Effect.result)
 
-  for (const file of markdownFiles) {
-    const source = yield* fs.readFileString(file.absolutePath)
-    const parsedResult = yield* Effect.try({
-      try: () => matter(source),
-      catch: toErrorMessage,
-    }).pipe(Effect.result)
-
-    if (Result.isFailure(parsedResult)) {
-      diagnostics.push({
+  if (Result.isFailure(parsedResult)) {
+    return {
+      _tag: "diagnostic",
+      diagnostic: {
         relativePath: file.relativePath,
         message: Option.getOrThrow(Result.getFailure(parsedResult)),
-      })
-      continue
+      },
     }
+  }
 
-    const parsedFile = Option.getOrThrow(Result.getSuccess(parsedResult))
-    const frontmatterResult = yield* Effect.try({
-      try: () => validateFrontmatter(parsedFile.data, parsedFile.matter),
-      catch: toErrorMessage,
-    }).pipe(Effect.result)
+  const parsedFile = Option.getOrThrow(Result.getSuccess(parsedResult))
+  const frontmatterResult = yield* Effect.try({
+    try: () => validateFrontmatter(parsedFile.data, parsedFile.matter),
+    catch: toErrorMessage,
+  }).pipe(Effect.result)
 
-    if (Result.isFailure(frontmatterResult)) {
-      diagnostics.push({
+  if (Result.isFailure(frontmatterResult)) {
+    return {
+      _tag: "diagnostic",
+      diagnostic: {
         relativePath: file.relativePath,
         message: Option.getOrThrow(Result.getFailure(frontmatterResult)),
-      })
-      continue
+      },
     }
+  }
 
-    const frontmatter = Option.getOrThrow(Result.getSuccess(frontmatterResult))
-    validatedFiles.push({
+  const frontmatter = Option.getOrThrow(Result.getSuccess(frontmatterResult))
+  return {
+    _tag: "validated",
+    validatedFile: {
       ...file,
       body: parsedFile.content,
       frontmatter,
-    })
+    },
+  }
+})
+
+export const validateMarkdownSources = Effect.fn("buildGraph.validateMarkdownSources")(function* (
+  markdownFiles: ReadonlyArray<MarkdownSourceFile>,
+) {
+  const diagnostics: Array<FrontmatterValidationDiagnostic> = []
+  const validatedFiles: Array<ValidatedMarkdownFile> = []
+
+  const outcomes = yield* Effect.forEach(markdownFiles, validateMarkdownSource)
+  for (const outcome of outcomes) {
+    if (outcome._tag === "diagnostic") {
+      diagnostics.push(outcome.diagnostic)
+      continue
+    }
+    validatedFiles.push(outcome.validatedFile)
   }
 
   if (diagnostics.length > 0) {

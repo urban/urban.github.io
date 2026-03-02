@@ -1,44 +1,25 @@
-import { NodeServices } from "@effect/platform-node"
-import { afterEach, expect, test } from "bun:test"
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises"
-import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { expect, test } from "bun:test"
 import { Effect, Option, Result } from "effect"
-import { discoverMarkdownFiles } from "../src/core/discover"
 import {
   BuildGraphDuplicatePermalinkError,
   BuildGraphFrontmatterValidationError,
-  validateDiscoveredMarkdownFiles,
+  validateMarkdownSources,
+  type MarkdownSourceFile,
 } from "../src/core/validate"
 
-const tempDirectories = new Set<string>()
-
-const makeTempDirectory = async () => {
-  const directory = await mkdtemp(join(tmpdir(), "build-graph-validate-"))
-  tempDirectories.add(directory)
-  return directory
-}
-
-afterEach(async () => {
-  for (const directory of tempDirectories) {
-    await rm(directory, { recursive: true, force: true })
-  }
-  tempDirectories.clear()
+const sourceFile = (relativePath: string, source: string): MarkdownSourceFile => ({
+  relativePath,
+  source,
 })
 
 test("validates frontmatter and defaults published to true", async () => {
-  const from = await makeTempDirectory()
-
-  await writeFile(
-    join(from, "note.md"),
-    `---\npermalink: /note\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# note\n`,
-  )
-
   const result = await Effect.runPromise(
-    Effect.gen(function* () {
-      const discovered = yield* discoverMarkdownFiles(from)
-      return yield* validateDiscoveredMarkdownFiles(discovered)
-    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+    validateMarkdownSources([
+      sourceFile(
+        "note.md",
+        `---\npermalink: /note\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# note\n`,
+      ),
+    ]).pipe(Effect.result),
   )
 
   expect(Result.isSuccess(result)).toBeTrue()
@@ -49,18 +30,13 @@ test("validates frontmatter and defaults published to true", async () => {
 })
 
 test("accepts semantically valid leap-day dates", async () => {
-  const from = await makeTempDirectory()
-
-  await writeFile(
-    join(from, "note.md"),
-    `---\npermalink: /note\ncreated: 2024-02-29\nupdated: 2024-03-01\n---\n# note\n`,
-  )
-
   const result = await Effect.runPromise(
-    Effect.gen(function* () {
-      const discovered = yield* discoverMarkdownFiles(from)
-      return yield* validateDiscoveredMarkdownFiles(discovered)
-    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+    validateMarkdownSources([
+      sourceFile(
+        "note.md",
+        `---\npermalink: /note\ncreated: 2024-02-29\nupdated: 2024-03-01\n---\n# note\n`,
+      ),
+    ]).pipe(Effect.result),
   )
 
   expect(Result.isSuccess(result)).toBeTrue()
@@ -70,18 +46,13 @@ test("accepts semantically valid leap-day dates", async () => {
 })
 
 test("rejects semantically invalid calendar dates in YYYY-MM-DD form", async () => {
-  const from = await makeTempDirectory()
-
-  await writeFile(
-    join(from, "invalid-date.md"),
-    `---\npermalink: /invalid\ncreated: 2025-02-29\nupdated: 2026-02-30\n---\n# invalid\n`,
-  )
-
   const result = await Effect.runPromise(
-    Effect.gen(function* () {
-      const discovered = yield* discoverMarkdownFiles(from)
-      return yield* validateDiscoveredMarkdownFiles(discovered)
-    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+    validateMarkdownSources([
+      sourceFile(
+        "invalid-date.md",
+        `---\npermalink: /invalid\ncreated: 2025-02-29\nupdated: 2026-02-30\n---\n# invalid\n`,
+      ),
+    ]).pipe(Effect.result),
   )
 
   expect(Result.isFailure(result)).toBeTrue()
@@ -98,23 +69,17 @@ test("rejects semantically invalid calendar dates in YYYY-MM-DD form", async () 
 })
 
 test("aggregates frontmatter validation diagnostics across files", async () => {
-  const from = await makeTempDirectory()
-
-  await mkdir(join(from, "nested"), { recursive: true })
-  await writeFile(
-    join(from, "a-missing-permalink.md"),
-    `---\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# missing\n`,
-  )
-  await writeFile(
-    join(from, "nested", "b-invalid-updated.md"),
-    `---\npermalink: /valid\ncreated: 2026-02-01\nupdated: not-a-date\n---\n# invalid\n`,
-  )
-
   const result = await Effect.runPromise(
-    Effect.gen(function* () {
-      const discovered = yield* discoverMarkdownFiles(from)
-      return yield* validateDiscoveredMarkdownFiles(discovered)
-    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+    validateMarkdownSources([
+      sourceFile(
+        "a-missing-permalink.md",
+        `---\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# missing\n`,
+      ),
+      sourceFile(
+        "nested/b-invalid-updated.md",
+        `---\npermalink: /valid\ncreated: 2026-02-01\nupdated: not-a-date\n---\n# invalid\n`,
+      ),
+    ]).pipe(Effect.result),
   )
 
   expect(Result.isFailure(result)).toBeTrue()
@@ -135,23 +100,17 @@ test("aggregates frontmatter validation diagnostics across files", async () => {
 })
 
 test("fails with duplicate permalink diagnostics", async () => {
-  const from = await makeTempDirectory()
-
-  await mkdir(join(from, "nested"), { recursive: true })
-  await writeFile(
-    join(from, "a.md"),
-    `---\npermalink: /shared\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# a\n`,
-  )
-  await writeFile(
-    join(from, "nested", "b.md"),
-    `---\npermalink: /shared\ncreated: 2026-02-03\nupdated: 2026-02-04\n---\n# b\n`,
-  )
-
   const result = await Effect.runPromise(
-    Effect.gen(function* () {
-      const discovered = yield* discoverMarkdownFiles(from)
-      return yield* validateDiscoveredMarkdownFiles(discovered)
-    }).pipe(Effect.provide(NodeServices.layer), Effect.result),
+    validateMarkdownSources([
+      sourceFile(
+        "a.md",
+        `---\npermalink: /shared\ncreated: 2026-02-01\nupdated: 2026-02-02\n---\n# a\n`,
+      ),
+      sourceFile(
+        "nested/b.md",
+        `---\npermalink: /shared\ncreated: 2026-02-03\nupdated: 2026-02-04\n---\n# b\n`,
+      ),
+    ]).pipe(Effect.result),
   )
 
   expect(Result.isFailure(result)).toBeTrue()

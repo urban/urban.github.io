@@ -1,14 +1,12 @@
 import { expect, test } from "bun:test"
 import { buildGraphSnapshot } from "../src/core/build"
 import {
-  buildWikilinkResolverV1Index,
   BuildGraphAmbiguousWikilinkResolutionError,
   type ParsedWikilinkWithSource,
 } from "../src/core/resolve"
 import type { ValidatedMarkdownFile } from "../src/core/validate"
 
 const createValidatedNote = (relativePath: string, permalink: string): ValidatedMarkdownFile => ({
-  absolutePath: `/notes/${relativePath}`,
   relativePath,
   body: "",
   frontmatter: {
@@ -38,8 +36,7 @@ test("creates and reuses placeholder nodes for unresolved wikilinks", () => {
     createValidatedNote("target.md", "/target"),
   ]
 
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-  const snapshot = buildGraphSnapshot(notes, resolverV1Index, [
+  const snapshot = buildGraphSnapshot(notes, [
     createWikilinkWithSource("source-a.md", "missing/path"),
     createWikilinkWithSource("source-b.md", "Missing/Path", "Missing"),
     createWikilinkWithSource("source-a.md", "target"),
@@ -86,10 +83,8 @@ test("fails with ambiguity diagnostics when wikilink resolution is ambiguous", (
     createValidatedNote("z/foo.md", "/z/foo"),
   ]
 
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-
   try {
-    buildGraphSnapshot(notes, resolverV1Index, [createWikilinkWithSource("source.md", "foo")])
+    buildGraphSnapshot(notes, [createWikilinkWithSource("source.md", "foo")])
     throw new Error("Expected BuildGraphAmbiguousWikilinkResolutionError")
   } catch (error) {
     expect(error).toBeInstanceOf(BuildGraphAmbiguousWikilinkResolutionError)
@@ -107,4 +102,46 @@ test("fails with ambiguity diagnostics when wikilink resolution is ambiguous", (
       },
     ])
   }
+})
+
+test("resolves by precedence path before filename before alias in v2 snapshot flow", () => {
+  const aliasOnly = createValidatedNote("alias-only.md", "/alias-only")
+  const notes = [
+    createValidatedNote("source.md", "/source"),
+    createValidatedNote("nested/foo.md", "/nested-foo"),
+    {
+      ...aliasOnly,
+      frontmatter: {
+        ...aliasOnly.frontmatter,
+        aliases: ["foo", "launch"],
+      },
+    },
+  ]
+
+  const snapshot = buildGraphSnapshot(notes, [
+    createWikilinkWithSource("source.md", "nested/foo"),
+    createWikilinkWithSource("source.md", "foo"),
+    createWikilinkWithSource("source.md", "launch"),
+  ])
+
+  expect(snapshot.edges).toHaveLength(3)
+  expect(snapshot.edges).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        target: "nested/foo",
+        targetNodeId: "nested/foo.md",
+        resolutionStrategy: "path",
+      }),
+      expect.objectContaining({
+        target: "foo",
+        targetNodeId: "nested/foo.md",
+        resolutionStrategy: "filename",
+      }),
+      expect.objectContaining({
+        target: "launch",
+        targetNodeId: "alias-only.md",
+        resolutionStrategy: "alias",
+      }),
+    ]),
+  )
 })
