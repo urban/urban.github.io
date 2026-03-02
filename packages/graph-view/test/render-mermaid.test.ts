@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test"
 import { renderMermaidFromSnapshot } from "../src/core/render-mermaid"
 import type { GraphSnapshot } from "../src/domain/schema"
+import { GraphViewRenderInvariantError } from "../src/core/render-model"
 
 const snapshotWithNotesAndEdges: GraphSnapshot = {
   nodes: [
@@ -95,4 +96,53 @@ test("renders deterministic mermaid text regardless of node and edge input order
   const second = renderMermaidFromSnapshot(reorderedSnapshot)
 
   expect(first).toBe(second)
+})
+
+test("fails when an edge references a missing target node id", () => {
+  const invalidSnapshot: GraphSnapshot = {
+    nodes: [
+      {
+        id: "notes/a.md",
+        kind: "note",
+        relativePath: "notes/a.md",
+        permalink: "/a",
+      },
+    ],
+    edges: [
+      {
+        sourceNodeId: "notes/a.md",
+        targetNodeId: "notes/missing.md",
+        sourceRelativePath: "notes/a.md",
+        rawWikilink: "[[missing]]",
+        target: "missing",
+        resolutionStrategy: "path",
+      },
+    ],
+    diagnostics: [],
+  }
+
+  expect(() => renderMermaidFromSnapshot(invalidSnapshot)).toThrow(GraphViewRenderInvariantError)
+})
+
+test("fails when snapshot contains duplicate node ids", () => {
+  const invalidSnapshot: GraphSnapshot = {
+    nodes: [
+      {
+        id: "duplicate",
+        kind: "note",
+        relativePath: "notes/a.md",
+        permalink: "/a",
+      },
+      {
+        id: "duplicate",
+        kind: "note",
+        relativePath: "notes/b.md",
+        permalink: "/b",
+      },
+    ],
+    edges: [],
+    diagnostics: [],
+  }
+
+  expect(() => renderMermaidFromSnapshot(invalidSnapshot)).toThrow(GraphViewRenderInvariantError)
 })
