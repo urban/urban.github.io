@@ -2,7 +2,8 @@ import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
 import { decodeGraphSnapshot } from "../core/decode"
-import { renderHtmlFromSnapshot } from "../core/render-html"
+import { buildGraphRenderModel } from "../core/model"
+import { renderHtmlFromModel } from "../core/render-html"
 
 const CLI_VERSION = "0.0.0"
 
@@ -75,7 +76,8 @@ export const runGraphVisualizer = Effect.fn("graphVisualizerCli.runGraphVisualiz
 
   const snapshotText = yield* fs.readFileString(from)
   const snapshot = yield* decodeGraphSnapshot(snapshotText)
-  const html = renderHtmlFromSnapshot(snapshot)
+  const model = yield* buildGraphRenderModel(snapshot)
+  const html = renderHtmlFromModel(model)
 
   yield* fs.makeDirectory(path.dirname(to), { recursive: true })
   yield* fs.writeFileString(to, html)

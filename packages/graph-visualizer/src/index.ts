@@ -11,7 +11,17 @@ export {
   GraphVisualizerSnapshotValidationError,
   type GraphVisualizerSnapshotInput,
 } from "./core/decode"
-export { renderHtmlFromSnapshot } from "./core/render-html"
+export {
+  buildGraphRenderModel,
+  GraphVisualizerModelIntegrityError,
+  type GraphRenderEdge,
+  type GraphRenderModel,
+  type GraphRenderNode,
+  type GraphRenderNoteNode,
+  type GraphRenderPlaceholderNode,
+  type GraphVisualizerModelIssue,
+} from "./core/model"
+export { renderHtmlFromModel, renderHtmlFromSnapshot } from "./core/render-html"
 export {
   GraphSnapshotEdgeSchema,
   GraphSnapshotIndexesSchema,

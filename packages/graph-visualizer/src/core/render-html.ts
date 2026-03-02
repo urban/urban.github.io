@@ -1,10 +1,11 @@
-import type { GraphSnapshot } from "../domain/schema"
+import { Effect } from "effect"
+import { buildGraphRenderModel, type GraphRenderModel } from "./model"
 
 const escapeScriptPayload = (value: string): string =>
   value.replaceAll("&", "\\u0026").replaceAll("<", "\\u003c").replaceAll(">", "\\u003e")
 
-export const renderHtmlFromSnapshot = (snapshot: GraphSnapshot): string => {
-  const payload = escapeScriptPayload(JSON.stringify(snapshot))
+export const renderHtmlFromModel = (model: GraphRenderModel): string => {
+  const payload = escapeScriptPayload(JSON.stringify(model))
 
   return [
     "<!doctype html>",
@@ -44,3 +45,7 @@ export const renderHtmlFromSnapshot = (snapshot: GraphSnapshot): string => {
     "",
   ].join("\n")
 }
+
+export const renderHtmlFromSnapshot = (
+  snapshot: Parameters<typeof buildGraphRenderModel>[0],
+): string => renderHtmlFromModel(Effect.runSync(buildGraphRenderModel(snapshot)))
