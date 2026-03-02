@@ -1,4 +1,8 @@
-import type { GraphSnapshot, GraphSnapshotEdge, GraphSnapshotNode } from "../domain/schema"
+import type {
+  GraphSnapshot,
+  GraphSnapshotEdge,
+  GraphSnapshotNode,
+} from "@urban/build-graph/src/domain/schema"
 
 const compareStrings = (left: string, right: string): number => {
   if (left < right) {

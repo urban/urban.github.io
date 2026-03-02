@@ -1,4 +1,4 @@
-import type { GraphSnapshot } from "../domain/schema"
+import type { GraphSnapshot } from "@urban/build-graph/src/domain/schema"
 import { renderMermaidFromSnapshot } from "./render-mermaid"
 
 export const renderMarkdownFromSnapshot = (snapshot: GraphSnapshot): string =>

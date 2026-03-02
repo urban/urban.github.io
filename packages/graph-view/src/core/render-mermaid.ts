@@ -1,5 +1,5 @@
 import { Graph } from "effect"
-import type { GraphSnapshot } from "../domain/schema"
+import type { GraphSnapshot } from "@urban/build-graph/src/domain/schema"
 import { buildRenderModel } from "./render-model"
 
 export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
