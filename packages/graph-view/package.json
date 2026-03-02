@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@effect/platform-node": "catalog:",
+    "@urban/build-graph": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

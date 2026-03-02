@@ -5,9 +5,10 @@ import {
   GraphViewJsonParseError,
   GraphViewSnapshotValidationError,
 } from "../src/core/decode"
-import type { GraphSnapshot } from "../src/domain/schema"
+import type { GraphSnapshot } from "@urban/build-graph/src/domain/schema"
 
 const validSnapshot: GraphSnapshot = {
+  schemaVersion: "2",
   nodes: [
     {
       id: "notes/a.md",
@@ -18,6 +19,18 @@ const validSnapshot: GraphSnapshot = {
   ],
   edges: [],
   diagnostics: [],
+  indexes: {
+    nodesById: {
+      "notes/a.md": {
+        id: "notes/a.md",
+        kind: "note",
+        relativePath: "notes/a.md",
+        permalink: "/a",
+      },
+    },
+    edgesBySourceNodeId: {},
+    edgesByTargetNodeId: {},
+  },
 }
 
 test("decodes a valid graph snapshot object", async () => {
@@ -46,8 +59,35 @@ test("fails decode on schema-invalid input", async () => {
   const result = await Effect.runPromiseExit(
     decodeGraphSnapshot(
       JSON.stringify({
+        schemaVersion: "2",
         nodes: [],
         edges: [],
+      }),
+    ),
+  )
+  expect(Exit.isFailure(result)).toBeTrue()
+
+  if (!Exit.isFailure(result)) {
+    throw new Error("Expected decode to fail")
+  }
+
+  const firstError = Option.getOrThrow(Result.getSuccess(Exit.findError(result)))
+  expect(firstError).toBeInstanceOf(GraphViewSnapshotValidationError)
+})
+
+test("fails decode on non-v2 snapshot payload", async () => {
+  const result = await Effect.runPromiseExit(
+    decodeGraphSnapshot(
+      JSON.stringify({
+        schemaVersion: "1",
+        nodes: [],
+        edges: [],
+        diagnostics: [],
+        indexes: {
+          nodesById: {},
+          edgesBySourceNodeId: {},
+          edgesByTargetNodeId: {},
+        },
       }),
     ),
   )

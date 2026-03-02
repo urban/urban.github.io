@@ -30,6 +30,7 @@ test("writes graph markdown with note nodes and unlabeled edges from a snapshot 
     from,
     JSON.stringify(
       {
+        schemaVersion: "2",
         nodes: [
           {
             id: "notes/z.md",
@@ -56,6 +57,48 @@ test("writes graph markdown with note nodes and unlabeled edges from a snapshot 
           },
         ],
         diagnostics: [],
+        indexes: {
+          nodesById: {
+            "notes/a.md": {
+              id: "notes/a.md",
+              kind: "note",
+              relativePath: "notes/a.md",
+              permalink: "/a",
+            },
+            "notes/z.md": {
+              id: "notes/z.md",
+              kind: "note",
+              relativePath: "notes/z.md",
+              permalink: "/z",
+            },
+          },
+          edgesBySourceNodeId: {
+            "notes/a.md": [
+              {
+                sourceNodeId: "notes/a.md",
+                targetNodeId: "notes/z.md",
+                sourceRelativePath: "notes/a.md",
+                rawWikilink: "[[z|Z]]",
+                target: "z",
+                displayText: "Z",
+                resolutionStrategy: "path",
+              },
+            ],
+          },
+          edgesByTargetNodeId: {
+            "notes/z.md": [
+              {
+                sourceNodeId: "notes/a.md",
+                targetNodeId: "notes/z.md",
+                sourceRelativePath: "notes/a.md",
+                rawWikilink: "[[z|Z]]",
+                target: "z",
+                displayText: "Z",
+                resolutionStrategy: "path",
+              },
+            ],
+          },
+        },
       },
       null,
       2,

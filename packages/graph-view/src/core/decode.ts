@@ -1,5 +1,5 @@
 import { Effect, Schema } from "effect"
-import { GraphSnapshotSchema, type GraphSnapshot } from "../domain/schema"
+import { GraphSnapshotSchema, type GraphSnapshot } from "@urban/build-graph/src/domain/schema"
 
 export type GraphViewSnapshotInput = GraphSnapshot | string
 
