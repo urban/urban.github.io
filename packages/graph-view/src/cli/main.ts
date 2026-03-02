@@ -1,4 +1,4 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { BunRuntime, BunServices } from "@effect/platform-bun"
 import { Effect, FileSystem, Path, Schema } from "effect"
 import { Argument, Command } from "effect/unstable/cli"
 import { decodeGraphSnapshot } from "../core/decode"
@@ -138,13 +138,13 @@ export const graphViewCommand = Command.make(
 
 export const runWithArgs = (args: ReadonlyArray<string>) =>
   Command.runWith(graphViewCommand, { version: CLI_VERSION })(args).pipe(
-    Effect.provide(NodeServices.layer),
+    Effect.provide(BunServices.layer),
   )
 
 if (import.meta.main) {
   graphViewCommand.pipe(
     Command.run({ version: CLI_VERSION }),
-    Effect.provide(NodeServices.layer),
-    NodeRuntime.runMain,
+    Effect.provide(BunServices.layer),
+    BunRuntime.runMain,
   )
 }

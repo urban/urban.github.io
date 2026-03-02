@@ -4,6 +4,7 @@
   "private": true,
   "workspaces": {
     "catalog": {
+      "@effect/platform-bun": "4.0.0-beta.21",
       "@effect/platform-node": "4.0.0-beta.21",
       "effect": "4.0.0-beta.21",
       "typescript": "^5.9.3"
