@@ -6,7 +6,7 @@ Render deterministic Mermaid graph Markdown from a `graph-snapshot.json` file (t
 
 - Validates snapshot input with `@urban/build-graph` `GraphSnapshotSchema`.
 - Accepts either a parsed snapshot object or JSON string in library APIs.
-- Renders Mermaid with `graph LR` layout.
+- Renders Mermaid with `flowchart LR` layout (directed arrows).
 - Renders note nodes using `relativePath`.
 - Renders unresolved placeholder nodes with distinct shape.
 - Renders unlabeled edges (Obsidian-like graph semantics).

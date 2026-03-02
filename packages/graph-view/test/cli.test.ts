@@ -110,7 +110,7 @@ test("writes graph markdown with note nodes and unlabeled edges from a snapshot 
 
   const markdown = await readFile(to, "utf8")
   expect(markdown).toBe(
-    '## Graph\n\n```mermaid\ngraph LR\n  0["notes/a.md"]\n  1["notes/z.md"]\n  0 --- 1\n```\n',
+    '## Graph\n\n```mermaid\nflowchart LR\n  0["notes/a.md"]\n  1["notes/z.md"]\n  0 --> 1\n```\n',
   )
 })
 

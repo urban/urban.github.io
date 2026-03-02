@@ -45,7 +45,7 @@ const emptySnapshot: GraphSnapshot = {
 test("renders the baseline graph markdown wrapper", () => {
   const markdown = renderMarkdownFromSnapshot(emptySnapshot)
 
-  expect(markdown).toBe("## Graph\n\n```mermaid\ngraph LR\n```\n")
+  expect(markdown).toBe("## Graph\n\n```mermaid\nflowchart LR\n```\n")
 })
 
 test("renders markdown with note nodes and unlabeled edges", () => {
@@ -85,6 +85,6 @@ test("renders markdown with note nodes and unlabeled edges", () => {
   const markdown = renderMarkdownFromSnapshot(snapshot)
 
   expect(markdown).toBe(
-    '## Graph\n\n```mermaid\ngraph LR\n  0["notes/a.md"]\n  1["notes/b.md"]\n  0 --- 1\n```\n',
+    '## Graph\n\n```mermaid\nflowchart LR\n  0["notes/a.md"]\n  1["notes/b.md"]\n  0 --> 1\n```\n',
   )
 })

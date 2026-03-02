@@ -22,7 +22,7 @@ export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
   })
 
   return Graph.toMermaid(graph, {
-    diagramType: "graph",
+    diagramType: "flowchart",
     direction: "LR",
     edgeLabel: () => "",
     nodeLabel: (node) => node.label,

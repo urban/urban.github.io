@@ -95,11 +95,11 @@ const snapshotWithNotesAndEdges: GraphSnapshot = {
   indexes: buildIndexes(snapshotNodes, snapshotEdges),
 }
 
-test("renders note nodes and unlabeled note-to-note edges with graph LR", () => {
+test("renders note nodes and unlabeled note-to-note edges with flowchart LR", () => {
   const mermaid = renderMermaidFromSnapshot(snapshotWithNotesAndEdges)
 
   expect(mermaid).toBe(
-    'graph LR\n  0["notes/a.md"]\n  1["notes/z.md"]\n  2{{"unresolved:missing"}}\n  0 --- 1\n  1 --- 0\n  1 --- 2',
+    'flowchart LR\n  0["notes/a.md"]\n  1["notes/z.md"]\n  2{{"unresolved:missing"}}\n  0 --> 1\n  1 --> 0\n  1 --> 2',
   )
   expect(mermaid.includes("|")).toBeFalse()
 })
