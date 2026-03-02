@@ -87,6 +87,190 @@ test("writes byte-identical snapshots for unchanged input across runs", async ()
   expect(backupSnapshot).toBe(firstSnapshot)
 })
 
+test("writes v2 snapshot for resolved-only wikilink happy path", async () => {
+  const from = await makeTempDirectory()
+  const to = await makeTempDirectory()
+
+  await mkdir(join(from, "nested"), { recursive: true })
+  await writeFile(
+    join(from, "source.md"),
+    [
+      "---",
+      "permalink: /source",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "aliases: [Start]",
+      "---",
+      "[[nested/target]] [[target-two]] [[Launch Target]]",
+      "",
+    ].join("\n"),
+  )
+  await writeFile(
+    join(from, "nested", "target.md"),
+    [
+      "---",
+      "permalink: /nested-target",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "---",
+      "# nested target",
+      "",
+    ].join("\n"),
+  )
+  await writeFile(
+    join(from, "target-two.md"),
+    [
+      "---",
+      "permalink: /target-two",
+      "created: 2026-02-27",
+      "updated: 2026-02-27",
+      "aliases: [Launch Target]",
+      "---",
+      "# target two",
+      "",
+    ].join("\n"),
+  )
+
+  const result = await Effect.runPromiseExit(runWithArgs([from, to]))
+  expect(Exit.isSuccess(result)).toBeTrue()
+
+  const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
+  const snapshot = JSON.parse(await readFile(snapshotPath, "utf8"))
+
+  expect(snapshot).toEqual({
+    schemaVersion: "2",
+    nodes: [
+      {
+        id: "nested/target.md",
+        kind: "note",
+        relativePath: "nested/target.md",
+        permalink: "/nested-target",
+      },
+      {
+        id: "source.md",
+        kind: "note",
+        relativePath: "source.md",
+        permalink: "/source",
+      },
+      {
+        id: "target-two.md",
+        kind: "note",
+        relativePath: "target-two.md",
+        permalink: "/target-two",
+      },
+    ],
+    edges: [
+      {
+        sourceNodeId: "source.md",
+        targetNodeId: "nested/target.md",
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[nested/target]]",
+        target: "nested/target",
+        resolutionStrategy: "path",
+      },
+      {
+        sourceNodeId: "source.md",
+        targetNodeId: "target-two.md",
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[Launch Target]]",
+        target: "Launch Target",
+        resolutionStrategy: "alias",
+      },
+      {
+        sourceNodeId: "source.md",
+        targetNodeId: "target-two.md",
+        sourceRelativePath: "source.md",
+        rawWikilink: "[[target-two]]",
+        target: "target-two",
+        resolutionStrategy: "path",
+      },
+    ],
+    diagnostics: [],
+    indexes: {
+      nodesById: {
+        "nested/target.md": {
+          id: "nested/target.md",
+          kind: "note",
+          relativePath: "nested/target.md",
+          permalink: "/nested-target",
+        },
+        "source.md": {
+          id: "source.md",
+          kind: "note",
+          relativePath: "source.md",
+          permalink: "/source",
+        },
+        "target-two.md": {
+          id: "target-two.md",
+          kind: "note",
+          relativePath: "target-two.md",
+          permalink: "/target-two",
+        },
+      },
+      edgesBySourceNodeId: {
+        "source.md": [
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "nested/target.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[nested/target]]",
+            target: "nested/target",
+            resolutionStrategy: "path",
+          },
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "target-two.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[Launch Target]]",
+            target: "Launch Target",
+            resolutionStrategy: "alias",
+          },
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "target-two.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[target-two]]",
+            target: "target-two",
+            resolutionStrategy: "path",
+          },
+        ],
+      },
+      edgesByTargetNodeId: {
+        "nested/target.md": [
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "nested/target.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[nested/target]]",
+            target: "nested/target",
+            resolutionStrategy: "path",
+          },
+        ],
+        "target-two.md": [
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "target-two.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[Launch Target]]",
+            target: "Launch Target",
+            resolutionStrategy: "alias",
+          },
+          {
+            sourceNodeId: "source.md",
+            targetNodeId: "target-two.md",
+            sourceRelativePath: "source.md",
+            rawWikilink: "[[target-two]]",
+            target: "target-two",
+            resolutionStrategy: "path",
+          },
+        ],
+      },
+    },
+  })
+
+  expect(decodeGraphSnapshot(snapshot)).toEqual(snapshot)
+})
+
 test("backs up an existing snapshot before overwrite", async () => {
   const from = await makeTempDirectory()
   const to = await makeTempDirectory()

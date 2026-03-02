@@ -8,12 +8,12 @@ import type {
 } from "../domain/schema"
 import { compareStrings, normalizePathLike } from "./helpers"
 import {
+  buildWikilinkResolverV1Index,
   BuildGraphAmbiguousWikilinkResolutionError,
   formatAmbiguousWikilinkResolutionDiagnostics,
   resolveWikilinkTargetV1,
   summarizeWikilinkResolutionsV1,
   type ParsedWikilinkWithSource,
-  type WikilinkResolverV1Index,
 } from "./resolve"
 import { normalizeGraphSnapshot } from "./snapshot"
 import type { ValidatedMarkdownFile } from "./validate"
@@ -50,9 +50,9 @@ const createWikilinkEdge = (
 
 export const buildGraphSnapshot = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
-  resolverV1Index: WikilinkResolverV1Index,
   wikilinks: ReadonlyArray<ParsedWikilinkWithSource>,
 ): GraphSnapshot => {
+  const resolverV1Index = buildWikilinkResolverV1Index(notes)
   const resolutionSummary = summarizeWikilinkResolutionsV1(resolverV1Index, wikilinks)
   if (resolutionSummary.ambiguousDiagnostics.length > 0) {
     throw new BuildGraphAmbiguousWikilinkResolutionError({

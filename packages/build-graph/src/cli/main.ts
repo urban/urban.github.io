@@ -4,12 +4,6 @@ import { Argument, Command } from "effect/unstable/cli"
 import { discoverMarkdownFiles } from "./discover"
 import { buildGraphSnapshot } from "../core/build"
 import { parseWikilinks } from "../core/parse"
-import {
-  buildWikilinkResolverV1Index,
-  BuildGraphAmbiguousWikilinkResolutionError,
-  formatAmbiguousWikilinkResolutionDiagnostics,
-  summarizeWikilinkResolutionsV1,
-} from "../core/resolve"
 import { serializeGraphSnapshot } from "../core/snapshot"
 import { validateMarkdownSources, type MarkdownSourceFile } from "../core/validate"
 
@@ -91,18 +85,7 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
     })),
   )
   yield* Console.log(`Parsed ${parsedWikilinks.length} wikilink(s)`)
-  const resolverV1Index = buildWikilinkResolverV1Index(validatedNotes)
-  const resolutionSummary = summarizeWikilinkResolutionsV1(resolverV1Index, parsedWikilinks)
-  if (resolutionSummary.ambiguousDiagnostics.length > 0) {
-    return yield* new BuildGraphAmbiguousWikilinkResolutionError({
-      message: formatAmbiguousWikilinkResolutionDiagnostics(resolutionSummary.ambiguousDiagnostics),
-      diagnostics: resolutionSummary.ambiguousDiagnostics,
-    })
-  }
-  yield* Console.log(
-    `Resolved ${resolutionSummary.resolvedCount} wikilink(s) via v1 path/filename/alias matching`,
-  )
-  const snapshot = buildGraphSnapshot(validatedNotes, resolverV1Index, parsedWikilinks)
+  const snapshot = buildGraphSnapshot(validatedNotes, parsedWikilinks)
   if (snapshot.diagnostics.length > 0) {
     yield* Console.log(`Recorded ${snapshot.diagnostics.length} unresolved wikilink diagnostic(s)`)
   }

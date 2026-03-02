@@ -1,7 +1,6 @@
 import { expect, test } from "bun:test"
 import { buildGraphSnapshot } from "../src/core/build"
 import {
-  buildWikilinkResolverV1Index,
   BuildGraphAmbiguousWikilinkResolutionError,
   type ParsedWikilinkWithSource,
 } from "../src/core/resolve"
@@ -37,8 +36,7 @@ test("creates and reuses placeholder nodes for unresolved wikilinks", () => {
     createValidatedNote("target.md", "/target"),
   ]
 
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-  const snapshot = buildGraphSnapshot(notes, resolverV1Index, [
+  const snapshot = buildGraphSnapshot(notes, [
     createWikilinkWithSource("source-a.md", "missing/path"),
     createWikilinkWithSource("source-b.md", "Missing/Path", "Missing"),
     createWikilinkWithSource("source-a.md", "target"),
@@ -85,10 +83,8 @@ test("fails with ambiguity diagnostics when wikilink resolution is ambiguous", (
     createValidatedNote("z/foo.md", "/z/foo"),
   ]
 
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-
   try {
-    buildGraphSnapshot(notes, resolverV1Index, [createWikilinkWithSource("source.md", "foo")])
+    buildGraphSnapshot(notes, [createWikilinkWithSource("source.md", "foo")])
     throw new Error("Expected BuildGraphAmbiguousWikilinkResolutionError")
   } catch (error) {
     expect(error).toBeInstanceOf(BuildGraphAmbiguousWikilinkResolutionError)

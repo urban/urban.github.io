@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { buildGraphSnapshot } from "../src/core/build"
-import { buildWikilinkResolverV1Index, type ParsedWikilinkWithSource } from "../src/core/resolve"
+import { type ParsedWikilinkWithSource } from "../src/core/resolve"
 import type {
   GraphSnapshot,
   GraphSnapshotEdge,
@@ -56,8 +56,7 @@ test("preserves v1 information surface in v2 arrays with no data loss", () => {
     createValidatedNote("alias-target.md", "/alias-target", ["friendly-target"]),
   ]
 
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-  const snapshot = buildGraphSnapshot(notes, resolverV1Index, [
+  const snapshot = buildGraphSnapshot(notes, [
     createWikilinkWithSource("source.md", "filename-target"),
     createWikilinkWithSource("source.md", "path/target"),
     createWikilinkWithSource("source.md", "friendly-target", "Friendly"),
@@ -149,10 +148,7 @@ test("indexes are derivable from v1 surface and add lookup capability only", () 
     createValidatedNote("target.md", "/target"),
   ]
 
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-  const snapshot = buildGraphSnapshot(notes, resolverV1Index, [
-    createWikilinkWithSource("source.md", "target"),
-  ])
+  const snapshot = buildGraphSnapshot(notes, [createWikilinkWithSource("source.md", "target")])
 
   const v1Surface = toV1Surface(snapshot)
 
