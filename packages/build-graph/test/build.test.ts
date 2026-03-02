@@ -103,3 +103,45 @@ test("fails with ambiguity diagnostics when wikilink resolution is ambiguous", (
     ])
   }
 })
+
+test("resolves by precedence path before filename before alias in v2 snapshot flow", () => {
+  const aliasOnly = createValidatedNote("alias-only.md", "/alias-only")
+  const notes = [
+    createValidatedNote("source.md", "/source"),
+    createValidatedNote("nested/foo.md", "/nested-foo"),
+    {
+      ...aliasOnly,
+      frontmatter: {
+        ...aliasOnly.frontmatter,
+        aliases: ["foo", "launch"],
+      },
+    },
+  ]
+
+  const snapshot = buildGraphSnapshot(notes, [
+    createWikilinkWithSource("source.md", "nested/foo"),
+    createWikilinkWithSource("source.md", "foo"),
+    createWikilinkWithSource("source.md", "launch"),
+  ])
+
+  expect(snapshot.edges).toHaveLength(3)
+  expect(snapshot.edges).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        target: "nested/foo",
+        targetNodeId: "nested/foo.md",
+        resolutionStrategy: "path",
+      }),
+      expect.objectContaining({
+        target: "foo",
+        targetNodeId: "nested/foo.md",
+        resolutionStrategy: "filename",
+      }),
+      expect.objectContaining({
+        target: "launch",
+        targetNodeId: "alias-only.md",
+        resolutionStrategy: "alias",
+      }),
+    ]),
+  )
+})
