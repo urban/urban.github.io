@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test"
 import {
-  buildWikilinkResolverV1Index,
-  resolveWikilinkTargetV1,
-  summarizeWikilinkResolutionsV1,
+  buildWikilinkResolverIndex,
+  resolveWikilinkTarget,
+  summarizeWikilinkResolutions,
   type ParsedWikilinkWithSource,
 } from "../src/core/resolve"
 import type { ValidatedMarkdownFile } from "../src/core/validate"
@@ -39,8 +39,8 @@ test("uses case-insensitive path matching before filename matching", () => {
     createValidatedNote("alpha.md", "/alpha"),
   ]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "PROJECTS/alpha")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "PROJECTS/alpha")
 
   expect(result.strategy).toBe("path")
   expect(result.candidates.map((candidate) => candidate.relativePath)).toEqual([
@@ -51,8 +51,8 @@ test("uses case-insensitive path matching before filename matching", () => {
 test("falls back to case-insensitive filename matching when no path match exists", () => {
   const notes = [createValidatedNote("docs/guide.md", "/docs/guide")]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "missing-folder/GUIDE")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "missing-folder/GUIDE")
 
   expect(result.strategy).toBe("filename")
   expect(result.candidates.map((candidate) => candidate.relativePath)).toEqual(["docs/guide.md"])
@@ -64,8 +64,8 @@ test("returns deterministically sorted candidates for ambiguous filename matches
     createValidatedNote("a/foo.md", "/a/foo"),
   ]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "foo")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "foo")
 
   expect(result.strategy).toBe("filename")
   expect(result.candidates.map((candidate) => candidate.relativePath)).toEqual([
@@ -77,8 +77,8 @@ test("returns deterministically sorted candidates for ambiguous filename matches
 test("falls back to case-insensitive alias matching when no path or filename match exists", () => {
   const notes = [createValidatedNote("docs/guide.md", "/docs/guide", ["How To Guide"])]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "how to guide")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "how to guide")
 
   expect(result.strategy).toBe("alias")
   expect(result.candidates.map((candidate) => candidate.relativePath)).toEqual(["docs/guide.md"])
@@ -90,8 +90,8 @@ test("uses filename matching before alias matching when both could match", () =>
     createValidatedNote("misc/overview.md", "/misc/overview", ["guide"]),
   ]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "guide")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "guide")
 
   expect(result.strategy).toBe("filename")
   expect(result.candidates.map((candidate) => candidate.relativePath)).toEqual(["docs/guide.md"])
@@ -103,8 +103,8 @@ test("returns deterministically sorted candidates for ambiguous alias matches", 
     createValidatedNote("a/foo.md", "/a/foo", ["ROADMAP"]),
   ]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "roadmap")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "roadmap")
 
   expect(result.strategy).toBe("alias")
   expect(result.candidates.map((candidate) => candidate.relativePath)).toEqual([
@@ -116,8 +116,8 @@ test("returns deterministically sorted candidates for ambiguous alias matches", 
 test("returns unresolved when no candidate matches path, filename, or alias", () => {
   const notes = [createValidatedNote("docs/guide.md", "/docs/guide")]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const result = resolveWikilinkTargetV1(index, "unknown-target")
+  const index = buildWikilinkResolverIndex(notes)
+  const result = resolveWikilinkTarget(index, "unknown-target")
 
   expect(result.strategy).toBe("unresolved")
   expect(result.candidates).toEqual([])
@@ -130,8 +130,8 @@ test("summarizes resolved counts while excluding unresolved and ambiguous matche
     createValidatedNote("docs/guide.md", "/docs/guide"),
   ]
 
-  const index = buildWikilinkResolverV1Index(notes)
-  const summary = summarizeWikilinkResolutionsV1(index, [
+  const index = buildWikilinkResolverIndex(notes)
+  const summary = summarizeWikilinkResolutions(index, [
     createWikilinkWithSource("source.md", "foo"),
     createWikilinkWithSource("source.md", "guide"),
     createWikilinkWithSource("source.md", "missing"),

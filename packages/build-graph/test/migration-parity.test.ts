@@ -9,7 +9,7 @@ import type {
 } from "../src/domain/schema"
 import type { ValidatedMarkdownFile } from "../src/core/validate"
 
-type LegacyGraphSnapshotV1Surface = Readonly<{
+type GraphSnapshotBaseSurface = Readonly<{
   readonly nodes: ReadonlyArray<GraphSnapshotNode>
   readonly edges: ReadonlyArray<GraphSnapshotEdge>
   readonly diagnostics: ReadonlyArray<UnresolvedWikilinkDiagnostic>
@@ -42,13 +42,13 @@ const createWikilinkWithSource = (
   displayText,
 })
 
-const toV1Surface = (snapshot: GraphSnapshot): LegacyGraphSnapshotV1Surface => ({
+const toBaseSurface = (snapshot: GraphSnapshot): GraphSnapshotBaseSurface => ({
   nodes: snapshot.nodes,
   edges: snapshot.edges,
   diagnostics: snapshot.diagnostics,
 })
 
-test("preserves v1 information surface in v2 arrays with no data loss", () => {
+test("preserves prior information surface in v2 arrays with no data loss", () => {
   const notes = [
     createValidatedNote("source.md", "/source"),
     createValidatedNote("nested/filename-target.md", "/filename-target"),
@@ -63,7 +63,7 @@ test("preserves v1 information surface in v2 arrays with no data loss", () => {
     createWikilinkWithSource("source.md", "missing/path"),
   ])
 
-  expect(toV1Surface(snapshot)).toEqual({
+  expect(toBaseSurface(snapshot)).toEqual({
     nodes: [
       {
         id: "alias-target.md",
@@ -142,7 +142,7 @@ test("preserves v1 information surface in v2 arrays with no data loss", () => {
   })
 })
 
-test("indexes are derivable from v1 surface and add lookup capability only", () => {
+test("indexes are derivable from base surface and add lookup capability only", () => {
   const notes = [
     createValidatedNote("source.md", "/source"),
     createValidatedNote("target.md", "/target"),
@@ -150,12 +150,12 @@ test("indexes are derivable from v1 surface and add lookup capability only", () 
 
   const snapshot = buildGraphSnapshot(notes, [createWikilinkWithSource("source.md", "target")])
 
-  const v1Surface = toV1Surface(snapshot)
+  const baseSurface = toBaseSurface(snapshot)
 
   expect(snapshot.schemaVersion).toBe("2")
-  expect(snapshot.indexes.nodesById["source.md"]).toEqual(v1Surface.nodes[0])
-  expect(snapshot.indexes.nodesById["target.md"]).toEqual(v1Surface.nodes[1])
-  expect(snapshot.indexes.edgesBySourceNodeId["source.md"]).toEqual(v1Surface.edges)
-  expect(snapshot.indexes.edgesByTargetNodeId["target.md"]).toEqual(v1Surface.edges)
-  expect(v1Surface.diagnostics).toEqual([])
+  expect(snapshot.indexes.nodesById["source.md"]).toEqual(baseSurface.nodes[0])
+  expect(snapshot.indexes.nodesById["target.md"]).toEqual(baseSurface.nodes[1])
+  expect(snapshot.indexes.edgesBySourceNodeId["source.md"]).toEqual(baseSurface.edges)
+  expect(snapshot.indexes.edgesByTargetNodeId["target.md"]).toEqual(baseSurface.edges)
+  expect(baseSurface.diagnostics).toEqual([])
 })

@@ -5,13 +5,13 @@ import type { ValidatedMarkdownFile } from "./validate"
 
 const MARKDOWN_EXTENSION = ".md"
 
-export type WikilinkResolverV1Index = {
+export type WikilinkResolverIndex = {
   readonly byPath: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
   readonly byFilename: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
   readonly byAlias: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
 }
 
-export type WikilinkResolutionV1 = {
+export type WikilinkResolution = {
   readonly strategy: "path" | "filename" | "alias" | "unresolved"
   readonly candidates: ReadonlyArray<ValidatedMarkdownFile>
 }
@@ -44,7 +44,7 @@ export type ParsedWikilinkWithSource = ParsedWikilink & {
   readonly sourceRelativePath: string
 }
 
-export type WikilinkResolutionSummaryV1 = {
+export type WikilinkResolutionSummary = {
   readonly resolvedCount: number
   readonly ambiguousDiagnostics: ReadonlyArray<AmbiguousWikilinkResolutionDiagnostic>
 }
@@ -83,9 +83,9 @@ const sortCandidateMap = (
     ]),
   )
 
-export const buildWikilinkResolverV1Index = (
+export const buildWikilinkResolverIndex = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
-): WikilinkResolverV1Index => {
+): WikilinkResolverIndex => {
   const sortedNotes = [...notes].sort((left, right) =>
     compareStrings(left.relativePath, right.relativePath),
   )
@@ -137,10 +137,10 @@ export const buildWikilinkResolverV1Index = (
 
 const noMatch: ReadonlyArray<ValidatedMarkdownFile> = []
 
-export const resolveWikilinkTargetV1 = (
-  index: WikilinkResolverV1Index,
+export const resolveWikilinkTarget = (
+  index: WikilinkResolverIndex,
   target: string,
-): WikilinkResolutionV1 => {
+): WikilinkResolution => {
   const normalizedTarget = normalizePathLike(target)
   if (normalizedTarget.length === 0) {
     return { strategy: "unresolved", candidates: noMatch }
@@ -178,15 +178,15 @@ export const resolveWikilinkTargetV1 = (
   return { strategy: "unresolved", candidates: noMatch }
 }
 
-export const summarizeWikilinkResolutionsV1 = (
-  index: WikilinkResolverV1Index,
+export const summarizeWikilinkResolutions = (
+  index: WikilinkResolverIndex,
   wikilinks: ReadonlyArray<ParsedWikilinkWithSource>,
-): WikilinkResolutionSummaryV1 => {
+): WikilinkResolutionSummary => {
   let resolvedCount = 0
   const ambiguousDiagnostics: Array<AmbiguousWikilinkResolutionDiagnostic> = []
 
   for (const wikilink of wikilinks) {
-    const resolution = resolveWikilinkTargetV1(index, wikilink.target)
+    const resolution = resolveWikilinkTarget(index, wikilink.target)
 
     if (resolution.candidates.length === 1) {
       resolvedCount += 1

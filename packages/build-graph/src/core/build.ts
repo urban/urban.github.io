@@ -8,11 +8,11 @@ import type {
 } from "../domain/schema"
 import { compareStrings, normalizePathLike } from "./helpers"
 import {
-  buildWikilinkResolverV1Index,
+  buildWikilinkResolverIndex,
   BuildGraphAmbiguousWikilinkResolutionError,
   formatAmbiguousWikilinkResolutionDiagnostics,
-  resolveWikilinkTargetV1,
-  summarizeWikilinkResolutionsV1,
+  resolveWikilinkTarget,
+  summarizeWikilinkResolutions,
   type ParsedWikilinkWithSource,
 } from "./resolve"
 import { normalizeGraphSnapshot } from "./snapshot"
@@ -52,8 +52,8 @@ export const buildGraphSnapshot = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
   wikilinks: ReadonlyArray<ParsedWikilinkWithSource>,
 ): GraphSnapshot => {
-  const resolverV1Index = buildWikilinkResolverV1Index(notes)
-  const resolutionSummary = summarizeWikilinkResolutionsV1(resolverV1Index, wikilinks)
+  const resolverIndex = buildWikilinkResolverIndex(notes)
+  const resolutionSummary = summarizeWikilinkResolutions(resolverIndex, wikilinks)
   if (resolutionSummary.ambiguousDiagnostics.length > 0) {
     throw new BuildGraphAmbiguousWikilinkResolutionError({
       message: formatAmbiguousWikilinkResolutionDiagnostics(resolutionSummary.ambiguousDiagnostics),
@@ -95,7 +95,7 @@ export const buildGraphSnapshot = (
         continue
       }
 
-      const resolution = resolveWikilinkTargetV1(resolverV1Index, wikilink.target)
+      const resolution = resolveWikilinkTarget(resolverIndex, wikilink.target)
       if (resolution.candidates.length === 1) {
         const targetRelativePath = resolution.candidates[0]?.relativePath
         if (targetRelativePath === undefined) {
