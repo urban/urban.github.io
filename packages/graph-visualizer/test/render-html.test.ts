@@ -92,3 +92,24 @@ test("is deterministic for unchanged snapshot input", () => {
   const second = renderHtmlFromSnapshot(snapshot)
   expect(first).toBe(second)
 })
+
+test("is deterministic for reordered but semantically identical snapshot input", () => {
+  const reorderedSnapshot: GraphSnapshot = {
+    ...snapshot,
+    nodes: [...snapshot.nodes].reverse(),
+    edges: [...snapshot.edges].reverse(),
+  }
+
+  const first = renderHtmlFromSnapshot(snapshot)
+  const second = renderHtmlFromSnapshot(reorderedSnapshot)
+  expect(first).toBe(second)
+})
+
+test("stays self-contained with no network-capable runtime calls", () => {
+  const html = renderHtmlFromSnapshot(snapshot)
+  expect(html).not.toMatch(/<script[^>]+src=/i)
+  expect(html).not.toMatch(/<link[^>]+href=/i)
+  expect(html).not.toMatch(/\bfetch\s*\(/)
+  expect(html).not.toMatch(/\bXMLHttpRequest\b/)
+  expect(html).not.toMatch(/\bWebSocket\b/)
+})
