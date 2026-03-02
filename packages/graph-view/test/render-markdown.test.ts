@@ -46,6 +46,6 @@ test("renders markdown with note nodes and unlabeled edges", () => {
   const markdown = renderMarkdownFromSnapshot(snapshot)
 
   expect(markdown).toBe(
-    '## Graph\n\n```mermaid\ngraph LR\n  n0["notes/a.md"]\n  n1["notes/b.md"]\n  n0 --> n1\n```\n',
+    '## Graph\n\n```mermaid\ngraph LR\n  0["notes/a.md"]\n  1["notes/b.md"]\n  0 --- 1\n```\n',
   )
 })

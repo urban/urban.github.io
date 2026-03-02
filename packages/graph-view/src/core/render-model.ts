@@ -15,22 +15,20 @@ const compareStrings = (left: string, right: string): number => {
 type RenderModelNoteNode = {
   readonly kind: "note"
   readonly nodeId: string
-  readonly mermaidId: string
   readonly label: string
 }
 
 type RenderModelPlaceholderNode = {
   readonly kind: "placeholder"
   readonly nodeId: string
-  readonly mermaidId: string
   readonly label: string
 }
 
 type RenderModelNode = RenderModelNoteNode | RenderModelPlaceholderNode
 
 type RenderModelEdge = {
-  readonly sourceMermaidId: string
-  readonly targetMermaidId: string
+  readonly sourceNodeIndex: number
+  readonly targetNodeIndex: number
 }
 
 export type RenderModel = {
@@ -147,25 +145,23 @@ export const buildRenderModel = (snapshot: GraphSnapshot): RenderModel => {
     .sort(sortPlaceholderNodes)
   const sortedNodes: ReadonlyArray<GraphSnapshotNode> = [...noteNodes, ...placeholderNodes]
 
-  const nodeMermaidIds = new Map<string, string>()
+  const nodeIndices = new Map<string, number>()
   const nodes: Array<RenderModelNode> = []
 
   for (let index = 0; index < sortedNodes.length; index += 1) {
     const node = sortedNodes[index]
-    const mermaidId = `n${index}`
-    if (nodeMermaidIds.has(node.id)) {
+    if (nodeIndices.has(node.id)) {
       throw new GraphViewRenderInvariantError({
         _tag: "DuplicateNodeId",
         nodeId: node.id,
       })
     }
-    nodeMermaidIds.set(node.id, mermaidId)
+    nodeIndices.set(node.id, index)
 
     if (node.kind === "note") {
       nodes.push({
         kind: "note",
         nodeId: node.id,
-        mermaidId,
         label: node.relativePath,
       })
       continue
@@ -174,7 +170,6 @@ export const buildRenderModel = (snapshot: GraphSnapshot): RenderModel => {
     nodes.push({
       kind: "placeholder",
       nodeId: node.id,
-      mermaidId,
       label: `unresolved:${node.unresolvedTarget}`,
     })
   }
@@ -182,8 +177,8 @@ export const buildRenderModel = (snapshot: GraphSnapshot): RenderModel => {
   const edges: Array<RenderModelEdge> = []
   const sortedEdges = [...snapshot.edges].sort(sortEdges)
   for (const edge of sortedEdges) {
-    const sourceMermaidId = nodeMermaidIds.get(edge.sourceNodeId)
-    if (sourceMermaidId === undefined) {
+    const sourceNodeIndex = nodeIndices.get(edge.sourceNodeId)
+    if (sourceNodeIndex === undefined) {
       throw new GraphViewRenderInvariantError({
         _tag: "MissingEdgeSourceNode",
         nodeId: edge.sourceNodeId,
@@ -191,8 +186,8 @@ export const buildRenderModel = (snapshot: GraphSnapshot): RenderModel => {
       })
     }
 
-    const targetMermaidId = nodeMermaidIds.get(edge.targetNodeId)
-    if (targetMermaidId === undefined) {
+    const targetNodeIndex = nodeIndices.get(edge.targetNodeId)
+    if (targetNodeIndex === undefined) {
       throw new GraphViewRenderInvariantError({
         _tag: "MissingEdgeTargetNode",
         nodeId: edge.targetNodeId,
@@ -201,8 +196,8 @@ export const buildRenderModel = (snapshot: GraphSnapshot): RenderModel => {
     }
 
     edges.push({
-      sourceMermaidId,
-      targetMermaidId,
+      sourceNodeIndex,
+      targetNodeIndex,
     })
   }
 
