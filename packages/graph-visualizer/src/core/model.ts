@@ -168,7 +168,14 @@ const toAdjacencyRecord = (
   adjacencyByNodeId: ReadonlyMap<string, ReadonlySet<string>>,
 ): Readonly<Record<string, ReadonlyArray<string>>> => {
   const record: Record<string, ReadonlyArray<string>> = {}
-  for (const [nodeId, neighbors] of adjacencyByNodeId) {
+  const sortedNodeIds = [...adjacencyByNodeId.keys()].sort((left, right) =>
+    left.localeCompare(right),
+  )
+  for (const nodeId of sortedNodeIds) {
+    const neighbors = adjacencyByNodeId.get(nodeId)
+    if (neighbors === undefined) {
+      continue
+    }
     record[nodeId] = [...neighbors].sort((left, right) => left.localeCompare(right))
   }
   return record
@@ -211,9 +218,20 @@ export const buildGraphRenderModel = (
       addAdjacent(adjacencyByNodeId, edge.targetNodeId, edge.sourceNodeId)
     }
 
+    const sortedNodes = [...nodesById.values()].sort((left, right) =>
+      left.id.localeCompare(right.id),
+    )
+    const sortedEdges = [...edges].sort((left, right) => {
+      const sourceOrder = left.sourceNodeId.localeCompare(right.sourceNodeId)
+      if (sourceOrder !== 0) {
+        return sourceOrder
+      }
+      return left.targetNodeId.localeCompare(right.targetNodeId)
+    })
+
     return {
-      nodes: [...nodesById.values()],
-      edges,
+      nodes: sortedNodes,
+      edges: sortedEdges,
       adjacencyByNodeId: toAdjacencyRecord(adjacencyByNodeId),
     }
   })

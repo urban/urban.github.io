@@ -10,6 +10,7 @@ const CLI_VERSION = "0.0.0"
 export type GraphVisualizerInput = {
   readonly from: string
   readonly to: string
+  readonly maxArtifactBytes?: number
 }
 
 export class GraphVisualizerCliValidationError extends Schema.TaggedErrorClass<GraphVisualizerCliValidationError>()(
@@ -18,6 +19,37 @@ export class GraphVisualizerCliValidationError extends Schema.TaggedErrorClass<G
     message: Schema.String,
   },
 ) {}
+
+export class GraphVisualizerArtifactTooLargeError extends Schema.TaggedErrorClass<GraphVisualizerArtifactTooLargeError>()(
+  "GraphVisualizerArtifactTooLargeError",
+  {
+    message: Schema.String,
+    actualBytes: Schema.Number,
+    maxBytes: Schema.Number,
+  },
+) {}
+
+export const GRAPH_VISUALIZER_MAX_ARTIFACT_BYTES = 25 * 1024 * 1024
+
+const getUtf8ByteLength = (value: string): number => new TextEncoder().encode(value).length
+
+export const ensureArtifactSizeWithinLimit = (
+  html: string,
+  maxBytes: number,
+): Effect.Effect<void, GraphVisualizerArtifactTooLargeError> => {
+  const actualBytes = getUtf8ByteLength(html)
+  if (actualBytes <= maxBytes) {
+    return Effect.void
+  }
+
+  return Effect.fail(
+    new GraphVisualizerArtifactTooLargeError({
+      message: `Rendered artifact exceeds max size: ${actualBytes} bytes > ${maxBytes} bytes`,
+      actualBytes,
+      maxBytes,
+    }),
+  )
+}
 
 const ensureFile = Effect.fn("graphVisualizerCli.ensureFile")(function* (path: string) {
   const fs = yield* FileSystem.FileSystem
@@ -67,6 +99,7 @@ const ensureOutputPath = Effect.fn("graphVisualizerCli.ensureOutputPath")(functi
 export const runGraphVisualizer = Effect.fn("graphVisualizerCli.runGraphVisualizer")(function* ({
   from,
   to,
+  maxArtifactBytes,
 }: GraphVisualizerInput) {
   const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
@@ -78,6 +111,8 @@ export const runGraphVisualizer = Effect.fn("graphVisualizerCli.runGraphVisualiz
   const snapshot = yield* decodeGraphSnapshot(snapshotText)
   const model = yield* buildGraphRenderModel(snapshot)
   const html = renderHtmlFromModel(model)
+  const maxBytes = maxArtifactBytes ?? GRAPH_VISUALIZER_MAX_ARTIFACT_BYTES
+  yield* ensureArtifactSizeWithinLimit(html, maxBytes)
 
   yield* fs.makeDirectory(path.dirname(to), { recursive: true })
   yield* fs.writeFileString(to, html)
