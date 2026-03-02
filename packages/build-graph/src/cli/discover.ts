@@ -1,5 +1,5 @@
 import { Effect, FileSystem, Path } from "effect"
-import { compareStrings } from "../core/helpers"
+import { compareByRelativePath, compareStrings } from "../core/helpers"
 
 export type DiscoveredMarkdownFile = {
   readonly absolutePath: string
@@ -99,7 +99,5 @@ export const discoverMarkdownFiles = (rootDirectory: string) =>
       new Set<string>(),
     )
 
-    return [...discoveredFiles].sort((left, right) =>
-      compareStrings(left.relativePath, right.relativePath),
-    )
+    return [...discoveredFiles].sort(compareByRelativePath)
   })

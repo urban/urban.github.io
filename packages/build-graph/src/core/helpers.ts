@@ -10,6 +10,13 @@ export const compareStrings = (left: string, right: string) => {
   return 0
 }
 
+export const normalizeCaseFolded = (value: string): string => value.trim().toLowerCase()
+
+export const compareByRelativePath = <T extends { readonly relativePath: string }>(
+  left: T,
+  right: T,
+): number => compareStrings(left.relativePath, right.relativePath)
+
 export const normalizePathLike = (value: string): string =>
   // Keep lightweight manual normalization to preserve current matching semantics exactly.
   value

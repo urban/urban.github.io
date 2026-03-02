@@ -1,6 +1,6 @@
 import { Schema } from "effect"
 import type { ParsedWikilink } from "./parse"
-import { compareStrings, normalizePathLike } from "./helpers"
+import { compareByRelativePath, normalizeCaseFolded, normalizePathLike } from "./helpers"
 import type { ValidatedMarkdownFile } from "./validate"
 
 const MARKDOWN_EXTENSION = ".md"
@@ -49,8 +49,6 @@ export type WikilinkResolutionSummary = {
   readonly ambiguousDiagnostics: ReadonlyArray<AmbiguousWikilinkResolutionDiagnostic>
 }
 
-const normalizeAlias = (value: string): string => value.trim().toLowerCase()
-
 const removeMarkdownExtension = (value: string) =>
   value.endsWith(MARKDOWN_EXTENSION) ? value.slice(0, -MARKDOWN_EXTENSION.length) : value
 
@@ -79,16 +77,14 @@ const sortCandidateMap = (
   new Map(
     [...index.entries()].map(([key, candidates]) => [
       key,
-      [...candidates].sort((left, right) => compareStrings(left.relativePath, right.relativePath)),
+      [...candidates].sort(compareByRelativePath),
     ]),
   )
 
 export const buildWikilinkResolverIndex = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
 ): WikilinkResolverIndex => {
-  const sortedNotes = [...notes].sort((left, right) =>
-    compareStrings(left.relativePath, right.relativePath),
-  )
+  const sortedNotes = [...notes].sort(compareByRelativePath)
   const byPath = new Map<string, Array<ValidatedMarkdownFile>>()
   const byFilename = new Map<string, Array<ValidatedMarkdownFile>>()
   const byAlias = new Map<string, Array<ValidatedMarkdownFile>>()
@@ -118,7 +114,7 @@ export const buildWikilinkResolverIndex = (
 
     const normalizedAliases = new Set<string>()
     for (const alias of note.frontmatter.aliases) {
-      const normalizedAlias = normalizeAlias(alias)
+      const normalizedAlias = normalizeCaseFolded(alias)
       if (normalizedAlias.length === 0 || normalizedAliases.has(normalizedAlias)) {
         continue
       }
@@ -167,7 +163,7 @@ export const resolveWikilinkTarget = (
     }
   }
 
-  const aliasCandidates = index.byAlias.get(normalizeAlias(target))
+  const aliasCandidates = index.byAlias.get(normalizeCaseFolded(target))
   if (aliasCandidates !== undefined && aliasCandidates.length > 0) {
     return {
       strategy: "alias",

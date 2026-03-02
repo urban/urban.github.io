@@ -6,7 +6,7 @@ import type {
   GraphSnapshotResolutionStrategy,
   UnresolvedWikilinkDiagnostic,
 } from "../domain/schema"
-import { compareStrings, normalizePathLike } from "./helpers"
+import { compareByRelativePath, normalizePathLike } from "./helpers"
 import {
   buildWikilinkResolverIndex,
   BuildGraphAmbiguousWikilinkResolutionError,
@@ -70,9 +70,7 @@ export const buildGraphSnapshot = (
   >()
 
   const graph = Graph.directed<GraphSnapshotNode, GraphSnapshotEdge>((mutable) => {
-    for (const note of [...notes].sort((left, right) =>
-      compareStrings(left.relativePath, right.relativePath),
-    )) {
+    for (const note of [...notes].sort(compareByRelativePath)) {
       const nodeId = note.relativePath
       const nodeIndex = Graph.addNode(mutable, {
         id: nodeId,
