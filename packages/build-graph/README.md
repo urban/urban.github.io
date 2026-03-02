@@ -201,9 +201,6 @@ Supported exports from `@urban/build-graph`:
 - `runWithArgs` (CLI entry for programmatic execution).
 - `validateMarkdownSources`.
 - `parseWikilinks`.
-- `buildWikilinkResolverV1Index`.
-- `resolveWikilinkTargetV1`.
-- `summarizeWikilinkResolutionsV1`.
 - `formatAmbiguousWikilinkResolutionDiagnostics`.
 - `buildGraphSnapshot`.
 - `normalizeGraphSnapshot`.

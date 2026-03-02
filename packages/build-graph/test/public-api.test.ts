@@ -8,14 +8,11 @@ test("exports only the curated v2 public API surface", () => {
     "BuildGraphFrontmatterValidationError",
     "GraphSnapshotSchema",
     "buildGraphSnapshot",
-    "buildWikilinkResolverV1Index",
     "formatAmbiguousWikilinkResolutionDiagnostics",
     "normalizeGraphSnapshot",
     "parseWikilinks",
-    "resolveWikilinkTargetV1",
     "runWithArgs",
     "serializeGraphSnapshot",
-    "summarizeWikilinkResolutionsV1",
     "validateMarkdownSources",
   ])
 })
