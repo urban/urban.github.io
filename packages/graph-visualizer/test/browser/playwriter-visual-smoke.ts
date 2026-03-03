@@ -13,11 +13,60 @@ type SmokeState = {
   readonly renderedPixelCount: number
   readonly sceneEdgeCount: number
   readonly sceneNodeCount: number
+  readonly targetNodeId: string
+  readonly initialSnapshot: GraphInteractionSnapshot
+  readonly hoveredSnapshot: GraphInteractionSnapshot
+  readonly resetSnapshot: GraphInteractionSnapshot
   readonly url: string
+}
+
+type GraphInteractionSnapshot = {
+  readonly pointerNodeId: string | null
+  readonly hoveredNodeId: string | null
+  readonly highlightedNodeIds: readonly string[]
+  readonly highlightedEdgeIds: readonly string[]
+  readonly mutedNodeIds: readonly string[]
+  readonly mutedEdgeIds: readonly string[]
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null
+
+const readStringArray = (record: Record<string, unknown>, key: string): readonly string[] => {
+  const value = record[key]
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    throw new Error(`Invalid ${key} field`)
+  }
+  return value
+}
+
+const readInteractionSnapshot = (
+  record: Record<string, unknown>,
+  key: "initialSnapshot" | "hoveredSnapshot" | "resetSnapshot",
+): GraphInteractionSnapshot => {
+  const value = record[key]
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${key} field`)
+  }
+  return {
+    pointerNodeId:
+      typeof value.pointerNodeId === "string" || value.pointerNodeId === null
+        ? value.pointerNodeId
+        : (() => {
+            throw new Error(`Invalid ${key}.pointerNodeId field`)
+          })(),
+    hoveredNodeId:
+      typeof value.hoveredNodeId === "string" || value.hoveredNodeId === null
+        ? value.hoveredNodeId
+        : (() => {
+            throw new Error(`Invalid ${key}.hoveredNodeId field`)
+          })(),
+    highlightedNodeIds: readStringArray(value, "highlightedNodeIds"),
+    highlightedEdgeIds: readStringArray(value, "highlightedEdgeIds"),
+    mutedNodeIds: readStringArray(value, "mutedNodeIds"),
+    mutedEdgeIds: readStringArray(value, "mutedEdgeIds"),
+  }
+}
 
 const parseSessionId = (): number => {
   const raw = process.env.PLAYWRITER_SESSION_ID
@@ -71,7 +120,14 @@ const readState = (output: string): SmokeState => {
   const getNumber = (
     key: keyof Omit<
       SmokeState,
-      "url" | "hasRuntimeState" | "appChildTagNames" | "graphCanvasIsAppOnlyChild"
+      | "url"
+      | "hasRuntimeState"
+      | "appChildTagNames"
+      | "graphCanvasIsAppOnlyChild"
+      | "targetNodeId"
+      | "initialSnapshot"
+      | "hoveredSnapshot"
+      | "resetSnapshot"
     >,
   ): number => {
     const value = record[key]
@@ -103,6 +159,10 @@ const readState = (output: string): SmokeState => {
   if (typeof graphCanvasIsAppOnlyChildValue !== "boolean") {
     throw new Error("Invalid graphCanvasIsAppOnlyChild field")
   }
+  const targetNodeIdValue = record.targetNodeId
+  if (typeof targetNodeIdValue !== "string") {
+    throw new Error("Invalid targetNodeId field")
+  }
 
   return {
     appChildCount: getNumber("appChildCount"),
@@ -113,10 +173,31 @@ const readState = (output: string): SmokeState => {
     hasRuntimeState: hasRuntimeStateValue,
     graphCanvasCount: getNumber("graphCanvasCount"),
     graphCanvasIsAppOnlyChild: graphCanvasIsAppOnlyChildValue,
+    initialSnapshot: readInteractionSnapshot(record, "initialSnapshot"),
     renderedPixelCount: getNumber("renderedPixelCount"),
+    hoveredSnapshot: readInteractionSnapshot(record, "hoveredSnapshot"),
+    resetSnapshot: readInteractionSnapshot(record, "resetSnapshot"),
     sceneEdgeCount: getNumber("sceneEdgeCount"),
     sceneNodeCount: getNumber("sceneNodeCount"),
+    targetNodeId: targetNodeIdValue,
     url: urlValue,
+  }
+}
+
+const expectStringArrayEquals = (
+  actual: readonly string[],
+  expected: readonly string[],
+  label: string,
+): void => {
+  if (actual.length !== expected.length) {
+    throw new Error(
+      `Expected ${label} length ${expected.length}, got ${actual.length}: [${actual.join(", ")}]`,
+    )
+  }
+  for (const [index, value] of expected.entries()) {
+    if (actual[index] !== value) {
+      throw new Error(`Expected ${label}[${index}] = ${value}, got ${actual[index] ?? "<missing>"}`)
+    }
   }
 }
 
@@ -156,6 +237,74 @@ const assertSmokeState = (state: SmokeState): void => {
   if (state.renderedPixelCount === 0) {
     throw new Error("Expected non-empty canvas pixels")
   }
+
+  if (state.targetNodeId !== "notes/a.md") {
+    throw new Error(`Expected targetNodeId notes/a.md, got: ${state.targetNodeId}`)
+  }
+
+  if (
+    state.initialSnapshot.pointerNodeId !== null ||
+    state.initialSnapshot.hoveredNodeId !== null
+  ) {
+    throw new Error("Expected initial interaction snapshot to be neutral")
+  }
+  expectStringArrayEquals(
+    state.initialSnapshot.highlightedNodeIds,
+    [],
+    "initialSnapshot.highlightedNodeIds",
+  )
+  expectStringArrayEquals(
+    state.initialSnapshot.highlightedEdgeIds,
+    [],
+    "initialSnapshot.highlightedEdgeIds",
+  )
+  expectStringArrayEquals(state.initialSnapshot.mutedNodeIds, [], "initialSnapshot.mutedNodeIds")
+  expectStringArrayEquals(state.initialSnapshot.mutedEdgeIds, [], "initialSnapshot.mutedEdgeIds")
+
+  if (
+    state.hoveredSnapshot.pointerNodeId !== "notes/a.md" ||
+    state.hoveredSnapshot.hoveredNodeId !== "notes/a.md"
+  ) {
+    throw new Error(
+      `Expected hovered snapshot node to be notes/a.md, got pointer=${state.hoveredSnapshot.pointerNodeId} hovered=${state.hoveredSnapshot.hoveredNodeId}`,
+    )
+  }
+  expectStringArrayEquals(
+    state.hoveredSnapshot.highlightedNodeIds,
+    ["notes/a.md", "notes/b.md"],
+    "hoveredSnapshot.highlightedNodeIds",
+  )
+  expectStringArrayEquals(
+    state.hoveredSnapshot.highlightedEdgeIds,
+    ["notes/a.md=>notes/b.md"],
+    "hoveredSnapshot.highlightedEdgeIds",
+  )
+  expectStringArrayEquals(
+    state.hoveredSnapshot.mutedNodeIds,
+    ["placeholder:missing/topic"],
+    "hoveredSnapshot.mutedNodeIds",
+  )
+  expectStringArrayEquals(
+    state.hoveredSnapshot.mutedEdgeIds,
+    ["notes/b.md=>placeholder:missing/topic"],
+    "hoveredSnapshot.mutedEdgeIds",
+  )
+
+  if (state.resetSnapshot.pointerNodeId !== null || state.resetSnapshot.hoveredNodeId !== null) {
+    throw new Error("Expected reset snapshot to be neutral after pointer leave")
+  }
+  expectStringArrayEquals(
+    state.resetSnapshot.highlightedNodeIds,
+    [],
+    "resetSnapshot.highlightedNodeIds",
+  )
+  expectStringArrayEquals(
+    state.resetSnapshot.highlightedEdgeIds,
+    [],
+    "resetSnapshot.highlightedEdgeIds",
+  )
+  expectStringArrayEquals(state.resetSnapshot.mutedNodeIds, [], "resetSnapshot.mutedNodeIds")
+  expectStringArrayEquals(state.resetSnapshot.mutedEdgeIds, [], "resetSnapshot.mutedEdgeIds")
 }
 
 const main = async (): Promise<void> => {
@@ -184,6 +333,51 @@ const smokeState = await state.page.evaluate(() => {
   const scene = sceneElement instanceof HTMLScriptElement ? JSON.parse(sceneElement.textContent ?? "{}") : { nodes: [], edges: [] };
   const sceneNodeCount = Array.isArray(scene.nodes) ? scene.nodes.length : 0;
   const sceneEdgeCount = Array.isArray(scene.edges) ? scene.edges.length : 0;
+  const initialSnapshot = (window.__graphVisualizerState !== null && typeof window.__graphVisualizerState === "object" && "readSnapshot" in window.__graphVisualizerState && typeof window.__graphVisualizerState.readSnapshot === "function")
+    ? window.__graphVisualizerState.readSnapshot()
+    : {
+        pointerNodeId: null,
+        hoveredNodeId: null,
+        highlightedNodeIds: [],
+        highlightedEdgeIds: [],
+        mutedNodeIds: [],
+        mutedEdgeIds: [],
+      };
+  const targetNodeId = "notes/a.md";
+  const targetNode = Array.isArray(scene.nodes)
+    ? scene.nodes.find((node) => node !== null && typeof node === "object" && node.id === targetNodeId)
+    : undefined;
+  if (!(canvas instanceof HTMLCanvasElement) || targetNode === undefined || typeof targetNode.x !== "number" || typeof targetNode.y !== "number") {
+    return {
+      appChildCount,
+      appChildTagNames,
+      canvasCount,
+      externalDomUrlCount: -1,
+      externalResourceCount: -1,
+      hasRuntimeState: false,
+      graphCanvasCount,
+      graphCanvasIsAppOnlyChild,
+      initialSnapshot,
+      hoveredSnapshot: initialSnapshot,
+      renderedPixelCount: 0,
+      resetSnapshot: initialSnapshot,
+      sceneEdgeCount,
+      sceneNodeCount,
+      targetNodeId,
+      url: window.location.href,
+    };
+  }
+  const rect = canvas.getBoundingClientRect();
+  const clientX = rect.left + (targetNode.x / canvas.width) * rect.width;
+  const clientY = rect.top + (targetNode.y / canvas.height) * rect.height;
+  canvas.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX, clientY }));
+  const hoveredSnapshot = (window.__graphVisualizerState !== null && typeof window.__graphVisualizerState === "object" && "readSnapshot" in window.__graphVisualizerState && typeof window.__graphVisualizerState.readSnapshot === "function")
+    ? window.__graphVisualizerState.readSnapshot()
+    : initialSnapshot;
+  canvas.dispatchEvent(new PointerEvent("pointerleave", { bubbles: true }));
+  const resetSnapshot = (window.__graphVisualizerState !== null && typeof window.__graphVisualizerState === "object" && "readSnapshot" in window.__graphVisualizerState && typeof window.__graphVisualizerState.readSnapshot === "function")
+    ? window.__graphVisualizerState.readSnapshot()
+    : hoveredSnapshot;
   const externalDomUrlCount = Array.from(document.querySelectorAll("[src], [href]"))
     .map((element) => {
       if (element instanceof HTMLScriptElement && typeof element.src === "string" && element.src.length > 0) {
@@ -228,9 +422,13 @@ const smokeState = await state.page.evaluate(() => {
     hasRuntimeState: typeof window.__graphVisualizerState === "object" && window.__graphVisualizerState !== null,
     graphCanvasCount,
     graphCanvasIsAppOnlyChild,
+    initialSnapshot,
+    hoveredSnapshot,
     renderedPixelCount,
+    resetSnapshot,
     sceneEdgeCount,
     sceneNodeCount,
+    targetNodeId,
     url: window.location.href,
   };
 });
