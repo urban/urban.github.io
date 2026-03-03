@@ -81,3 +81,13 @@ Run typecheck:
 ```bash
 bun run --cwd packages/graph-visualizer typecheck
 ```
+
+Run Playwriter browser invariants:
+
+```bash
+PLAYWRITER_SESSION_ID=<session-id> bun run --cwd packages/graph-visualizer test:browser:smoke
+```
+
+- Requires an active Playwriter session bound to local Chrome:
+  `bunx playwriter@latest session new`
+- Browser check validates local `file://` artifact, single-canvas root invariants, and no external network/runtime resources.
