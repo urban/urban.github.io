@@ -1,3 +1,4 @@
 # Ralph Auto Progress Log
 # This file tracks autonomous task completions
 - 2026-03-03: Completed task 63 (visible graph render). Replaced count-only canvas draw with deterministic scene primitives (edges/nodes/labels), embedded graph-scene payload, kept offline + deterministic tests green.
+- 2026-03-03: Completed task 64 (pointer hit-test + hover neighborhood styling). Added canvas pointer hit-testing with nearest-node selection, hover-derived highlight/mute edge+node styling, pointerleave reset, and render-html coverage tests for runtime hooks.
