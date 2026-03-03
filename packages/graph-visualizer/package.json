@@ -6,7 +6,8 @@
   "scripts": {
     "cli": "bun ./src/cli/main.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:browser:smoke": "bun ./test/browser/playwriter-visual-smoke.ts"
   },
   "dependencies": {
     "@effect/platform-node": "catalog:",
