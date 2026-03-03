@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./lib/common.sh
+source "$script_dir/lib/common.sh"
+
 notify() {
   if command -v tt >/dev/null 2>&1; then
     tt notify "$1" || true
@@ -48,51 +52,27 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ "${#positionals[@]}" -ne 1 ]; then
-  echo "Error: Exactly one GitHub PRD issue reference is required" >&2
-  echo "Usage: ./scripts/ralph/loop.sh <github-prd-issue-number-or-url> [options]" >&2
-  exit 1
-fi
+require_single_issue_ref \
+  "${#positionals[@]}" \
+  "./scripts/ralph/loop.sh <github-prd-issue-number-or-url> [options]"
 
 if ! [[ "$iterations" =~ ^[1-9][0-9]*$ ]]; then
   echo "Error: --iterations must be a positive integer, got: $iterations" >&2
   exit 1
 fi
 
-command -v gh >/dev/null 2>&1 || {
-  echo "Error: GitHub CLI (gh) is required." >&2
-  exit 1
-}
-command -v git >/dev/null 2>&1 || {
-  echo "Error: git is required." >&2
-  exit 1
-}
-command -v codex >/dev/null 2>&1 || {
-  echo "Error: Codex CLI is required." >&2
-  exit 1
-}
+require_core_commands
 
 issue_ref="${positionals[0]}"
-issue_number="$(gh issue view "$issue_ref" --json number --jq '.number')"
+issue_number="$(issue_number_from_ref "$issue_ref")"
 prd_issues_file="$(mktemp -t prd-issue.XXXXXX.md)"
 trap 'rm -f "$prd_issues_file"' EXIT
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-prompt_file="$script_dir/prompt-once-yolo.md"
-progress_file="$script_dir/progress.txt"
+prompt_file="$script_dir/PROMPT.md"
+progress_file="$script_dir/PROGRESS.txt"
 
-if [ ! -f "$prompt_file" ]; then
-  echo "Error: Prompt file not found: $prompt_file" >&2
-  exit 1
-fi
-
-if [ ! -f "$progress_file" ]; then
-  echo "Error: Progress file not found: $progress_file" >&2
-  exit 1
-fi
-
-
-gh issue list --limit 1000 --search "is:open in:body \"#${issue_number}\"" \
-  | awk -v id="$issue_number" '$1 != id { print }' >"$prd_issues_file"
+require_file "$prompt_file" "Prompt file"
+require_file "$progress_file" "Progress file"
+write_prd_issue_list "$issue_number" "$prd_issues_file" "1000"
 echo "PRD issue file: $prd_issues_file"
 
 for ((i=1; i<=iterations; i++)); do
