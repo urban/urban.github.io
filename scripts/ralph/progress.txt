@@ -7,3 +7,4 @@
 - 2026-03-03: Completed task 66 (Playwriter hover interaction assertions). Extended browser smoke to assert neutral interaction snapshot, pointer-hover neighborhood highlight+mute invariants for notes/a.md, and pointerleave reset to neutral; root typecheck/tests green.
 - 2026-03-03: Verified task 65 already closed upstream; posted PRD #62 status update; reran root typecheck+tests green.
 - 2026-03-03: Closed task 63 (visible graph render) after validating existing implementation against acceptance criteria; posted completion on #63 and parent #62; reran root typecheck+tests green.
+- 2026-03-03: Closed task 64 (pointer hit-test + hover neighborhood styling). Verified acceptance via existing runtime + tests; reran root typecheck/test green; posted completion evidence on #64.
