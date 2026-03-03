@@ -103,6 +103,23 @@ test("uses distinct visual styles for note and placeholder nodes", () => {
   expect(html).toContain("const PLACEHOLDER_FILL = '#fb923c'")
 })
 
+test("embeds pointer hit-test runtime for hover targeting", () => {
+  const html = renderHtmlFromSnapshot(snapshot)
+  expect(html).toContain("const HIT_TEST_PADDING = 6;")
+  expect(html).toContain("const pickPointerNodeId = (x, y) => {")
+  expect(html).toContain("canvas.addEventListener('pointermove'")
+  expect(html).toContain("canvas.addEventListener('pointerleave'")
+})
+
+test("embeds hover-neighborhood highlight and muting draw styles", () => {
+  const html = renderHtmlFromSnapshot(snapshot)
+  expect(html).toContain("const EDGE_HIGHLIGHT_STROKE = '#38bdf8';")
+  expect(html).toContain("const EDGE_MUTED_STROKE = 'rgba(71, 85, 105, 0.32)';")
+  expect(html).toContain("const NODE_MUTED_FILL = 'rgba(148, 163, 184, 0.35)';")
+  expect(html).toContain("const highlightedNodeIds = new Set(snapshot.highlightedNodeIds);")
+  expect(html).toContain("const mutedNodeIds = new Set(snapshot.mutedNodeIds);")
+})
+
 test("is deterministic for unchanged snapshot input", () => {
   const first = renderHtmlFromSnapshot(snapshot)
   const second = renderHtmlFromSnapshot(snapshot)
