@@ -82,9 +82,25 @@ test("renders standalone html with one canvas and embedded payload", () => {
   expect(html).toContain("<!doctype html>")
   expect(html.match(/<canvas /g)?.length ?? 0).toBe(1)
   expect(html).toContain('id="graph-snapshot"')
+  expect(html).toContain('id="graph-scene"')
   expect(html).toContain('id="graph-canvas"')
   expect(html).toContain('"label":"a"')
   expect(html).toContain('"kind":"placeholder"')
+})
+
+test("embeds visible scene primitives for non-empty graph", () => {
+  const html = renderHtmlFromSnapshot(snapshot)
+  expect(html).toContain('"sourceX":')
+  expect(html).toContain('"targetY":')
+  expect(html).toContain('"radius":16')
+  expect(html).toContain("context.moveTo(")
+  expect(html).toContain("context.arc(")
+})
+
+test("uses distinct visual styles for note and placeholder nodes", () => {
+  const html = renderHtmlFromSnapshot(snapshot)
+  expect(html).toContain("const NOTE_FILL = '#38bdf8'")
+  expect(html).toContain("const PLACEHOLDER_FILL = '#fb923c'")
 })
 
 test("is deterministic for unchanged snapshot input", () => {
