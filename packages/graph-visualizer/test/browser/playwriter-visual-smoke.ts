@@ -3,8 +3,13 @@ import { pathToFileURL } from "node:url"
 
 type SmokeState = {
   readonly appChildCount: number
+  readonly appChildTagNames: readonly string[]
   readonly canvasCount: number
+  readonly externalDomUrlCount: number
+  readonly externalResourceCount: number
   readonly hasRuntimeState: boolean
+  readonly graphCanvasCount: number
+  readonly graphCanvasIsAppOnlyChild: boolean
   readonly renderedPixelCount: number
   readonly sceneEdgeCount: number
   readonly sceneNodeCount: number
@@ -63,12 +68,25 @@ const readState = (output: string): SmokeState => {
   }
   const record = parsed
 
-  const getNumber = (key: keyof Omit<SmokeState, "url" | "hasRuntimeState">): number => {
+  const getNumber = (
+    key: keyof Omit<
+      SmokeState,
+      "url" | "hasRuntimeState" | "appChildTagNames" | "graphCanvasIsAppOnlyChild"
+    >,
+  ): number => {
     const value = record[key]
     if (typeof value !== "number" || !Number.isFinite(value)) {
       throw new Error(`Invalid numeric field: ${key}`)
     }
     return value
+  }
+
+  const appChildTagNamesValue = record.appChildTagNames
+  if (
+    !Array.isArray(appChildTagNamesValue) ||
+    appChildTagNamesValue.some((value) => typeof value !== "string")
+  ) {
+    throw new Error("Invalid appChildTagNames field")
   }
 
   const urlValue = record.url
@@ -81,10 +99,20 @@ const readState = (output: string): SmokeState => {
     throw new Error("Invalid hasRuntimeState field")
   }
 
+  const graphCanvasIsAppOnlyChildValue = record.graphCanvasIsAppOnlyChild
+  if (typeof graphCanvasIsAppOnlyChildValue !== "boolean") {
+    throw new Error("Invalid graphCanvasIsAppOnlyChild field")
+  }
+
   return {
     appChildCount: getNumber("appChildCount"),
+    appChildTagNames: appChildTagNamesValue,
     canvasCount: getNumber("canvasCount"),
+    externalDomUrlCount: getNumber("externalDomUrlCount"),
+    externalResourceCount: getNumber("externalResourceCount"),
     hasRuntimeState: hasRuntimeStateValue,
+    graphCanvasCount: getNumber("graphCanvasCount"),
+    graphCanvasIsAppOnlyChild: graphCanvasIsAppOnlyChildValue,
     renderedPixelCount: getNumber("renderedPixelCount"),
     sceneEdgeCount: getNumber("sceneEdgeCount"),
     sceneNodeCount: getNumber("sceneNodeCount"),
@@ -99,8 +127,22 @@ const assertSmokeState = (state: SmokeState): void => {
   if (state.canvasCount !== 1) {
     throw new Error(`Expected single canvas, got: ${state.canvasCount}`)
   }
+  if (state.graphCanvasCount !== 1) {
+    throw new Error(`Expected exactly one #graph-canvas, got: ${state.graphCanvasCount}`)
+  }
   if (state.appChildCount !== 1) {
     throw new Error(`Expected single graph root child in #app, got: ${state.appChildCount}`)
+  }
+  if (!state.graphCanvasIsAppOnlyChild) {
+    throw new Error(
+      `Expected #graph-canvas as only #app child, got: [${state.appChildTagNames.join(", ")}]`,
+    )
+  }
+  if (state.externalDomUrlCount !== 0) {
+    throw new Error(`Expected no external src/href URLs in DOM, got: ${state.externalDomUrlCount}`)
+  }
+  if (state.externalResourceCount !== 0) {
+    throw new Error(`Expected no external network resources, got: ${state.externalResourceCount}`)
   }
   if (state.sceneNodeCount < 2) {
     throw new Error(`Expected rendered scene nodes, got: ${state.sceneNodeCount}`)
@@ -126,15 +168,45 @@ state.page = context.pages().find((p) => p.url() === "about:blank") ?? (await co
 await state.page.setViewportSize({ width: 1280, height: 900 });
 await state.page.goto(${JSON.stringify(artifactUrl)}, { waitUntil: "domcontentloaded" });
 await state.page.waitForLoadState("domcontentloaded");
+await state.page.waitForTimeout(50);
 const smokeState = await state.page.evaluate(() => {
   const app = document.getElementById("app");
   const canvas = document.getElementById("graph-canvas");
   const sceneElement = document.getElementById("graph-scene");
   const canvasCount = document.querySelectorAll("canvas").length;
+  const graphCanvasCount = document.querySelectorAll("#graph-canvas").length;
   const appChildCount = app instanceof HTMLElement ? app.childElementCount : 0;
+  const appChildTagNames = app instanceof HTMLElement ? Array.from(app.children).map((element) => element.tagName.toLowerCase()) : [];
+  const graphCanvasIsAppOnlyChild = app instanceof HTMLElement
+    && app.childElementCount === 1
+    && app.firstElementChild instanceof HTMLCanvasElement
+    && app.firstElementChild.id === "graph-canvas";
   const scene = sceneElement instanceof HTMLScriptElement ? JSON.parse(sceneElement.textContent ?? "{}") : { nodes: [], edges: [] };
   const sceneNodeCount = Array.isArray(scene.nodes) ? scene.nodes.length : 0;
   const sceneEdgeCount = Array.isArray(scene.edges) ? scene.edges.length : 0;
+  const externalDomUrlCount = Array.from(document.querySelectorAll("[src], [href]"))
+    .map((element) => {
+      if (element instanceof HTMLScriptElement && typeof element.src === "string" && element.src.length > 0) {
+        return element.src;
+      }
+      if (element instanceof HTMLLinkElement && typeof element.href === "string" && element.href.length > 0) {
+        return element.href;
+      }
+      if (element instanceof HTMLImageElement && typeof element.src === "string" && element.src.length > 0) {
+        return element.src;
+      }
+      if (element instanceof HTMLAnchorElement && typeof element.href === "string" && element.href.length > 0) {
+        return element.href;
+      }
+      return "";
+    })
+    .filter((value) => /^https?:\\/\\//i.test(value) || /^\\/\\//.test(value))
+    .length;
+  const externalResourceCount = performance
+    .getEntriesByType("resource")
+    .map((entry) => entry.name)
+    .filter((name) => /^https?:\\/\\//i.test(name) || /^\\/\\//.test(name))
+    .length;
   let renderedPixelCount = 0;
   if (canvas instanceof HTMLCanvasElement) {
     const ctx = canvas.getContext("2d");
@@ -149,8 +221,13 @@ const smokeState = await state.page.evaluate(() => {
   }
   return {
     appChildCount,
+    appChildTagNames,
     canvasCount,
+    externalDomUrlCount,
+    externalResourceCount,
     hasRuntimeState: typeof window.__graphVisualizerState === "object" && window.__graphVisualizerState !== null,
+    graphCanvasCount,
+    graphCanvasIsAppOnlyChild,
     renderedPixelCount,
     sceneEdgeCount,
     sceneNodeCount,
