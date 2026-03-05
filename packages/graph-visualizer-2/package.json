@@ -1,0 +1,19 @@
+{
+  "name": "@urban/graph-visualizer-2",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@urban/build-graph": "workspace:*",
+    "d3-force": "3.0.0",
+    "effect": "catalog:",
+    "pixi.js": "8.16.0"
+  },
+  "devDependencies": {
+    "@types/d3-force": "3.0.10",
+    "vite": "7.3.1"
+  }
+}
