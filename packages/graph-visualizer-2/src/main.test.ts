@@ -1,15 +1,17 @@
 import { describe, expect, test } from "bun:test"
 import {
-  centerSelectedReleasedNode,
+  centerReleasedSelectedNode,
+  createAppState,
   deriveRenderModel,
+  reduceAppStateWithCommands,
   reduceGraphState,
-  reduceSpriteInteractionState,
+  reduceGraphStateWithCommands,
+  reduceGraphStateWithTransition,
   type GraphLink,
   type GraphNode,
   type GraphReducerContext,
   type GraphState,
   type SelectionSnapshot,
-  type SpriteInteractionState,
 } from "./main"
 
 function makeGraphFixtures() {
@@ -43,6 +45,7 @@ function makeGraphFixtures() {
   const initialState: GraphState = {
     selection: { type: "none" },
     hoveredNodeId: null,
+    draggedNodeId: null,
     renderModel: deriveRenderModel({
       nodes,
       links,
@@ -50,6 +53,7 @@ function makeGraphFixtures() {
       adjacency,
       selection: { type: "none" },
       hoveredNodeId: null,
+      draggedNodeId: null,
     }),
   }
 
@@ -63,10 +67,10 @@ function makeGraphFixtures() {
 }
 
 describe("reduceGraphState", () => {
-  test("selection/toggle selects node then computes neighborhood", () => {
+  test("selection/set selects node then computes neighborhood", () => {
     const { context, initialState } = makeGraphFixtures()
 
-    const next = reduceGraphState(initialState, { type: "selection/toggle", nodeId: "b" }, context)
+    const next = reduceGraphState(initialState, { type: "selection/set", nodeId: "b" }, context)
 
     expect(next.selection.type).toBe("selected")
     if (next.selection.type !== "selected") throw new Error("expected selected state")
@@ -76,22 +80,15 @@ describe("reduceGraphState", () => {
     expect(nodeVisualById.has("d")).toBeFalse()
   })
 
-  test("selection/toggle on same id keeps selection", () => {
+  test("selection/set on same id keeps selection", () => {
     const { context, initialState } = makeGraphFixtures()
-    const selected = reduceGraphState(
-      initialState,
-      { type: "selection/toggle", nodeId: "b" },
-      context,
-    )
+    const selected = reduceGraphState(initialState, { type: "selection/set", nodeId: "b" }, context)
 
-    const reselected = reduceGraphState(
-      selected,
-      { type: "selection/toggle", nodeId: "b" },
-      context,
-    )
+    const reselected = reduceGraphState(selected, { type: "selection/set", nodeId: "b" }, context)
 
     expect(reselected.selection).toEqual(selected.selection)
     expect(reselected.hoveredNodeId).toBeNull()
+    expect(reselected.draggedNodeId).toBeNull()
   })
 
   test("simulation/tick preserves selected node", () => {
@@ -103,14 +100,15 @@ describe("reduceGraphState", () => {
     expect(ticked.selection).toEqual(selected.selection)
   })
 
-  test("selection/clear does not change selection", () => {
+  test("selection/set replaces selected node", () => {
     const { context, initialState } = makeGraphFixtures()
     const selected = reduceGraphState(initialState, { type: "selection/set", nodeId: "a" }, context)
 
-    const cleared = reduceGraphState(selected, { type: "selection/clear" }, context)
+    const updated = reduceGraphState(selected, { type: "selection/set", nodeId: "c" }, context)
 
-    expect(cleared.selection).toEqual(selected.selection)
-    expect(cleared.hoveredNodeId).toEqual(selected.hoveredNodeId)
+    expect(updated.selection.type).toBe("selected")
+    if (updated.selection.type !== "selected") throw new Error("expected selected state")
+    expect(updated.selection.nodeId).toBe("c")
   })
 
   test("hover/set and hover/clear update hovered node id", () => {
@@ -122,66 +120,174 @@ describe("reduceGraphState", () => {
     expect(hovered.hoveredNodeId).toBe("b")
     expect(cleared.hoveredNodeId).toBeNull()
   })
+
+  test("drag/focus actions update dragged node id", () => {
+    const { context, initialState } = makeGraphFixtures()
+
+    const focused = reduceGraphState(initialState, { type: "drag/focus/set", nodeId: "b" }, context)
+    const cleared = reduceGraphState(focused, { type: "drag/focus/clear", nodeId: "b" }, context)
+
+    expect(focused.draggedNodeId).toBe("b")
+    expect(cleared.draggedNodeId).toBeNull()
+  })
 })
 
-describe("reduceSpriteInteractionState", () => {
-  const initialInteractionState: SpriteInteractionState = {
-    drag: { type: "idle" },
-    pointerGlobal: null,
-    selectionRequestNodeId: null,
-    selectionRequestId: 0,
-  }
+describe("reduceGraphStateWithTransition", () => {
+  test("emits selection/changed only when selected node changes", () => {
+    const { context, initialState } = makeGraphFixtures()
 
-  test("drag/move while idle no-op", () => {
-    const next = reduceSpriteInteractionState(initialInteractionState, {
-      type: "drag/move",
-      global: { x: 1, y: 2 },
-    })
+    const selected = reduceGraphStateWithTransition(
+      initialState,
+      { type: "selection/set", nodeId: "b" },
+      context,
+    )
+    expect(selected.transition).toEqual({ type: "selection/changed", selectedNodeId: "b" })
 
-    expect(next).toBe(initialInteractionState)
+    const ticked = reduceGraphStateWithTransition(
+      selected.state,
+      { type: "simulation/tick" },
+      context,
+    )
+    expect(ticked.transition).toEqual({ type: "none" })
+  })
+})
+
+describe("reduceGraphStateWithCommands", () => {
+  test("emits typed selection/changed command", () => {
+    const { context, initialState } = makeGraphFixtures()
+
+    const selected = reduceGraphStateWithCommands(
+      initialState,
+      { type: "selection/set", nodeId: "b" },
+      context,
+    )
+
+    expect(selected.commands).toEqual([{ type: "selection/changed", selectedNodeId: "b" }])
+  })
+})
+
+describe("reduceAppStateWithCommands", () => {
+  test("pointer/move while idle is no-op", () => {
+    const { context } = makeGraphFixtures()
+    const initial = createAppState(context)
+
+    const next = reduceAppStateWithCommands(
+      initial,
+      { type: "pointer/move", global: { x: 1, y: 2 } },
+      context,
+    )
+
+    expect(next.state).toBe(initial)
+    expect(next.commands).toEqual([])
   })
 
-  test("drag lifecycle updates pointer + resets on end", () => {
-    const started = reduceSpriteInteractionState(initialInteractionState, {
-      type: "drag/start",
-      nodeId: "a",
-      global: { x: 1, y: 2 },
-    })
-    const moved = reduceSpriteInteractionState(started, {
-      type: "drag/move",
-      global: { x: 4, y: 5 },
-    })
-    const ended = reduceSpriteInteractionState(moved, { type: "drag/end" })
+  test("drag click selects node and emits side-effect commands", () => {
+    const { context } = makeGraphFixtures()
+    const initial = createAppState(context)
 
-    expect(started.drag).toEqual({
-      type: "dragging",
-      nodeId: "a",
-      startGlobal: { x: 1, y: 2 },
+    const down = reduceAppStateWithCommands(
+      initial,
+      { type: "pointer/node-down", nodeId: "c", global: { x: 10, y: 10 } },
+      context,
+    )
+    const released = reduceAppStateWithCommands(down.state, { type: "pointer/release" }, context)
+
+    expect(down.state.pointer).toEqual({
+      type: "dragging-node",
+      nodeId: "c",
+      startGlobal: { x: 10, y: 10 },
       hasMoved: false,
     })
-    expect(moved.pointerGlobal).toEqual({ x: 4, y: 5 })
-    expect(ended).toEqual({
-      drag: { type: "idle" },
-      pointerGlobal: null,
-      selectionRequestNodeId: "a",
-      selectionRequestId: 1,
-    })
+    expect(down.commands).toEqual([
+      { type: "simulation/alpha-target", alphaTarget: 0.3, restart: true },
+      {
+        type: "drag/set-node-fixed-position",
+        nodeId: "c",
+        pointerGlobal: { x: 10, y: 10 },
+      },
+    ])
+
+    expect(released.state.pointer).toEqual({ type: "idle" })
+    expect(released.state.pointerGlobal).toBeNull()
+    expect(released.commands).toEqual([
+      { type: "simulation/alpha-target", alphaTarget: 0, restart: false },
+      { type: "drag/release-node-fixed-position", nodeId: "c" },
+      { type: "simulation/set-selected-node", nodeId: "c" },
+      { type: "simulation/reheat", alpha: 0.28 },
+      {
+        type: "drag/center-released-selected-node",
+        releasedNodeId: "c",
+        selectedNodeId: "c",
+      },
+    ])
   })
 
-  test("drag end after movement does not request selection", () => {
-    const started = reduceSpriteInteractionState(initialInteractionState, {
-      type: "drag/start",
-      nodeId: "c",
-      global: { x: 1, y: 2 },
-    })
-    const moved = reduceSpriteInteractionState(started, {
-      type: "drag/move",
-      global: { x: 20, y: 24 },
-    })
-    const ended = reduceSpriteInteractionState(moved, { type: "drag/end" })
+  test("drag move marks drag as moved and avoids selection command on release", () => {
+    const { context } = makeGraphFixtures()
+    const initial = createAppState(context)
 
-    expect(ended.selectionRequestNodeId).toBeNull()
-    expect(ended.selectionRequestId).toBe(0)
+    const down = reduceAppStateWithCommands(
+      initial,
+      { type: "pointer/node-down", nodeId: "c", global: { x: 1, y: 2 } },
+      context,
+    )
+    const moved = reduceAppStateWithCommands(
+      down.state,
+      { type: "pointer/move", global: { x: 20, y: 24 } },
+      context,
+    )
+    const released = reduceAppStateWithCommands(moved.state, { type: "pointer/release" }, context)
+
+    expect(moved.state.pointer).toEqual({
+      type: "dragging-node",
+      nodeId: "c",
+      startGlobal: { x: 1, y: 2 },
+      hasMoved: true,
+    })
+    expect(moved.commands).toEqual([
+      {
+        type: "drag/set-node-fixed-position",
+        nodeId: "c",
+        pointerGlobal: { x: 20, y: 24 },
+      },
+    ])
+
+    expect(released.commands).toEqual([
+      { type: "simulation/alpha-target", alphaTarget: 0, restart: false },
+      { type: "drag/release-node-fixed-position", nodeId: "c" },
+    ])
+  })
+
+  test("single gesture FSM handles stage pan", () => {
+    const { context } = makeGraphFixtures()
+    const initial = createAppState(context)
+
+    const down = reduceAppStateWithCommands(
+      initial,
+      {
+        type: "pointer/stage-down",
+        global: { x: 10, y: 10 },
+        world: { x: 100, y: 200 },
+      },
+      context,
+    )
+    const moved = reduceAppStateWithCommands(
+      down.state,
+      { type: "pointer/move", global: { x: 25, y: 40 } },
+      context,
+    )
+
+    expect(down.state.pointer).toEqual({
+      type: "panning",
+      startGlobal: { x: 10, y: 10 },
+      startWorld: { x: 100, y: 200 },
+    })
+    expect(moved.commands).toEqual([
+      {
+        type: "world/set-position",
+        position: { x: 115, y: 230 },
+      },
+    ])
   })
 })
 
@@ -201,6 +307,7 @@ describe("deriveRenderModel", () => {
       adjacency: context.adjacency,
       selection,
       hoveredNodeId: null,
+      draggedNodeId: null,
     })
 
     const nodeVisualById = new Map(model.nodes.map((node) => [node.id, node.visual]))
@@ -240,6 +347,7 @@ describe("deriveRenderModel", () => {
       adjacency: context.adjacency,
       selection,
       hoveredNodeId: null,
+      draggedNodeId: null,
     })
 
     expect(model.edges).toEqual([])
@@ -260,6 +368,7 @@ describe("deriveRenderModel", () => {
       adjacency: context.adjacency,
       selection,
       hoveredNodeId: "a",
+      draggedNodeId: null,
     })
 
     expect(model.edges).toEqual([
@@ -286,6 +395,7 @@ describe("deriveRenderModel", () => {
       adjacency: context.adjacency,
       selection: { type: "none" },
       hoveredNodeId: "a",
+      draggedNodeId: null,
     })
 
     const labelStateById = new Map(model.labels.map((label) => [label.id, label.state]))
@@ -294,26 +404,47 @@ describe("deriveRenderModel", () => {
     expect(labelStateById.get("c")).toBe("muted")
     expect(labelStateById.get("d")).toBe("muted")
   })
+
+  test("dragged node applies hover-like muting but disables dragged label hover animation", () => {
+    const { nodes, links, nodeById, context } = makeGraphFixtures()
+
+    const model = deriveRenderModel({
+      nodes,
+      links,
+      nodeById,
+      adjacency: context.adjacency,
+      selection: { type: "none" },
+      hoveredNodeId: null,
+      draggedNodeId: "a",
+    })
+
+    expect(model.edges).toEqual([
+      {
+        source: { x: 10, y: 20 },
+        target: { x: 30, y: 40 },
+        visual: "default",
+      },
+      {
+        source: { x: 30, y: 40 },
+        target: { x: 50, y: 60 },
+        visual: "muted",
+      },
+    ])
+
+    const labelById = new Map(model.labels.map((label) => [label.id, label]))
+    expect(labelById.get("a")?.state).toBe("default")
+    expect(labelById.get("a")?.isHovered).toBeFalse()
+    expect(labelById.get("b")?.state).toBe("default")
+    expect(labelById.get("c")?.state).toBe("muted")
+    expect(labelById.get("d")?.state).toBe("muted")
+  })
 })
 
-describe("centerSelectedReleasedNode", () => {
-  const makeState = (drag: SpriteInteractionState["drag"]): SpriteInteractionState => ({
-    drag,
-    pointerGlobal: null,
-    selectionRequestNodeId: null,
-    selectionRequestId: 0,
-  })
-
+describe("centerReleasedSelectedNode", () => {
   test("nudges selected node toward center when drag ends", () => {
     const { nodeById } = makeGraphFixtures()
-    const didCenter = centerSelectedReleasedNode({
-      previousState: makeState({
-        type: "dragging",
-        nodeId: "a",
-        startGlobal: { x: 0, y: 0 },
-        hasMoved: true,
-      }),
-      state: makeState({ type: "idle" }),
+    const didCenter = centerReleasedSelectedNode({
+      releasedNodeId: "a",
       selectedNodeId: "a",
       nodeById,
       world: { toLocal: (point) => ({ x: point.x + 10, y: point.y + 20 }) },
@@ -332,14 +463,8 @@ describe("centerSelectedReleasedNode", () => {
 
   test("does not center when released node is not selected", () => {
     const { nodeById } = makeGraphFixtures()
-    const didCenter = centerSelectedReleasedNode({
-      previousState: makeState({
-        type: "dragging",
-        nodeId: "a",
-        startGlobal: { x: 0, y: 0 },
-        hasMoved: true,
-      }),
-      state: makeState({ type: "idle" }),
+    const didCenter = centerReleasedSelectedNode({
+      releasedNodeId: "a",
       selectedNodeId: "b",
       nodeById,
       world: { toLocal: (point) => point },
@@ -363,14 +488,8 @@ describe("centerSelectedReleasedNode", () => {
       ["d", farAway],
     ])
 
-    const didCenter = centerSelectedReleasedNode({
-      previousState: makeState({
-        type: "dragging",
-        nodeId: "a",
-        startGlobal: { x: 0, y: 0 },
-        hasMoved: true,
-      }),
-      state: makeState({ type: "idle" }),
+    const didCenter = centerReleasedSelectedNode({
+      releasedNodeId: "a",
       selectedNodeId: "a",
       nodeById,
       world: { toLocal: (point) => point },

@@ -115,16 +115,6 @@
     "scratchpad": {
       "name": "scratchpad",
       "version": "0.0.0",
-      "dependencies": {
-        "@urban/build-graph": "workspace:*",
-        "d3-force": "3.0.0",
-        "effect": "catalog:",
-        "pixi.js": "8.16.0",
-      },
-      "devDependencies": {
-        "@types/d3-force": "3.0.10",
-        "vite": "7.3.1",
-      },
     },
     "scripts": {
       "name": "scripts",
