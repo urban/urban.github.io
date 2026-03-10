@@ -8,6 +8,7 @@ import {
   type AppState,
   type GraphAction,
   type GraphReducerContext,
+  type NodeId,
   type Point,
 } from "./shared"
 
@@ -158,9 +159,12 @@ function reduceRelease(
   }
 }
 
-export function createAppState(context: GraphReducerContext): AppState {
+export function createAppState(
+  context: GraphReducerContext,
+  initialSelectedNodeId: NodeId | null = null,
+): AppState {
   return {
-    graph: createGraphState(null, null, null, context),
+    graph: createGraphState(initialSelectedNodeId, null, null, context),
     pointer: { type: "idle" },
     pointerGlobal: null,
   }

@@ -21,6 +21,11 @@ export type HtmlGraphSnapshotSource =
   | { type: "snapshot-url"; snapshotUrl: URL }
   | { type: "snapshot-inline"; snapshotPayload: unknown }
 
+export type GraphVisualizerBootstrapOptions = {
+  selectedNodeId?: NodeId | null
+  documentObject?: Document
+}
+
 export function resolveGraphSnapshotSourceFromHtmlConfig({
   snapshotUrl,
   snapshotJson,
@@ -58,6 +63,17 @@ export function resolveGraphSnapshotSourceFromHtmlConfig({
   )
 }
 
+export function resolveInitialSelectedNodeIdFromHtmlConfig(
+  selectedNodeId: string | null | undefined,
+): NodeId | null {
+  if (selectedNodeId === null || selectedNodeId === undefined) {
+    return null
+  }
+
+  const normalizedSelectedNodeId = selectedNodeId.trim()
+  return normalizedSelectedNodeId === "" ? null : normalizedSelectedNodeId
+}
+
 function readGraphSnapshotSourceFromDocument(documentObject: Document): HtmlGraphSnapshotSource {
   const appElement = documentObject.getElementById("app")
   if (appElement === null) {
@@ -90,6 +106,15 @@ function readGraphSnapshotSourceFromDocument(documentObject: Document): HtmlGrap
     snapshotJson: snapshotScriptText === "" ? null : snapshotScriptText,
     baseUrl: documentObject.baseURI,
   })
+}
+
+function readInitialSelectedNodeIdFromDocument(documentObject: Document): NodeId | null {
+  const appElement = documentObject.getElementById("app")
+  if (appElement === null) {
+    throw new Error("Missing #app container element for graph visualizer bootstrap.")
+  }
+
+  return resolveInitialSelectedNodeIdFromHtmlConfig(appElement.dataset.selectedNodeId)
 }
 
 function setNodeFixedToPointer({
@@ -186,8 +211,11 @@ function executeAppCommands({
   }
 }
 
-export async function bootstrapGraphVisualizer() {
-  const graphSource = readGraphSnapshotSourceFromDocument(document)
+export async function bootstrapGraphVisualizer({
+  selectedNodeId,
+  documentObject = document,
+}: GraphVisualizerBootstrapOptions = {}) {
+  const graphSource = readGraphSnapshotSourceFromDocument(documentObject)
   const graph =
     graphSource.type === "snapshot-url"
       ? await loadGraphDataFromSnapshot(graphSource.snapshotUrl)
@@ -222,7 +250,11 @@ export async function bootstrapGraphVisualizer() {
   lifecycle.add(simulationController.dispose)
   lifecycle.add(renderer.dispose)
 
-  let appState = createAppState(context)
+  const initialSelectedNodeId =
+    selectedNodeId === undefined
+      ? readInitialSelectedNodeIdFromDocument(documentObject)
+      : selectedNodeId
+  let appState = createAppState(context, initialSelectedNodeId)
   simulationController.setSelectedNodeId(selectedNodeIdFromSelection(appState.graph.selection))
 
   const dispatch = (action: AppAction) => {
