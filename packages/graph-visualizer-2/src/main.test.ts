@@ -1,18 +1,91 @@
 import { describe, expect, test } from "bun:test"
 import {
   centerReleasedSelectedNode,
+  createGraphDataFromSnapshotPayload,
   createAppState,
   deriveRenderModel,
   reduceAppStateWithCommands,
   reduceGraphState,
   reduceGraphStateWithCommands,
   reduceGraphStateWithTransition,
+  resolveGraphSnapshotSourceFromHtmlConfig,
   type GraphLink,
   type GraphNode,
   type GraphReducerContext,
   type GraphState,
   type SelectionSnapshot,
 } from "./main"
+
+function makeSnapshotPayload() {
+  return {
+    schemaVersion: "2",
+    nodes: [
+      {
+        id: "alpha",
+        kind: "note",
+        relativePath: "alpha.md",
+        permalink: "/alpha/",
+      },
+      {
+        id: "beta",
+        kind: "note",
+        relativePath: "beta.md",
+        permalink: "/beta/",
+      },
+    ],
+    edges: [
+      {
+        sourceNodeId: "alpha",
+        targetNodeId: "beta",
+        sourceRelativePath: "alpha.md",
+        rawWikilink: "[[beta]]",
+        target: "beta",
+        resolutionStrategy: "path",
+      },
+    ],
+    diagnostics: [],
+    indexes: {
+      nodesById: {
+        alpha: {
+          id: "alpha",
+          kind: "note",
+          relativePath: "alpha.md",
+          permalink: "/alpha/",
+        },
+        beta: {
+          id: "beta",
+          kind: "note",
+          relativePath: "beta.md",
+          permalink: "/beta/",
+        },
+      },
+      edgesBySourceNodeId: {
+        alpha: [
+          {
+            sourceNodeId: "alpha",
+            targetNodeId: "beta",
+            sourceRelativePath: "alpha.md",
+            rawWikilink: "[[beta]]",
+            target: "beta",
+            resolutionStrategy: "path",
+          },
+        ],
+      },
+      edgesByTargetNodeId: {
+        beta: [
+          {
+            sourceNodeId: "alpha",
+            targetNodeId: "beta",
+            sourceRelativePath: "alpha.md",
+            rawWikilink: "[[beta]]",
+            target: "beta",
+            resolutionStrategy: "path",
+          },
+        ],
+      },
+    },
+  }
+}
 
 function makeGraphFixtures() {
   const nodes: GraphNode[] = [
@@ -65,6 +138,76 @@ function makeGraphFixtures() {
     initialState,
   }
 }
+
+describe("resolveGraphSnapshotSourceFromHtmlConfig", () => {
+  test("resolves URL snapshot config", () => {
+    const source = resolveGraphSnapshotSourceFromHtmlConfig({
+      snapshotUrl: "./graph.json",
+      snapshotJson: null,
+      baseUrl: "https://example.com/visualizer/index.html",
+    })
+
+    expect(source.type).toBe("snapshot-url")
+    if (source.type !== "snapshot-url") throw new Error("expected snapshot-url source")
+    expect(source.snapshotUrl.href).toBe("https://example.com/visualizer/graph.json")
+  })
+
+  test("resolves inline snapshot config", () => {
+    const source = resolveGraphSnapshotSourceFromHtmlConfig({
+      snapshotUrl: null,
+      snapshotJson: JSON.stringify(makeSnapshotPayload()),
+      baseUrl: "https://example.com/visualizer/index.html",
+    })
+
+    expect(source.type).toBe("snapshot-inline")
+    if (source.type !== "snapshot-inline") throw new Error("expected snapshot-inline source")
+    expect(source.snapshotPayload).toEqual(makeSnapshotPayload())
+  })
+
+  test("throws on ambiguous snapshot config", () => {
+    expect(() =>
+      resolveGraphSnapshotSourceFromHtmlConfig({
+        snapshotUrl: "./graph.json",
+        snapshotJson: JSON.stringify(makeSnapshotPayload()),
+        baseUrl: "https://example.com/visualizer/index.html",
+      }),
+    ).toThrow("Ambiguous graph snapshot source")
+  })
+
+  test("throws on missing snapshot config", () => {
+    expect(() =>
+      resolveGraphSnapshotSourceFromHtmlConfig({
+        snapshotUrl: null,
+        snapshotJson: null,
+        baseUrl: "https://example.com/visualizer/index.html",
+      }),
+    ).toThrow("Missing graph snapshot source in HTML")
+  })
+
+  test("throws on invalid inline snapshot JSON", () => {
+    expect(() =>
+      resolveGraphSnapshotSourceFromHtmlConfig({
+        snapshotUrl: null,
+        snapshotJson: "{not-valid-json",
+        baseUrl: "https://example.com/visualizer/index.html",
+      }),
+    ).toThrow("Invalid graph snapshot JSON in HTML")
+  })
+})
+
+describe("createGraphDataFromSnapshotPayload", () => {
+  test("decodes valid snapshot payload and derives graph model", () => {
+    const graph = createGraphDataFromSnapshotPayload(makeSnapshotPayload())
+
+    expect(graph.nodes).toEqual([
+      { id: "alpha", label: "alpha" },
+      { id: "beta", label: "beta" },
+    ])
+    expect(graph.links).toEqual([{ sourceNodeId: "alpha", targetNodeId: "beta" }])
+    expect(graph.nodeById.size).toBe(2)
+    expect([...(graph.adjacency.get("alpha") ?? [])]).toEqual(["beta"])
+  })
+})
 
 describe("reduceGraphState", () => {
   test("selection/set selects node then computes neighborhood", () => {
