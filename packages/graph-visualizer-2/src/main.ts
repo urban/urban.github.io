@@ -1,6 +1,8 @@
 export {
   bootstrapGraphVisualizer,
+  resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
+  type GraphVisualizerBootstrapOptions,
   type HtmlGraphSnapshotSource,
 } from "./bootstrap"
 export { createAppState, reduceAppStateWithCommands } from "./app-state"

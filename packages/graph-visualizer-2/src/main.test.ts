@@ -8,6 +8,7 @@ import {
   reduceGraphState,
   reduceGraphStateWithCommands,
   reduceGraphStateWithTransition,
+  resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
   type GraphLink,
   type GraphNode,
@@ -195,6 +196,18 @@ describe("resolveGraphSnapshotSourceFromHtmlConfig", () => {
   })
 })
 
+describe("resolveInitialSelectedNodeIdFromHtmlConfig", () => {
+  test("returns trimmed node id when configured", () => {
+    expect(resolveInitialSelectedNodeIdFromHtmlConfig("  beta  ")).toBe("beta")
+  })
+
+  test("returns null for missing or blank config", () => {
+    expect(resolveInitialSelectedNodeIdFromHtmlConfig(null)).toBeNull()
+    expect(resolveInitialSelectedNodeIdFromHtmlConfig(undefined)).toBeNull()
+    expect(resolveInitialSelectedNodeIdFromHtmlConfig("   ")).toBeNull()
+  })
+})
+
 describe("createGraphDataFromSnapshotPayload", () => {
   test("decodes valid snapshot payload and derives graph model", () => {
     const graph = createGraphDataFromSnapshotPayload(makeSnapshotPayload())
@@ -310,6 +323,26 @@ describe("reduceGraphStateWithCommands", () => {
 })
 
 describe("reduceAppStateWithCommands", () => {
+  test("creates initial selected state when host provides selected node id", () => {
+    const { context } = makeGraphFixtures()
+
+    const initial = createAppState(context, "c")
+
+    expect(initial.graph.selection.type).toBe("selected")
+    if (initial.graph.selection.type !== "selected") throw new Error("expected selected state")
+    expect(initial.graph.selection.nodeId).toBe("c")
+  })
+
+  test("falls back deterministically when host provides unknown selected node id", () => {
+    const { context } = makeGraphFixtures()
+
+    const initial = createAppState(context, "missing")
+
+    expect(initial.graph.selection.type).toBe("selected")
+    if (initial.graph.selection.type !== "selected") throw new Error("expected selected state")
+    expect(initial.graph.selection.nodeId).toBe("a")
+  })
+
   test("pointer/move while idle is no-op", () => {
     const { context } = makeGraphFixtures()
     const initial = createAppState(context)
