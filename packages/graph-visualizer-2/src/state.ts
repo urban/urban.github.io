@@ -21,7 +21,11 @@ import {
   selectedNodeIdFromSelection,
 } from "./shared"
 
-const decodeGraphSnapshot = Schema.decodeUnknownSync(GraphSnapshotSchema)
+const decodeGraphSnapshotUnknown = Schema.decodeUnknownSync(GraphSnapshotSchema)
+
+export function decodeGraphSnapshot(payload: unknown): GraphSnapshot {
+  return decodeGraphSnapshotUnknown(payload)
+}
 
 function toNodeLabel(relativePath: string) {
   return relativePath.endsWith(".md") ? relativePath.slice(0, -3) : relativePath
@@ -61,13 +65,17 @@ export function createGraphDataFromSnapshot(snapshot: GraphSnapshot): GraphData 
   return { nodes, links, nodeById, adjacency: buildAdjacency(nodes, links) }
 }
 
+export function createGraphDataFromSnapshotPayload(payload: unknown): GraphData {
+  return createGraphDataFromSnapshot(decodeGraphSnapshot(payload))
+}
+
 export async function loadGraphDataFromSnapshot(snapshotUrl: URL): Promise<GraphData> {
   const response = await fetch(snapshotUrl)
   if (!response.ok) {
     throw new Error(`Failed to load graph snapshot: ${response.status} ${response.statusText}`)
   }
   const payload: unknown = await response.json()
-  return createGraphDataFromSnapshot(decodeGraphSnapshot(payload))
+  return createGraphDataFromSnapshotPayload(payload)
 }
 
 function collectNodeIdsWithinDepth(

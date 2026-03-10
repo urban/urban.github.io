@@ -1,9 +1,15 @@
-export { bootstrapGraphVisualizer } from "./bootstrap"
+export {
+  bootstrapGraphVisualizer,
+  resolveGraphSnapshotSourceFromHtmlConfig,
+  type HtmlGraphSnapshotSource,
+} from "./bootstrap"
 export { createAppState, reduceAppStateWithCommands } from "./app-state"
 export { centerReleasedSelectedNode } from "./simulation"
 export {
+  createGraphDataFromSnapshotPayload,
   createGraphDataFromSnapshot,
   createGraphState,
+  decodeGraphSnapshot,
   deriveRenderModel,
   loadGraphDataFromSnapshot,
   reduceGraphState,

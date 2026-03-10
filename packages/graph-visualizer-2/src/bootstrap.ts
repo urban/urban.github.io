@@ -4,7 +4,7 @@ import { bindPointerInteractions } from "./interaction"
 import { createLifecycle } from "./lifecycle"
 import { createGraphRenderer, createPixiApp, createWorld } from "./renderer"
 import { centerReleasedSelectedNode, createSimulation } from "./simulation"
-import { loadGraphDataFromSnapshot } from "./state"
+import { createGraphDataFromSnapshotPayload, loadGraphDataFromSnapshot } from "./state"
 import {
   GRAPH_CONFIG,
   selectedNodeIdFromSelection,
@@ -14,6 +14,83 @@ import {
   type NodeId,
   type SimulationGraphLink,
 } from "./shared"
+
+const DEFAULT_GRAPH_SNAPSHOT_SCRIPT_ID = "graph-snapshot"
+
+export type HtmlGraphSnapshotSource =
+  | { type: "snapshot-url"; snapshotUrl: URL }
+  | { type: "snapshot-inline"; snapshotPayload: unknown }
+
+export function resolveGraphSnapshotSourceFromHtmlConfig({
+  snapshotUrl,
+  snapshotJson,
+  baseUrl,
+}: {
+  snapshotUrl: string | null
+  snapshotJson: string | null
+  baseUrl: string
+}): HtmlGraphSnapshotSource {
+  if (snapshotUrl !== null && snapshotJson !== null) {
+    throw new Error(
+      "Ambiguous graph snapshot source: provide either data-graph-snapshot-url or inline script JSON, not both.",
+    )
+  }
+
+  if (snapshotUrl !== null) {
+    return { type: "snapshot-url", snapshotUrl: new URL(snapshotUrl, baseUrl) }
+  }
+
+  if (snapshotJson !== null) {
+    try {
+      const snapshotPayload: unknown = JSON.parse(snapshotJson)
+      return { type: "snapshot-inline", snapshotPayload }
+    } catch (error: unknown) {
+      throw new Error(
+        `Invalid graph snapshot JSON in HTML: ${
+          error instanceof Error ? error.message : "unknown parse error"
+        }`,
+      )
+    }
+  }
+
+  throw new Error(
+    'Missing graph snapshot source in HTML. Set #app[data-graph-snapshot-url] or add <script id="graph-snapshot" type="application/json">...</script>.',
+  )
+}
+
+function readGraphSnapshotSourceFromDocument(documentObject: Document): HtmlGraphSnapshotSource {
+  const appElement = documentObject.getElementById("app")
+  if (appElement === null) {
+    throw new Error("Missing #app container element for graph visualizer bootstrap.")
+  }
+
+  const snapshotUrlValue = appElement.dataset.graphSnapshotUrl?.trim() ?? ""
+  const snapshotScriptIdValue = appElement.dataset.graphSnapshotScriptId?.trim()
+  if (snapshotUrlValue !== "" && snapshotScriptIdValue !== undefined) {
+    throw new Error(
+      "Ambiguous graph snapshot source: do not set both data-graph-snapshot-url and data-graph-snapshot-script-id on #app.",
+    )
+  }
+
+  const snapshotUrl = snapshotUrlValue === "" ? null : snapshotUrlValue
+  if (snapshotUrl !== null) {
+    return resolveGraphSnapshotSourceFromHtmlConfig({
+      snapshotUrl,
+      snapshotJson: null,
+      baseUrl: documentObject.baseURI,
+    })
+  }
+
+  const snapshotScriptId = snapshotScriptIdValue ?? DEFAULT_GRAPH_SNAPSHOT_SCRIPT_ID
+  const snapshotScriptElement = documentObject.getElementById(snapshotScriptId)
+  const snapshotScriptText = snapshotScriptElement?.textContent?.trim() ?? ""
+
+  return resolveGraphSnapshotSourceFromHtmlConfig({
+    snapshotUrl: null,
+    snapshotJson: snapshotScriptText === "" ? null : snapshotScriptText,
+    baseUrl: documentObject.baseURI,
+  })
+}
 
 function setNodeFixedToPointer({
   nodeId,
@@ -110,7 +187,11 @@ function executeAppCommands({
 }
 
 export async function bootstrapGraphVisualizer() {
-  const graph = await loadGraphDataFromSnapshot(new URL("./graph-snapshot.json", import.meta.url))
+  const graphSource = readGraphSnapshotSourceFromDocument(document)
+  const graph =
+    graphSource.type === "snapshot-url"
+      ? await loadGraphDataFromSnapshot(graphSource.snapshotUrl)
+      : createGraphDataFromSnapshotPayload(graphSource.snapshotPayload)
   const app = await createPixiApp("#app")
   const { world, edgeGraphics, nodeLayer, labelLayer } = createWorld(app)
 
