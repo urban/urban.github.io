@@ -1,10 +1,15 @@
 import * as d3 from "d3-force"
+import type { GraphSnapshotNode } from "@urban/build-graph/src/domain/schema"
 import { createAppState, reduceAppStateWithCommands } from "./app-state"
 import { bindPointerInteractions } from "./interaction"
 import { createLifecycle } from "./lifecycle"
 import { createGraphRenderer, createPixiApp, createWorld } from "./renderer"
 import { centerReleasedSelectedNode, createSimulation } from "./simulation"
-import { createGraphDataFromSnapshotPayload, loadGraphDataFromSnapshot } from "./state"
+import {
+  createGraphDataFromSnapshotPayload,
+  loadGraphDataFromSnapshot,
+  toSnapshotNodeLabel,
+} from "./state"
 import {
   GRAPH_CONFIG,
   selectedNodeIdFromSelection,
@@ -22,8 +27,85 @@ export type HtmlGraphSnapshotSource =
   | { type: "snapshot-inline"; snapshotPayload: unknown }
 
 export type GraphVisualizerBootstrapOptions = {
+  onSelectionChange?: (selection: GraphVisualizerSelectionChange) => void
   selectedNodeId?: NodeId | null
   documentObject?: Document
+}
+
+export type GraphVisualizerNoSelectionChange = { type: "none" }
+
+export type GraphVisualizerNoteSelectionChange = {
+  type: "note"
+  nodeId: NodeId
+  displayLabel: string
+  relativePath: string
+  permalink: string
+  sourceRelativePath?: string
+  slug?: string
+  routePath?: string
+  title?: string
+  description?: string
+  created?: string
+  updated?: string
+  aliases: ReadonlyArray<string>
+  published?: boolean
+}
+
+export type GraphVisualizerPlaceholderSelectionChange = {
+  type: "placeholder"
+  nodeId: NodeId
+  displayLabel: string
+  unresolvedTarget: string
+}
+
+export type GraphVisualizerSelectionChange =
+  | GraphVisualizerNoSelectionChange
+  | GraphVisualizerNoteSelectionChange
+  | GraphVisualizerPlaceholderSelectionChange
+
+export function createGraphVisualizerSelectionChange({
+  selectedNodeId,
+  snapshotNodeById,
+}: {
+  selectedNodeId: NodeId | null
+  snapshotNodeById: ReadonlyMap<NodeId, GraphSnapshotNode>
+}): GraphVisualizerSelectionChange {
+  if (selectedNodeId === null) {
+    return { type: "none" }
+  }
+
+  const snapshotNode = snapshotNodeById.get(selectedNodeId)
+  if (snapshotNode === undefined) {
+    return { type: "none" }
+  }
+
+  if (snapshotNode.kind === "placeholder") {
+    return {
+      type: "placeholder",
+      nodeId: snapshotNode.id,
+      displayLabel: toSnapshotNodeLabel(snapshotNode),
+      unresolvedTarget: snapshotNode.unresolvedTarget,
+    }
+  }
+
+  return {
+    type: "note",
+    nodeId: snapshotNode.id,
+    displayLabel: toSnapshotNodeLabel(snapshotNode),
+    relativePath: snapshotNode.relativePath,
+    permalink: snapshotNode.permalink,
+    aliases: snapshotNode.aliases ?? [],
+    ...(snapshotNode.sourceRelativePath === undefined
+      ? {}
+      : { sourceRelativePath: snapshotNode.sourceRelativePath }),
+    ...(snapshotNode.slug === undefined ? {} : { slug: snapshotNode.slug }),
+    ...(snapshotNode.routePath === undefined ? {} : { routePath: snapshotNode.routePath }),
+    ...(snapshotNode.title === undefined ? {} : { title: snapshotNode.title }),
+    ...(snapshotNode.description === undefined ? {} : { description: snapshotNode.description }),
+    ...(snapshotNode.created === undefined ? {} : { created: snapshotNode.created }),
+    ...(snapshotNode.updated === undefined ? {} : { updated: snapshotNode.updated }),
+    ...(snapshotNode.published === undefined ? {} : { published: snapshotNode.published }),
+  }
 }
 
 export function resolveGraphSnapshotSourceFromHtmlConfig({
@@ -144,16 +226,20 @@ function releaseFixedNode(nodeId: NodeId, nodeById: ReadonlyMap<NodeId, GraphNod
 
 function executeAppCommands({
   commands,
+  onSelectionChange,
   simulation,
   simulationController,
+  snapshotNodeById,
   nodeById,
   world,
   getCanvasCenterGlobal,
 }: {
   commands: ReadonlyArray<AppCommand>
+  onSelectionChange: ((selection: GraphVisualizerSelectionChange) => void) | undefined
   simulation: d3.Simulation<GraphNode, SimulationGraphLink>
   simulationController: ReturnType<typeof createSimulation>
   nodeById: ReadonlyMap<NodeId, GraphNode>
+  snapshotNodeById: ReadonlyMap<NodeId, GraphSnapshotNode>
   world: {
     x: number
     y: number
@@ -172,6 +258,14 @@ function executeAppCommands({
         break
       case "simulation/reheat":
         simulation.alpha(command.alpha).restart()
+        break
+      case "selection/notify-host":
+        onSelectionChange?.(
+          createGraphVisualizerSelectionChange({
+            selectedNodeId: command.selectedNodeId,
+            snapshotNodeById,
+          }),
+        )
         break
       case "simulation/alpha-target": {
         simulation.alphaTarget(command.alphaTarget)
@@ -212,6 +306,7 @@ function executeAppCommands({
 }
 
 export async function bootstrapGraphVisualizer({
+  onSelectionChange,
   selectedNodeId,
   documentObject = document,
 }: GraphVisualizerBootstrapOptions = {}) {
@@ -271,6 +366,8 @@ export async function bootstrapGraphVisualizer({
       simulation,
       simulationController,
       nodeById: graph.nodeById,
+      snapshotNodeById: graph.snapshotNodeById,
+      onSelectionChange,
       world,
       getCanvasCenterGlobal: () => ({ x: app.screen.width / 2, y: app.screen.height / 2 }),
     })

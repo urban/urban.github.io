@@ -1,5 +1,9 @@
 import { Schema } from "effect"
-import { GraphSnapshotSchema, type GraphSnapshot } from "@urban/build-graph/src/domain/schema"
+import {
+  GraphSnapshotSchema,
+  type GraphSnapshot,
+  type GraphSnapshotNode,
+} from "@urban/build-graph/src/domain/schema"
 import {
   GRAPH_CONFIG,
   GRAPH_RENDER_DEPTH,
@@ -31,7 +35,7 @@ function toNodeLabel(relativePath: string) {
   return relativePath.endsWith(".md") ? relativePath.slice(0, -3) : relativePath
 }
 
-function toSnapshotNodeLabel(node: GraphSnapshot["nodes"][number]) {
+export function toSnapshotNodeLabel(node: GraphSnapshotNode) {
   return node.kind === "note" ? toNodeLabel(node.relativePath) : node.unresolvedTarget
 }
 
@@ -57,12 +61,19 @@ export function createGraphDataFromSnapshot(snapshot: GraphSnapshot): GraphData 
     label: toSnapshotNodeLabel(node),
   }))
   const nodeById = mapById(nodes)
+  const snapshotNodeById = mapById(snapshot.nodes)
   const links = snapshot.edges.flatMap(({ sourceNodeId, targetNodeId }) =>
     nodeById.has(sourceNodeId) && nodeById.has(targetNodeId)
       ? [{ sourceNodeId, targetNodeId }]
       : [],
   )
-  return { nodes, links, nodeById, adjacency: buildAdjacency(nodes, links) }
+  return {
+    nodes,
+    links,
+    nodeById,
+    snapshotNodeById,
+    adjacency: buildAdjacency(nodes, links),
+  }
 }
 
 export function createGraphDataFromSnapshotPayload(payload: unknown): GraphData {
