@@ -8,13 +8,30 @@ import type { ValidatedMarkdownFile } from "../src/core/validate"
 
 const createValidatedNote = (relativePath: string, permalink: string): ValidatedMarkdownFile => ({
   relativePath,
+  sourceRelativePath: relativePath,
   body: "",
+  slug:
+    permalink
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? permalink,
+  routePath: permalink,
+  nodeId: relativePath,
+  label:
+    permalink
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? permalink,
   frontmatter: {
     permalink,
     created: "2026-02-01",
     updated: "2026-02-02",
     aliases: [],
     published: true,
+    title: undefined,
+    description: undefined,
   },
 })
 

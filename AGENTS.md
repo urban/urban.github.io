@@ -19,6 +19,11 @@ Fight entropy. Leave the codebase better than you found it.
 
 Write tests that verify semantically correct behavior
 Failing tests are acceptable when they expose genuine bugs and test correct behavior
+Before a task is complete, run full monorepo verification from repo root
+Required completion gate: `bun run lint`
+Required completion gate: `bun run test`
+Required completion gate: `bun run typecheck`
+Package-local checks fine during iteration, but never sufficient for task completion
 
 ## Information
 

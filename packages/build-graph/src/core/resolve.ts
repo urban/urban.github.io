@@ -1,9 +1,13 @@
 import { Schema } from "effect"
 import type { ParsedWikilink } from "./parse"
-import { compareByRelativePath, normalizeCaseFolded, normalizePathLike } from "./helpers"
+import {
+  basename,
+  compareByRelativePath,
+  normalizeCaseFolded,
+  normalizePathLike,
+  removeMarkdownExtension,
+} from "./helpers"
 import type { ValidatedMarkdownFile } from "./validate"
-
-const MARKDOWN_EXTENSION = ".md"
 
 export type WikilinkResolverIndex = {
   readonly byPath: ReadonlyMap<string, ReadonlyArray<ValidatedMarkdownFile>>
@@ -49,22 +53,22 @@ export type WikilinkResolutionSummary = {
   readonly ambiguousDiagnostics: ReadonlyArray<AmbiguousWikilinkResolutionDiagnostic>
 }
 
-const removeMarkdownExtension = (value: string) =>
-  value.endsWith(MARKDOWN_EXTENSION) ? value.slice(0, -MARKDOWN_EXTENSION.length) : value
-
-const basename = (normalizedPath: string) => {
-  const segments = normalizedPath.split("/")
-  return segments[segments.length - 1] ?? ""
-}
-
 const addCandidate = (
   index: Map<string, Array<ValidatedMarkdownFile>>,
   key: string,
   note: ValidatedMarkdownFile,
 ) => {
+  if (key.length === 0) {
+    return
+  }
+
   const existing = index.get(key)
   if (existing === undefined) {
     index.set(key, [note])
+    return
+  }
+
+  if (existing.some((candidate) => candidate.relativePath === note.relativePath)) {
     return
   }
 
@@ -99,6 +103,17 @@ export const buildWikilinkResolverIndex = (
     const relativePathWithoutExtension = removeMarkdownExtension(normalizedRelativePath)
     if (relativePathWithoutExtension !== normalizedRelativePath) {
       addCandidate(byPath, relativePathWithoutExtension, note)
+    }
+
+    const normalizedPermalink = normalizePathLike(note.frontmatter.permalink)
+    if (normalizedPermalink.length > 0) {
+      addCandidate(byPath, normalizedPermalink, note)
+    }
+
+    const normalizedRoutePath =
+      typeof note.routePath === "string" ? normalizePathLike(note.routePath) : ""
+    if (normalizedRoutePath.length > 0) {
+      addCandidate(byPath, normalizedRoutePath, note)
     }
 
     const normalizedFilename = basename(normalizedRelativePath)

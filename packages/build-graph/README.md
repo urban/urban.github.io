@@ -52,6 +52,22 @@ Optional:
 
 - `aliases`: array of non-empty strings (defaults to `[]`).
 - `published`: boolean (defaults to `true`).
+- `title`: non-empty string.
+- `description`: non-empty string.
+
+### Route-Aware Mode
+
+Library consumers can opt into canonical route identity with:
+
+- `identityStrategy: "canonical-route"`
+- `routePrefix: "/vault"` or `"vault"`
+
+In canonical-route mode:
+
+- `permalink` must be a kebab-case slug segment such as `harness-loop`.
+- source filenames may differ from route identity, for example `Harness Loop.md`.
+- canonical route paths are derived from `routePrefix + permalink`, for example `/vault/harness-loop`.
+- note node ids become canonical route paths instead of source-relative paths.
 
 The CLI fails if:
 
@@ -91,6 +107,21 @@ Snapshot shape:
 - `nodes`: note nodes and placeholder nodes.
 - `edges`: wikilink edges with `resolutionStrategy` (`path` | `filename` | `alias` | `unresolved`).
 - `diagnostics`: unresolved wikilink diagnostics.
+- `indexes.noteNodeIdBySlug`: note lookup by canonical slug when available.
+- `indexes.noteNodeIdByRoutePath`: note lookup by canonical route path when available.
+
+Note nodes now include route-aware and UI metadata fields such as:
+
+- `sourceRelativePath`
+- `slug`
+- `routePath`
+- `label`
+- `created`
+- `updated`
+- `aliases`
+- `published`
+- optional `title`
+- optional `description`
 
 Example unresolved placeholder node id:
 
@@ -199,22 +230,25 @@ After (v2 shape):
 Supported exports from `@urban/build-graph`:
 
 - `runWithArgs` (CLI entry for programmatic execution).
+- `discoverMarkdownFiles`.
 - `validateMarkdownSources`.
 - `parseWikilinks`.
 - `formatAmbiguousWikilinkResolutionDiagnostics`.
 - `buildGraphSnapshot`.
+- `buildGraphSnapshotFromMarkdownSources`.
+- `buildGraphSnapshotFromRoot`.
 - `normalizeGraphSnapshot`.
 - `serializeGraphSnapshot`.
 - `GraphSnapshotSchema`.
 - Tagged errors:
   - `BuildGraphFrontmatterValidationError`
   - `BuildGraphDuplicatePermalinkError`
+  - `BuildGraphInvalidCanonicalPermalinkError`
   - `BuildGraphAmbiguousWikilinkResolutionError`
 
 Not part of the curated public surface:
 
 - CLI internals/constants (`buildGraphCommand`, `runBuildGraph`, snapshot file-name constants).
-- Filesystem discovery internals (`discoverMarkdownFiles`).
 - Low-level domain helper schemas/types that are implementation details.
 
 ## Determinism
