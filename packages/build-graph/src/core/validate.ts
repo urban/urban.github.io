@@ -1,12 +1,13 @@
 import { Effect, Option, Result, Schema } from "effect"
 import matter from "gray-matter"
 import {
+  type BuildGraphOptions,
   NoteFrontmatterSchema,
   RawNoteFrontmatterSchema,
   normalizeRawNoteFrontmatter,
   type NoteFrontmatter,
 } from "../domain/schema"
-import { compareStrings } from "./helpers"
+import { compareStrings, joinRoutePath, normalizeRoutePrefix } from "./helpers"
 
 const FrontmatterValidationDiagnosticSchema = Schema.Struct({
   relativePath: Schema.String,
@@ -29,12 +30,19 @@ export type DuplicatePermalinkDiagnostic = Schema.Schema.Type<
 export type MarkdownSourceFile = {
   readonly relativePath: string
   readonly source: string
+  readonly absolutePath?: string
 }
 
 export type ValidatedMarkdownFile = {
   readonly relativePath: string
+  readonly sourceRelativePath: string
+  readonly absolutePath?: string
   readonly body: string
   readonly frontmatter: NoteFrontmatter
+  readonly slug: string
+  readonly routePath: string
+  readonly nodeId: string
+  readonly label: string
 }
 
 type FrontmatterParseOutcome =
@@ -63,10 +71,51 @@ export class BuildGraphDuplicatePermalinkError extends Schema.TaggedErrorClass<B
   },
 ) {}
 
+export class BuildGraphInvalidCanonicalPermalinkError extends Schema.TaggedErrorClass<BuildGraphInvalidCanonicalPermalinkError>()(
+  "BuildGraphInvalidCanonicalPermalinkError",
+  {
+    message: Schema.String,
+    diagnostics: Schema.Array(FrontmatterValidationDiagnosticSchema),
+  },
+) {}
+
 const decodeRawFrontmatter = Schema.decodeUnknownSync(RawNoteFrontmatterSchema)
 const decodeNoteFrontmatter = Schema.decodeUnknownSync(NoteFrontmatterSchema)
+const CANONICAL_PERMALINK_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+const defaultBuildGraphOptions: Required<BuildGraphOptions> = {
+  identityStrategy: "source-path",
+  routePrefix: "",
+}
+
+const normalizeBuildGraphOptions = (
+  options: BuildGraphOptions | undefined,
+): Required<BuildGraphOptions> => ({
+  identityStrategy: options?.identityStrategy ?? defaultBuildGraphOptions.identityStrategy,
+  routePrefix: normalizeRoutePrefix(options?.routePrefix),
+})
 
 const stripInlineComment = (value: string): string => value.replace(/\s+#.*$/, "").trim()
+
+const capitalizeWord = (value: string): string => {
+  const first = value[0]
+  if (first === undefined) {
+    return value
+  }
+
+  return `${first.toUpperCase()}${value.slice(1)}`
+}
+
+const humanizeLabel = (value: string): string => {
+  const normalized = value
+    .trim()
+    .split(/[-_\s]+/)
+    .filter((segment) => segment.length > 0)
+    .map(capitalizeWord)
+    .join(" ")
+
+  return normalized.length > 0 ? normalized : value
+}
 
 const stripOuterQuotes = (value: string): string => {
   if (value.length < 2) {
@@ -179,8 +228,47 @@ const validateFrontmatter = (frontmatter: unknown, rawFrontmatter?: string): Not
     ),
   )
 
+const validateCanonicalPermalinkSegment = (
+  relativePath: string,
+  frontmatter: NoteFrontmatter,
+): FrontmatterValidationDiagnostic | undefined => {
+  if (CANONICAL_PERMALINK_SEGMENT.test(frontmatter.permalink)) {
+    return undefined
+  }
+
+  return {
+    relativePath,
+    message:
+      `Invalid canonical permalink slug "${frontmatter.permalink}". ` +
+      'Expected kebab-case slug segment like "harness-loop" with no slash separators.',
+  }
+}
+
+const labelFromValidatedNote = (
+  relativePath: string,
+  frontmatter: NoteFrontmatter,
+  slug: string,
+): string => {
+  if (frontmatter.title !== undefined) {
+    return frontmatter.title
+  }
+
+  if (slug.length > 0) {
+    return humanizeLabel(slug)
+  }
+
+  const normalizedRelativePath = relativePath.replaceAll("\\", "/")
+  const segments = normalizedRelativePath.split("/")
+  const lastSegment = segments[segments.length - 1] ?? normalizedRelativePath
+  const basename = lastSegment.toLowerCase().endsWith(".md")
+    ? lastSegment.slice(0, -3)
+    : lastSegment
+  return humanizeLabel(basename)
+}
+
 const validateMarkdownSource = Effect.fn("buildGraph.validateMarkdownSource")(function* (
   file: MarkdownSourceFile,
+  options: Required<BuildGraphOptions>,
 ): Effect.fn.Return<FrontmatterParseOutcome> {
   const parsedResult = yield* Effect.try({
     try: () => matter(file.source),
@@ -214,23 +302,58 @@ const validateMarkdownSource = Effect.fn("buildGraph.validateMarkdownSource")(fu
   }
 
   const frontmatter = Option.getOrThrow(Result.getSuccess(frontmatterResult))
+  if (options.identityStrategy === "canonical-route") {
+    const canonicalPermalinkDiagnostic = validateCanonicalPermalinkSegment(
+      file.relativePath,
+      frontmatter,
+    )
+    if (canonicalPermalinkDiagnostic !== undefined) {
+      return {
+        _tag: "diagnostic",
+        diagnostic: canonicalPermalinkDiagnostic,
+      }
+    }
+  }
+
+  const slug =
+    options.identityStrategy === "canonical-route"
+      ? frontmatter.permalink
+      : (frontmatter.permalink
+          .replace(/^\/+|\/+$/g, "")
+          .split("/")
+          .filter(Boolean)
+          .pop() ?? frontmatter.permalink)
+  const routePath =
+    options.identityStrategy === "canonical-route"
+      ? joinRoutePath(options.routePrefix, slug)
+      : frontmatter.permalink
   return {
     _tag: "validated",
     validatedFile: {
-      ...file,
+      ...(file.absolutePath === undefined ? {} : { absolutePath: file.absolutePath }),
+      relativePath: file.relativePath,
+      sourceRelativePath: file.relativePath,
       body: parsedFile.content,
       frontmatter,
+      slug,
+      routePath,
+      nodeId: options.identityStrategy === "canonical-route" ? routePath : file.relativePath,
+      label: labelFromValidatedNote(file.relativePath, frontmatter, slug),
     },
   }
 })
 
 export const validateMarkdownSources = Effect.fn("buildGraph.validateMarkdownSources")(function* (
   markdownFiles: ReadonlyArray<MarkdownSourceFile>,
+  options?: BuildGraphOptions,
 ) {
+  const normalizedOptions = normalizeBuildGraphOptions(options)
   const diagnostics: Array<FrontmatterValidationDiagnostic> = []
   const validatedFiles: Array<ValidatedMarkdownFile> = []
 
-  const outcomes = yield* Effect.forEach(markdownFiles, validateMarkdownSource)
+  const outcomes = yield* Effect.forEach(markdownFiles, (file) =>
+    validateMarkdownSource(file, normalizedOptions),
+  )
   for (const outcome of outcomes) {
     if (outcome._tag === "diagnostic") {
       diagnostics.push(outcome.diagnostic)

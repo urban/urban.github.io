@@ -21,13 +21,30 @@ const createValidatedNote = (
   aliases: ReadonlyArray<string> = [],
 ): ValidatedMarkdownFile => ({
   relativePath,
+  sourceRelativePath: relativePath,
   body: "",
+  slug:
+    permalink
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? permalink,
+  routePath: permalink,
+  nodeId: relativePath,
+  label:
+    permalink
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? permalink,
   frontmatter: {
     permalink,
     created: "2026-02-01",
     updated: "2026-02-02",
     aliases: [...aliases],
     published: true,
+    title: undefined,
+    description: undefined,
   },
 })
 
@@ -70,18 +87,42 @@ test("preserves prior information surface in v2 arrays with no data loss", () =>
         kind: "note",
         relativePath: "alias-target.md",
         permalink: "/alias-target",
+        sourceRelativePath: "alias-target.md",
+        slug: "alias-target",
+        routePath: "/alias-target",
+        label: "alias-target",
+        created: "2026-02-01",
+        updated: "2026-02-02",
+        aliases: ["friendly-target"],
+        published: true,
       },
       {
         id: "nested/filename-target.md",
         kind: "note",
         relativePath: "nested/filename-target.md",
         permalink: "/filename-target",
+        sourceRelativePath: "nested/filename-target.md",
+        slug: "filename-target",
+        routePath: "/filename-target",
+        label: "filename-target",
+        created: "2026-02-01",
+        updated: "2026-02-02",
+        aliases: [],
+        published: true,
       },
       {
         id: "path/target.md",
         kind: "note",
         relativePath: "path/target.md",
         permalink: "/path-target",
+        sourceRelativePath: "path/target.md",
+        slug: "path-target",
+        routePath: "/path-target",
+        label: "path-target",
+        created: "2026-02-01",
+        updated: "2026-02-02",
+        aliases: [],
+        published: true,
       },
       {
         id: "placeholder:missing/path",
@@ -93,6 +134,14 @@ test("preserves prior information surface in v2 arrays with no data loss", () =>
         kind: "note",
         relativePath: "source.md",
         permalink: "/source",
+        sourceRelativePath: "source.md",
+        slug: "source",
+        routePath: "/source",
+        label: "source",
+        created: "2026-02-01",
+        updated: "2026-02-02",
+        aliases: [],
+        published: true,
       },
     ],
     edges: [
@@ -111,7 +160,7 @@ test("preserves prior information surface in v2 arrays with no data loss", () =>
         sourceRelativePath: "source.md",
         rawWikilink: "[[filename-target]]",
         target: "filename-target",
-        resolutionStrategy: "filename",
+        resolutionStrategy: "path",
       },
       {
         sourceNodeId: "source.md",
@@ -157,5 +206,10 @@ test("indexes are derivable from base surface and add lookup capability only", (
   expect(snapshot.indexes.nodesById["target.md"]).toEqual(baseSurface.nodes[1])
   expect(snapshot.indexes.edgesBySourceNodeId["source.md"]).toEqual(baseSurface.edges)
   expect(snapshot.indexes.edgesByTargetNodeId["target.md"]).toEqual(baseSurface.edges)
+  expect(snapshot.indexes.noteNodeIdBySlug).toEqual({ source: "source.md", target: "target.md" })
+  expect(snapshot.indexes.noteNodeIdByRoutePath).toEqual({
+    "/source": "source.md",
+    "/target": "target.md",
+  })
   expect(baseSurface.diagnostics).toEqual([])
 })

@@ -47,6 +47,8 @@ export const RawNoteFrontmatterSchema = Schema.Struct({
   updated: IsoDateOnlyString,
   aliases: Schema.optional(Schema.Array(Schema.NonEmptyString)),
   published: Schema.optional(Schema.Boolean),
+  title: Schema.optional(Schema.NonEmptyString),
+  description: Schema.optional(Schema.NonEmptyString),
 })
 
 export type RawNoteFrontmatter = Schema.Schema.Type<typeof RawNoteFrontmatterSchema>
@@ -57,9 +59,23 @@ export const NoteFrontmatterSchema = Schema.Struct({
   updated: IsoDateOnlyString,
   aliases: Schema.Array(Schema.NonEmptyString),
   published: Schema.Boolean,
+  title: Schema.optional(Schema.NonEmptyString),
+  description: Schema.optional(Schema.NonEmptyString),
 })
 
 export type NoteFrontmatter = Schema.Schema.Type<typeof NoteFrontmatterSchema>
+
+export const BuildGraphIdentityStrategySchema = Schema.Union([
+  Schema.Literal("source-path"),
+  Schema.Literal("canonical-route"),
+])
+
+export type BuildGraphIdentityStrategy = Schema.Schema.Type<typeof BuildGraphIdentityStrategySchema>
+
+export type BuildGraphOptions = {
+  readonly identityStrategy?: BuildGraphIdentityStrategy
+  readonly routePrefix?: string
+}
 
 export const GraphSnapshotResolutionStrategySchema = Schema.Union([
   Schema.Literal("path"),
@@ -73,6 +89,16 @@ export const GraphSnapshotNoteNodeSchema = Schema.Struct({
   kind: Schema.Literal("note"),
   relativePath: Schema.String,
   permalink: Schema.String,
+  sourceRelativePath: Schema.optional(Schema.String),
+  slug: Schema.optional(Schema.String),
+  routePath: Schema.optional(Schema.String),
+  label: Schema.optional(Schema.String),
+  created: Schema.optional(IsoDateOnlyString),
+  updated: Schema.optional(IsoDateOnlyString),
+  aliases: Schema.optional(Schema.Array(Schema.NonEmptyString)),
+  published: Schema.optional(Schema.Boolean),
+  title: Schema.optional(Schema.NonEmptyString),
+  description: Schema.optional(Schema.NonEmptyString),
 })
 
 export const GraphSnapshotPlaceholderNodeSchema = Schema.Struct({
@@ -110,6 +136,8 @@ export const GraphSnapshotIndexesSchema = Schema.Struct({
   nodesById: Schema.Record(Schema.String, GraphSnapshotNodeSchema),
   edgesBySourceNodeId: Schema.Record(Schema.String, Schema.Array(GraphSnapshotEdgeSchema)),
   edgesByTargetNodeId: Schema.Record(Schema.String, Schema.Array(GraphSnapshotEdgeSchema)),
+  noteNodeIdBySlug: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+  noteNodeIdByRoutePath: Schema.optional(Schema.Record(Schema.String, Schema.String)),
 })
 
 export const GraphSnapshotSchema = Schema.Struct({
@@ -142,4 +170,6 @@ export const normalizeRawNoteFrontmatter = (frontmatter: RawNoteFrontmatter): No
   updated: frontmatter.updated,
   aliases: frontmatter.aliases ?? [],
   published: frontmatter.published ?? true,
+  title: frontmatter.title,
+  description: frontmatter.description,
 })

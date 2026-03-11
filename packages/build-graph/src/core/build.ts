@@ -71,15 +71,26 @@ export const buildGraphSnapshot = (
 
   const graph = Graph.directed<GraphSnapshotNode, GraphSnapshotEdge>((mutable) => {
     for (const note of [...notes].sort(compareByRelativePath)) {
-      const nodeId = note.relativePath
       const nodeIndex = Graph.addNode(mutable, {
-        id: nodeId,
+        id: note.nodeId,
         kind: "note",
         relativePath: note.relativePath,
+        sourceRelativePath: note.sourceRelativePath,
         permalink: note.frontmatter.permalink,
+        slug: note.slug,
+        routePath: note.routePath,
+        label: note.label,
+        created: note.frontmatter.created,
+        updated: note.frontmatter.updated,
+        aliases: note.frontmatter.aliases,
+        published: note.frontmatter.published,
+        ...(note.frontmatter.title === undefined ? {} : { title: note.frontmatter.title }),
+        ...(note.frontmatter.description === undefined
+          ? {}
+          : { description: note.frontmatter.description }),
       })
-      noteNodeIds.set(note.relativePath, nodeId)
-      nodeIndices.set(nodeId, nodeIndex)
+      noteNodeIds.set(note.relativePath, note.nodeId)
+      nodeIndices.set(note.nodeId, nodeIndex)
     }
 
     for (const wikilink of wikilinks) {

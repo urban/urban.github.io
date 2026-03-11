@@ -27,6 +27,9 @@ test("validates frontmatter and defaults published to true", async () => {
   expect(validatedFiles).toHaveLength(1)
   expect(validatedFiles[0].frontmatter.aliases).toEqual([])
   expect(validatedFiles[0].frontmatter.published).toBeTrue()
+  expect(validatedFiles[0].slug).toBe("note")
+  expect(validatedFiles[0].routePath).toBe("/note")
+  expect(validatedFiles[0].nodeId).toBe("note.md")
 })
 
 test("accepts semantically valid leap-day dates", async () => {
@@ -130,4 +133,101 @@ test("fails with duplicate permalink diagnostics", async () => {
   expect(error.message).toContain("/shared")
   expect(error.message).toContain("a.md")
   expect(error.message).toContain("nested/b.md")
+})
+
+test("supports canonical-route mode for spaced source filenames with prefixed route paths", async () => {
+  const result = await Effect.runPromise(
+    validateMarkdownSources(
+      [
+        sourceFile(
+          "Harness Loop.md",
+          [
+            "---",
+            "title: Harness Loop",
+            "permalink: harness-loop",
+            "created: 2026-02-01",
+            "updated: 2026-02-02",
+            "---",
+            "# note",
+            "",
+          ].join("\n"),
+        ),
+      ],
+      { identityStrategy: "canonical-route", routePrefix: "/vault/" },
+    ).pipe(Effect.result),
+  )
+
+  expect(Result.isSuccess(result)).toBeTrue()
+  const validatedFiles = Option.getOrThrow(Result.getSuccess(result))
+  expect(validatedFiles[0]).toMatchObject({
+    relativePath: "Harness Loop.md",
+    sourceRelativePath: "Harness Loop.md",
+    slug: "harness-loop",
+    routePath: "/vault/harness-loop",
+    nodeId: "/vault/harness-loop",
+    label: "Harness Loop",
+  })
+})
+
+test("humanizes canonical-route labels when title is absent", async () => {
+  const result = await Effect.runPromise(
+    validateMarkdownSources(
+      [
+        sourceFile(
+          "Harness Loop.md",
+          [
+            "---",
+            "permalink: harness-loop",
+            "created: 2026-02-01",
+            "updated: 2026-02-02",
+            "---",
+            "# note",
+            "",
+          ].join("\n"),
+        ),
+      ],
+      { identityStrategy: "canonical-route" },
+    ).pipe(Effect.result),
+  )
+
+  expect(Result.isSuccess(result)).toBeTrue()
+  const validatedFiles = Option.getOrThrow(Result.getSuccess(result))
+  expect(validatedFiles[0]).toMatchObject({
+    relativePath: "Harness Loop.md",
+    slug: "harness-loop",
+    routePath: "/harness-loop",
+    nodeId: "/harness-loop",
+    label: "Harness Loop",
+  })
+})
+
+test("rejects non-kebab permalink values in canonical-route mode", async () => {
+  const result = await Effect.runPromise(
+    validateMarkdownSources(
+      [
+        sourceFile(
+          "Harness Loop.md",
+          [
+            "---",
+            "permalink: /vault/Harness Loop",
+            "created: 2026-02-01",
+            "updated: 2026-02-02",
+            "---",
+            "# note",
+            "",
+          ].join("\n"),
+        ),
+      ],
+      { identityStrategy: "canonical-route", routePrefix: "/vault" },
+    ).pipe(Effect.result),
+  )
+
+  expect(Result.isFailure(result)).toBeTrue()
+  const error = Option.getOrThrow(Result.getFailure(result))
+  expect(error).toBeInstanceOf(BuildGraphFrontmatterValidationError)
+  if (!(error instanceof BuildGraphFrontmatterValidationError)) {
+    throw new Error("Expected BuildGraphFrontmatterValidationError")
+  }
+
+  expect(error.message).toContain("Invalid canonical permalink slug")
 })

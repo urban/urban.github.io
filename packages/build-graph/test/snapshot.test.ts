@@ -12,7 +12,15 @@ const makeUnsortedSnapshot = (): GraphSnapshot => ({
       id: "z.md",
       kind: "note",
       relativePath: "z.md",
+      sourceRelativePath: "z.md",
       permalink: "/z",
+      slug: "z",
+      routePath: "/z",
+      label: "z",
+      created: "2026-02-01",
+      updated: "2026-02-02",
+      aliases: [],
+      published: true,
     },
     {
       id: "placeholder:missing",
@@ -23,7 +31,15 @@ const makeUnsortedSnapshot = (): GraphSnapshot => ({
       id: "a.md",
       kind: "note",
       relativePath: "a.md",
+      sourceRelativePath: "a.md",
       permalink: "/a",
+      slug: "a",
+      routePath: "/a",
+      label: "a",
+      created: "2026-02-01",
+      updated: "2026-02-02",
+      aliases: [],
+      published: true,
     },
   ],
   edges: [
@@ -58,6 +74,8 @@ const makeUnsortedSnapshot = (): GraphSnapshot => ({
     nodesById: {},
     edgesBySourceNodeId: {},
     edgesByTargetNodeId: {},
+    noteNodeIdBySlug: {},
+    noteNodeIdByRoutePath: {},
   },
 })
 
@@ -71,6 +89,8 @@ test("serializes deterministic, byte-stable snapshots", () => {
   expect(Object.keys(snapshot.indexes.nodesById)).toEqual(["a.md", "placeholder:missing", "z.md"])
   expect(Object.keys(snapshot.indexes.edgesBySourceNodeId)).toEqual(["a.md", "z.md"])
   expect(Object.keys(snapshot.indexes.edgesByTargetNodeId)).toEqual(["placeholder:missing", "z.md"])
+  expect(snapshot.indexes.noteNodeIdBySlug).toEqual({ a: "a.md", z: "z.md" })
+  expect(snapshot.indexes.noteNodeIdByRoutePath).toEqual({ "/a": "a.md", "/z": "z.md" })
   expect(snapshot.nodes.map((node) => snapshot.indexes.nodesById[node.id])).toEqual([
     ...snapshot.nodes,
   ])
@@ -116,7 +136,15 @@ test("fails when node ids are duplicated and indexes cannot stay identity-consis
         id: "dup.md",
         kind: "note",
         relativePath: "dup.md",
+        sourceRelativePath: "dup.md",
         permalink: "/dup-a",
+        slug: "dup-a",
+        routePath: "/dup-a",
+        label: "dup-a",
+        created: "2026-02-01",
+        updated: "2026-02-02",
+        aliases: [],
+        published: true,
       },
       {
         id: "dup.md",
@@ -140,7 +168,15 @@ test("fails when an edge references a missing node id", () => {
         id: "a.md",
         kind: "note",
         relativePath: "a.md",
+        sourceRelativePath: "a.md",
         permalink: "/a",
+        slug: "a",
+        routePath: "/a",
+        label: "a",
+        created: "2026-02-01",
+        updated: "2026-02-02",
+        aliases: [],
+        published: true,
       },
     ],
     edges: [

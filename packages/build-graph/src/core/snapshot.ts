@@ -51,6 +51,19 @@ const groupEdgesByNodeId = (
   return toSortedRecord([...grouped.entries()])
 }
 
+const noteNodeIdEntriesBy = (
+  nodes: ReadonlyArray<GraphSnapshotNode>,
+  selectKey: (node: Extract<GraphSnapshotNode, { readonly kind: "note" }>) => string | undefined,
+): ReadonlyArray<readonly [string, string]> =>
+  nodes.flatMap((node) => {
+    if (node.kind !== "note") {
+      return []
+    }
+
+    const key = selectKey(node)
+    return key !== undefined && key.length > 0 ? [[key, node.id] as const] : []
+  })
+
 const assertUniqueNodeIds = (nodes: ReadonlyArray<GraphSnapshotNode>): void => {
   const seenNodeIds = new Set<string>()
   for (const node of nodes) {
@@ -151,6 +164,8 @@ export const normalizeGraphSnapshot = (snapshot: GraphSnapshotArrays): GraphSnap
       nodesById: toSortedRecord(nodes.map((node) => [node.id, node] as const)),
       edgesBySourceNodeId: groupEdgesByNodeId(edges, (edge) => edge.sourceNodeId),
       edgesByTargetNodeId: groupEdgesByNodeId(edges, (edge) => edge.targetNodeId),
+      noteNodeIdBySlug: toSortedRecord(noteNodeIdEntriesBy(nodes, (node) => node.slug)),
+      noteNodeIdByRoutePath: toSortedRecord(noteNodeIdEntriesBy(nodes, (node) => node.routePath)),
     },
   }
 }
