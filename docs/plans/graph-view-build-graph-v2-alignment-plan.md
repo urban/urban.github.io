@@ -54,21 +54,21 @@ Update `@urban/graph-view` to consume the current `@urban/build-graph` snapshot 
 
 ### Snapshot Contract Intake
 
-- [ ] Extend graph-view schemas and decode tests to require `schemaVersion: "2"` and `indexes`, while accepting the richer v2 note-node payload.
-- [ ] Export any newly required schema types from the top-level public API without regressing current CLI/decode entry points.
-- [ ] Add regression coverage proving graph-view accepts snapshots emitted by current build-graph fixtures, including slug/route-path indexes.
+- [x] Extend graph-view schemas and decode tests to require `schemaVersion: "2"` and `indexes`, while accepting the richer v2 note-node payload.
+- [x] Export any newly required schema types from the top-level public API without regressing current CLI/decode entry points.
+- [x] Add regression coverage proving graph-view accepts snapshots emitted by current build-graph fixtures, including slug/route-path indexes.
 
 ### Route-Aware Rendering
 
-- [ ] Define deterministic node label selection for note nodes using the new metadata surface, preferring `title`, then `label`, with source-path fallback for legacy snapshots where optional fields are absent.
-- [ ] Update Mermaid and Markdown renderer expectations for canonical-route node ids, route-aware labels, and unresolved placeholders.
-- [ ] Add tests covering both source-path and canonical-route builds so rendering remains stable across identity strategies.
+- [x] Define deterministic node label selection for note nodes using the new metadata surface, preferring `title`, then `label`, with source-path fallback for legacy snapshots where optional fields are absent.
+- [x] Update Mermaid and Markdown renderer expectations for canonical-route node ids, route-aware labels, and unresolved placeholders.
+- [x] Add tests covering both source-path and canonical-route builds so rendering remains stable across identity strategies.
 
 ### Consumer Compatibility and Docs
 
-- [ ] Update CLI tests and README examples to show the v2 snapshot root shape and route-aware note metadata.
-- [ ] Document migration notes for consumers who assumed graph-view only accepted the pre-v2 root or always rendered `relativePath`.
-- [ ] Verify top-level API tests, package docs, and example snapshot JSON stay aligned with build-graph README guarantees.
+- [x] Update CLI tests and README examples to show the v2 snapshot root shape and route-aware note metadata.
+- [x] Document migration notes for consumers who assumed graph-view only accepted the pre-v2 root or always rendered `relativePath`.
+- [x] Verify top-level API tests, package docs, and example snapshot JSON stay aligned with build-graph README guarantees.
 
 ## Dependency and Sequencing Strategy
 
@@ -98,9 +98,9 @@ Update `@urban/graph-view` to consume the current `@urban/build-graph` snapshot 
 
 ## Progress Tracking
 
-- Status: Not started
-- Active stream: Snapshot Contract Intake
-- Notes: Planning only. User confirmed rendered note label precedence should prefer `title` before `label`; implementation should codify the remaining deterministic fallback order in tests.
+- Status: Completed
+- Active stream: None
+- Notes: Implemented v2 root validation, route-aware note label rendering, public API/schema export coverage, CLI/render regression fixtures, and README migration guidance. Full repo gates passed on 2026-03-11.
 
 ## Further Notes
 

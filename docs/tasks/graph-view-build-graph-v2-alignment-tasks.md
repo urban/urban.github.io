@@ -20,7 +20,7 @@ Objective: make graph-view accept real build-graph v2 snapshots at the read boun
 #### Task GV-BG2-1
 
 - Title: Decode current build-graph snapshot root
-- Status: Not started
+- Status: Completed
 - Blocked by: None
 - Plan references:
   - `Snapshot Contract Intake`
@@ -34,7 +34,7 @@ Objective: make graph-view accept real build-graph v2 snapshots at the read boun
 #### Task GV-BG2-2
 
 - Title: Freeze exported v2 schema surface
-- Status: Not started
+- Status: Completed
 - Blocked by: GV-BG2-1
 - Plan references:
   - `Snapshot Contract Intake`
@@ -52,7 +52,7 @@ Objective: make rendered graphs readable and deterministic for both source-path 
 #### Task GV-BG2-3
 
 - Title: Render note labels from route-aware metadata
-- Status: Not started
+- Status: Completed
 - Blocked by: GV-BG2-1
 - Plan references:
   - `Route-Aware Rendering`
@@ -66,7 +66,7 @@ Objective: make rendered graphs readable and deterministic for both source-path 
 #### Task GV-BG2-4
 
 - Title: Cover identity-mode rendering parity
-- Status: Not started
+- Status: Completed
 - Blocked by: GV-BG2-3
 - Plan references:
   - `Route-Aware Rendering`
@@ -84,7 +84,7 @@ Objective: make the aligned contract explicit in docs and package verification.
 #### Task GV-BG2-5
 
 - Title: Publish v2 consumer guidance
-- Status: Not started
+- Status: Completed
 - Blocked by: GV-BG2-2, GV-BG2-4
 - Plan references:
   - `Consumer Compatibility and Docs`
@@ -105,7 +105,6 @@ Objective: make the aligned contract explicit in docs and package verification.
 
 ## Tracking Notes
 
-- Active stream: Snapshot Contract Intake
+- Active stream: None
 - Global blockers: None
-- TODO: Confirm: final note-label precedence for rendering once you review whether graph-view should prefer `label`, `title`, or a route/path fallback.
-- TODO: Confirm: fallback order after `title` then `label` if snapshots omit both fields.
+- TODO: None.

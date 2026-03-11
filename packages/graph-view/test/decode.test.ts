@@ -6,19 +6,28 @@ import {
   GraphViewSnapshotValidationError,
 } from "../src/core/decode"
 import type { GraphSnapshot } from "../src/domain/schema"
+import { makeGraphSnapshot } from "./fixtures"
 
-const validSnapshot: GraphSnapshot = {
+const validSnapshot: GraphSnapshot = makeGraphSnapshot({
   nodes: [
     {
-      id: "notes/a.md",
+      id: "/vault/a",
       kind: "note",
       relativePath: "notes/a.md",
+      sourceRelativePath: "notes/a.md",
       permalink: "/a",
+      slug: "a",
+      routePath: "/vault/a",
+      label: "A",
+      created: "2026-03-01",
+      updated: "2026-03-02",
+      aliases: ["Alpha"],
+      published: true,
+      title: "Note A",
+      description: "Primary note",
     },
   ],
-  edges: [],
-  diagnostics: [],
-}
+})
 
 test("decodes a valid graph snapshot object", async () => {
   const result = await Effect.runPromise(decodeGraphSnapshot(validSnapshot))
@@ -46,6 +55,7 @@ test("fails decode on schema-invalid input", async () => {
   const result = await Effect.runPromiseExit(
     decodeGraphSnapshot(
       JSON.stringify({
+        schemaVersion: "2",
         nodes: [],
         edges: [],
       }),

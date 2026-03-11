@@ -1,4 +1,4 @@
-import type { GraphSnapshot } from "../domain/schema"
+import type { GraphSnapshot, GraphSnapshotNoteNode } from "../domain/schema"
 
 const compareStrings = (left: string, right: string): number => {
   if (left < right) {
@@ -19,6 +19,14 @@ export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
       const idComparison = compareStrings(left.id, right.id)
       if (idComparison !== 0) {
         return idComparison
+      }
+
+      const sourcePathComparison = compareStrings(
+        left.sourceRelativePath ?? "",
+        right.sourceRelativePath ?? "",
+      )
+      if (sourcePathComparison !== 0) {
+        return sourcePathComparison
       }
 
       const pathComparison = compareStrings(left.relativePath, right.relativePath)
@@ -83,15 +91,20 @@ export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
 
       return compareStrings(left.displayText ?? "", right.displayText ?? "")
     })
-    .map((edge) => {
-      const sourceId = nodeMermaidIds.get(edge.sourceNodeId)!
-      const targetId = nodeMermaidIds.get(edge.targetNodeId)!
-      return `  ${sourceId} --> ${targetId}`
+    .flatMap((edge) => {
+      const sourceId = nodeMermaidIds.get(edge.sourceNodeId)
+      const targetId = nodeMermaidIds.get(edge.targetNodeId)
+      if (sourceId === undefined || targetId === undefined) {
+        return []
+      }
+
+      return [`  ${sourceId} --> ${targetId}`]
     })
 
-  const noteNodeLines = noteNodes.map(
-    (node, index) => `  n${index}[${JSON.stringify(node.relativePath)}]`,
-  )
+  const noteNodeLines = noteNodes.map((node, index) => {
+    const label = selectRenderedNoteLabel(node)
+    return `  n${index}[${JSON.stringify(label)}]`
+  })
   const placeholderNodeLines = placeholderNodes.map(
     (node, index) =>
       `  n${noteNodes.length + index}[${JSON.stringify(`unresolved:${node.unresolvedTarget}`)}]`,
@@ -112,3 +125,12 @@ export const renderMermaidFromSnapshot = (snapshot: GraphSnapshot): string => {
     ...placeholderClassLines,
   ].join("\n")
 }
+
+const selectRenderedNoteLabel = (node: GraphSnapshotNoteNode): string =>
+  node.title ??
+  node.label ??
+  node.sourceRelativePath ??
+  node.relativePath ??
+  node.routePath ??
+  node.permalink ??
+  node.id

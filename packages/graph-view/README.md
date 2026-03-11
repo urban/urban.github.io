@@ -5,9 +5,10 @@ Render deterministic Mermaid graph Markdown from a `graph-snapshot.json` file (t
 ## What it does
 
 - Validates graph snapshot input against `GraphSnapshotSchema`.
+- Requires the build-graph v2 root contract: `schemaVersion: "2"` plus `indexes`.
 - Accepts either a parsed snapshot object or a JSON string in library APIs.
 - Renders Mermaid with `graph LR` layout.
-- Renders note nodes using their `relativePath`.
+- Renders note nodes using `title`, then `label`, then source-path fallbacks.
 - Renders unresolved placeholder nodes with an `unresolved` Mermaid class/style.
 - Renders unlabeled edges (Obsidian-like graph semantics).
 - Wraps Mermaid output in Markdown:
@@ -54,24 +55,34 @@ The command fails when:
 - snapshot JSON is invalid.
 - snapshot JSON does not match `GraphSnapshotSchema`.
 
+`@urban/graph-view` does not accept the pre-v2 snapshot root that only contained `nodes`, `edges`, and `diagnostics`.
+
 ## Snapshot input contract
 
 The snapshot shape is:
 
+- `schemaVersion`: required string literal `"2"`.
 - `nodes`: array of note or placeholder nodes.
 - `edges`: array of wikilink edges.
 - `diagnostics`: array of unresolved wikilink diagnostics.
+- `indexes`: required lookup object with `nodesById`, `edgesBySourceNodeId`, `edgesByTargetNodeId`, and optional route-aware note indexes.
 
 Minimal valid example:
 
 ```json
 {
+  "schemaVersion": "2",
   "nodes": [
     {
-      "id": "notes/a.md",
+      "id": "/vault/a",
       "kind": "note",
       "relativePath": "notes/a.md",
-      "permalink": "/a"
+      "sourceRelativePath": "notes/a.md",
+      "permalink": "/a",
+      "slug": "a",
+      "routePath": "/vault/a",
+      "label": "A",
+      "title": "Note A"
     },
     {
       "id": "placeholder:missing",
@@ -97,11 +108,73 @@ Minimal valid example:
       "target": "missing",
       "placeholderNodeId": "placeholder:missing"
     }
-  ]
+  ],
+  "indexes": {
+    "nodesById": {
+      "/vault/a": {
+        "id": "/vault/a",
+        "kind": "note",
+        "relativePath": "notes/a.md",
+        "sourceRelativePath": "notes/a.md",
+        "permalink": "/a",
+        "slug": "a",
+        "routePath": "/vault/a",
+        "label": "A",
+        "title": "Note A"
+      },
+      "placeholder:missing": {
+        "id": "placeholder:missing",
+        "kind": "placeholder",
+        "unresolvedTarget": "missing"
+      }
+    },
+    "edgesBySourceNodeId": {
+      "/vault/a": [
+        {
+          "sourceNodeId": "/vault/a",
+          "targetNodeId": "placeholder:missing",
+          "sourceRelativePath": "notes/a.md",
+          "rawWikilink": "[[missing]]",
+          "target": "missing",
+          "resolutionStrategy": "unresolved"
+        }
+      ]
+    },
+    "edgesByTargetNodeId": {
+      "placeholder:missing": [
+        {
+          "sourceNodeId": "/vault/a",
+          "targetNodeId": "placeholder:missing",
+          "sourceRelativePath": "notes/a.md",
+          "rawWikilink": "[[missing]]",
+          "target": "missing",
+          "resolutionStrategy": "unresolved"
+        }
+      ]
+    },
+    "noteNodeIdBySlug": {
+      "a": "/vault/a"
+    },
+    "noteNodeIdByRoutePath": {
+      "/vault/a": "/vault/a"
+    }
+  }
 }
 ```
 
 `resolutionStrategy` is one of: `path`, `filename`, `alias`, `unresolved`.
+
+Rendered note labels use this precedence:
+
+- `title`
+- `label`
+- `sourceRelativePath`
+- `relativePath`
+- `routePath`
+- `permalink`
+- `id`
+
+This keeps canonical-route snapshots readable without projecting route ids back into filenames.
 
 ## Library usage
 
@@ -138,6 +211,8 @@ const markdown = renderMarkdownFromSnapshot(snapshot)
   - `renderMarkdownFromSnapshot`
 - Schemas:
   - `GraphSnapshotSchema`
+  - `GraphSnapshotSchemaVersionSchema`
+  - `GraphSnapshotIndexesSchema`
   - `GraphSnapshotNodeSchema`
   - `GraphSnapshotNoteNodeSchema`
   - `GraphSnapshotPlaceholderNodeSchema`
