@@ -1,5 +1,6 @@
 import * as d3 from "d3-force"
 import * as PIXI from "pixi.js"
+import type { GraphSnapshotNode } from "@urban/build-graph/src/domain/schema"
 
 export type NodeId = string
 export type NodeState = "default" | "selected" | "muted"
@@ -29,6 +30,7 @@ export interface GraphData {
   nodes: GraphNode[]
   links: GraphLink[]
   nodeById: Map<NodeId, GraphNode>
+  snapshotNodeById: Map<NodeId, GraphSnapshotNode>
   adjacency: Map<NodeId, Set<NodeId>>
 }
 
@@ -107,6 +109,7 @@ export type AppCommand =
   | { type: "simulation/sync-selected-layout-center" }
   | { type: "simulation/set-selected-node"; nodeId: NodeId | null }
   | { type: "simulation/reheat"; alpha: number }
+  | { type: "selection/notify-host"; selectedNodeId: NodeId | null }
   | { type: "simulation/alpha-target"; alphaTarget: number; restart: boolean }
   | { type: "world/set-position"; position: Point }
   | { type: "drag/set-node-fixed-position"; nodeId: NodeId; pointerGlobal: Point }

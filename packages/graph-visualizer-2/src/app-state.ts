@@ -23,6 +23,7 @@ function toSelectionCommands(
       type: "simulation/reheat",
       alpha: GRAPH_CONFIG.physics.selectedCenterReheatAlpha,
     })
+    commands.push({ type: "selection/notify-host", selectedNodeId: command.selectedNodeId })
   }
   return commands
 }

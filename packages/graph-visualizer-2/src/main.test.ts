@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test"
+import type { GraphSnapshot } from "@urban/build-graph/src/domain/schema"
+import { createGraphVisualizerSelectionChange } from "./bootstrap"
 import {
   centerReleasedSelectedNode,
   createGraphDataFromSnapshotPayload,
@@ -10,6 +12,7 @@ import {
   reduceGraphStateWithTransition,
   resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
+  type AppCommand,
   type GraphLink,
   type GraphNode,
   type GraphReducerContext,
@@ -17,7 +20,7 @@ import {
   type SelectionSnapshot,
 } from "./main"
 
-function makeSnapshotPayload() {
+function makeSnapshotPayload(): GraphSnapshot {
   return {
     schemaVersion: "2",
     nodes: [
@@ -26,12 +29,19 @@ function makeSnapshotPayload() {
         kind: "note",
         relativePath: "alpha.md",
         permalink: "/alpha/",
+        slug: "alpha",
+        routePath: "/vault/alpha",
+        title: "Alpha Title",
+        aliases: ["alpha-alias"],
+        published: true,
       },
       {
         id: "beta",
         kind: "note",
         relativePath: "beta.md",
         permalink: "/beta/",
+        slug: "beta",
+        routePath: "/vault/beta",
       },
     ],
     edges: [
@@ -52,12 +62,19 @@ function makeSnapshotPayload() {
           kind: "note",
           relativePath: "alpha.md",
           permalink: "/alpha/",
+          slug: "alpha",
+          routePath: "/vault/alpha",
+          title: "Alpha Title",
+          aliases: ["alpha-alias"],
+          published: true,
         },
         beta: {
           id: "beta",
           kind: "note",
           relativePath: "beta.md",
           permalink: "/beta/",
+          slug: "beta",
+          routePath: "/vault/beta",
         },
       },
       edgesBySourceNodeId: {
@@ -81,6 +98,83 @@ function makeSnapshotPayload() {
             rawWikilink: "[[beta]]",
             target: "beta",
             resolutionStrategy: "path",
+          },
+        ],
+      },
+    },
+  }
+}
+
+function makeSnapshotPayloadWithPlaceholder(): GraphSnapshot {
+  return {
+    schemaVersion: "2",
+    nodes: [
+      {
+        id: "alpha",
+        kind: "note",
+        relativePath: "alpha.md",
+        permalink: "/alpha/",
+      },
+      {
+        id: "ghost",
+        kind: "placeholder",
+        unresolvedTarget: "ghost-note",
+      },
+    ],
+    edges: [
+      {
+        sourceNodeId: "alpha",
+        targetNodeId: "ghost",
+        sourceRelativePath: "alpha.md",
+        rawWikilink: "[[ghost-note]]",
+        target: "ghost-note",
+        resolutionStrategy: "unresolved",
+      },
+    ],
+    diagnostics: [
+      {
+        type: "unresolved-wikilink",
+        sourceRelativePath: "alpha.md",
+        rawWikilink: "[[ghost-note]]",
+        target: "ghost-note",
+        placeholderNodeId: "ghost",
+      },
+    ],
+    indexes: {
+      nodesById: {
+        alpha: {
+          id: "alpha",
+          kind: "note",
+          relativePath: "alpha.md",
+          permalink: "/alpha/",
+        },
+        ghost: {
+          id: "ghost",
+          kind: "placeholder",
+          unresolvedTarget: "ghost-note",
+        },
+      },
+      edgesBySourceNodeId: {
+        alpha: [
+          {
+            sourceNodeId: "alpha",
+            targetNodeId: "ghost",
+            sourceRelativePath: "alpha.md",
+            rawWikilink: "[[ghost-note]]",
+            target: "ghost-note",
+            resolutionStrategy: "unresolved",
+          },
+        ],
+      },
+      edgesByTargetNodeId: {
+        ghost: [
+          {
+            sourceNodeId: "alpha",
+            targetNodeId: "ghost",
+            sourceRelativePath: "alpha.md",
+            rawWikilink: "[[ghost-note]]",
+            target: "ghost-note",
+            resolutionStrategy: "unresolved",
           },
         ],
       },
@@ -218,7 +312,59 @@ describe("createGraphDataFromSnapshotPayload", () => {
     ])
     expect(graph.links).toEqual([{ sourceNodeId: "alpha", targetNodeId: "beta" }])
     expect(graph.nodeById.size).toBe(2)
+    expect(graph.snapshotNodeById.get("alpha")).toEqual(makeSnapshotPayload().nodes[0])
     expect([...(graph.adjacency.get("alpha") ?? [])]).toEqual(["beta"])
+  })
+})
+
+describe("createGraphVisualizerSelectionChange", () => {
+  test("builds note payload with navigation-relevant fields", () => {
+    const graph = createGraphDataFromSnapshotPayload(makeSnapshotPayload())
+
+    expect(
+      createGraphVisualizerSelectionChange({
+        selectedNodeId: "alpha",
+        snapshotNodeById: graph.snapshotNodeById,
+      }),
+    ).toEqual({
+      type: "note",
+      nodeId: "alpha",
+      displayLabel: "alpha",
+      relativePath: "alpha.md",
+      permalink: "/alpha/",
+      slug: "alpha",
+      routePath: "/vault/alpha",
+      title: "Alpha Title",
+      aliases: ["alpha-alias"],
+      published: true,
+    })
+  })
+
+  test("builds placeholder payload for unresolved nodes", () => {
+    const graph = createGraphDataFromSnapshotPayload(makeSnapshotPayloadWithPlaceholder())
+
+    expect(
+      createGraphVisualizerSelectionChange({
+        selectedNodeId: "ghost",
+        snapshotNodeById: graph.snapshotNodeById,
+      }),
+    ).toEqual({
+      type: "placeholder",
+      nodeId: "ghost",
+      displayLabel: "ghost-note",
+      unresolvedTarget: "ghost-note",
+    })
+  })
+
+  test("returns none for empty selection", () => {
+    const graph = createGraphDataFromSnapshotPayload(makeSnapshotPayload())
+
+    expect(
+      createGraphVisualizerSelectionChange({
+        selectedNodeId: null,
+        snapshotNodeById: graph.snapshotNodeById,
+      }),
+    ).toEqual({ type: "none" })
   })
 })
 
@@ -390,6 +536,7 @@ describe("reduceAppStateWithCommands", () => {
       { type: "drag/release-node-fixed-position", nodeId: "c" },
       { type: "simulation/set-selected-node", nodeId: "c" },
       { type: "simulation/reheat", alpha: 0.28 },
+      { type: "selection/notify-host", selectedNodeId: "c" },
       {
         type: "drag/center-released-selected-node",
         releasedNodeId: "c",
@@ -432,6 +579,24 @@ describe("reduceAppStateWithCommands", () => {
       { type: "simulation/alpha-target", alphaTarget: 0, restart: false },
       { type: "drag/release-node-fixed-position", nodeId: "c" },
     ])
+  })
+
+  test("reselecting same node emits no host notification command", () => {
+    const { context } = makeGraphFixtures()
+    const initial = createAppState(context, "c")
+
+    const down = reduceAppStateWithCommands(
+      initial,
+      { type: "pointer/node-down", nodeId: "c", global: { x: 10, y: 10 } },
+      context,
+    )
+    const released = reduceAppStateWithCommands(down.state, { type: "pointer/release" }, context)
+
+    const hostCommands = released.commands.filter(
+      (command): command is Extract<AppCommand, { type: "selection/notify-host" }> =>
+        command.type === "selection/notify-host",
+    )
+    expect(hostCommands).toEqual([])
   })
 
   test("single gesture FSM handles stage pan", () => {
