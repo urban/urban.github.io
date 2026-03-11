@@ -1,12 +1,9 @@
 import { expect, test } from "bun:test"
 import { renderMarkdownFromSnapshot } from "../src/core/render-markdown"
 import type { GraphSnapshot } from "../src/domain/schema"
+import { makeGraphSnapshot } from "./fixtures"
 
-const emptySnapshot: GraphSnapshot = {
-  nodes: [],
-  edges: [],
-  diagnostics: [],
-}
+const emptySnapshot: GraphSnapshot = makeGraphSnapshot({ nodes: [] })
 
 test("renders the baseline graph markdown wrapper", () => {
   const markdown = renderMarkdownFromSnapshot(emptySnapshot)
@@ -15,19 +12,21 @@ test("renders the baseline graph markdown wrapper", () => {
 })
 
 test("renders markdown with note nodes and unlabeled edges", () => {
-  const snapshot: GraphSnapshot = {
+  const snapshot: GraphSnapshot = makeGraphSnapshot({
     nodes: [
       {
         id: "notes/b.md",
         kind: "note",
         relativePath: "notes/b.md",
         permalink: "/b",
+        label: "B Label",
       },
       {
         id: "notes/a.md",
         kind: "note",
         relativePath: "notes/a.md",
         permalink: "/a",
+        sourceRelativePath: "notes/a.md",
       },
     ],
     edges: [
@@ -40,12 +39,11 @@ test("renders markdown with note nodes and unlabeled edges", () => {
         resolutionStrategy: "path",
       },
     ],
-    diagnostics: [],
-  }
+  })
 
   const markdown = renderMarkdownFromSnapshot(snapshot)
 
   expect(markdown).toBe(
-    '## Graph\n\n```mermaid\ngraph LR\n  n0["notes/a.md"]\n  n1["notes/b.md"]\n  n0 --> n1\n```\n',
+    '## Graph\n\n```mermaid\ngraph LR\n  n0["notes/a.md"]\n  n1["B Label"]\n  n0 --> n1\n```\n',
   )
 })
