@@ -1,6 +1,6 @@
 import type { Effect } from "effect"
-import type { Content } from "@/lib/services/Content"
-import { dateRange, dateTenure } from "@/lib/utils"
+import type { Content } from "../lib/services/Content"
+import { dateRange, dateTenure } from "../lib/utils"
 import { Text } from "./Text"
 
 type Work = Effect.Success<ReturnType<typeof Content.Service.getWork>>[0]

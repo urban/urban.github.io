@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/main.ts",
+    "./bootstrap": "./src/bootstrap.ts"
+  },
   "scripts": {
     "dev": "vite",
     "test": "bun test",

@@ -6,18 +6,19 @@ import {
 } from "@phosphor-icons/react/dist/ssr"
 import { Array, Effect, pipe, Record } from "effect"
 import type { Metadata } from "next"
-import { SITE, SOCIALS } from "@/lib/consts"
-import { RuntimeServer } from "@/lib/RuntimeServer"
-import { Content } from "@/lib/services/Content"
-import { Container } from "@/ui/Container"
-import { Link } from "@/ui/Link"
+import { SITE, SOCIALS } from "../lib/consts"
+import { RuntimeServer } from "../lib/RuntimeServer"
+import { Content } from "../lib/services/Content"
+import type { ContentService } from "../lib/services/Content"
+import { Container } from "../ui/Container"
+import { Link } from "../ui/Link"
 // import { ArrowCard } from "@/ui/ArrowCard";
-import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
-import { PageTitle } from "@/ui/PageTitle"
-import { WorkList } from "@/ui/WorkList"
+import { PageNavigationAnimation } from "../ui/PageNavigationAnimation"
+import { PageTitle } from "../ui/PageTitle"
+import { WorkList } from "../ui/WorkList"
 
 const main = Effect.gen(function* () {
-  const content = yield* Content
+  const content: ContentService = yield* Content
 
   // const articles = yield* content.getArticles().pipe(
   //   Effect.map((articles) => articles.filter(({ data }) => !data.draft)),

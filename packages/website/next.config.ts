@@ -1,5 +1,6 @@
 const nextConfig = {
   output: "export",
+  transpilePackages: ["@urban/build-graph", "@urban/graph-visualizer-2"],
 
   typescript: {
     tsconfigPath: "./tsconfig.app.json",

@@ -7,6 +7,8 @@ const DateFromString = Schema.Date.pipe(
   }),
 )
 
+const DateFromFrontmatter = Schema.Union([DateFromString, Schema.Date])
+
 export const Work = Schema.Struct({
   company: Schema.String,
   role: Schema.String,
@@ -31,6 +33,21 @@ export const Project = Schema.Struct({
   draft: Schema.optional(Schema.Boolean),
   demoURL: Schema.optional(Schema.String),
   repoURL: Schema.optional(Schema.String),
+})
+
+export const VaultFrontmatter = Schema.Struct({
+  permalink: Schema.NonEmptyString,
+  created: DateFromFrontmatter,
+  updated: DateFromFrontmatter,
+  aliases: Schema.optional(Schema.Array(Schema.NonEmptyString)),
+  published: Schema.optional(Schema.Boolean),
+  title: Schema.optional(Schema.NonEmptyString),
+  description: Schema.optional(Schema.NonEmptyString),
+})
+
+export const CompiledVFileData = Schema.Struct({
+  filepath: Schema.String,
+  descriptionExcerpt: Schema.optional(Schema.String),
 })
 
 export const CollectionEntry = Schema.Struct({

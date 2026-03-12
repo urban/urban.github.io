@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { GraphSnapshot } from "@urban/build-graph/src/domain/schema"
+import type { GraphSnapshot } from "@urban/build-graph/schema"
 import { createGraphVisualizerSelectionChange } from "./bootstrap"
 import {
   centerReleasedSelectedNode,

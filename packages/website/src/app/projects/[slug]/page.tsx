@@ -1,23 +1,24 @@
 import { Array, Effect } from "effect"
 import type { Metadata, ResolvingMetadata } from "next"
-import { RuntimeServer } from "@/lib/RuntimeServer"
-import { Content } from "@/lib/services/Content"
-import { readingTime } from "@/lib/utils"
-import { BackToPrev } from "@/ui/BackToPrev"
-import { Container } from "@/ui/Container"
-import { FormattedDate } from "@/ui/FormattedDate"
-import { Link } from "@/ui/Link"
-import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
+import { RuntimeServer } from "../../../lib/RuntimeServer"
+import { Content } from "../../../lib/services/Content"
+import type { ContentService } from "../../../lib/services/Content"
+import { readingTime } from "../../../lib/utils"
+import { BackToPrev } from "../../../ui/BackToPrev"
+import { Container } from "../../../ui/Container"
+import { FormattedDate } from "../../../ui/FormattedDate"
+import { Link } from "../../../ui/Link"
+import { PageNavigationAnimation } from "../../../ui/PageNavigationAnimation"
 
 const main = (pathSlug: string) =>
   Effect.gen(function* () {
-    const content = yield* Content
+    const content: ContentService = yield* Content
     const projects = yield* content.getProjects()
     return yield* Array.findFirst(projects, ({ slug }) => slug === pathSlug)
   })
 
 const mainAll = Effect.gen(function* () {
-  const content = yield* Content
+  const content: ContentService = yield* Content
   const allProjects = yield* content.getCollection("projects")
   return allProjects.map(({ slug }) => ({
     slug,

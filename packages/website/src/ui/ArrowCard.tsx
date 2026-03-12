@@ -1,4 +1,4 @@
-import { Article, Project } from "@/lib/schemas"
+import { Article, Project } from "../lib/schemas"
 import NextLink from "next/link"
 
 type Props = {
