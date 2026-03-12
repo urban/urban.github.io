@@ -9,4 +9,3 @@
 - **graph-visualizer**
   - [ ] Make sure all nodes are visible within the viewport on intial render. Right now some nodes are off screen.
   - [ ] Add controls for re-centering content. Otherwize it's too easy to accidently scroll the graph out of view.
-  - [ ] The cursor should change to a hand when you can pan the viewport
