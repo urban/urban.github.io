@@ -1,13 +1,14 @@
 import { Array, Effect, Order, pipe, Record } from "effect"
 import type { Metadata } from "next"
-import { RuntimeServer } from "@/lib/RuntimeServer"
-import { Content } from "@/lib/services/Content"
-import { ArrowCard } from "@/ui/ArrowCard"
-import { Container } from "@/ui/Container"
-import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
+import { RuntimeServer } from "../../lib/RuntimeServer"
+import { Content } from "../../lib/services/Content"
+import type { ContentService } from "../../lib/services/Content"
+import { ArrowCard } from "../../ui/ArrowCard"
+import { Container } from "../../ui/Container"
+import { PageNavigationAnimation } from "../../ui/PageNavigationAnimation"
 
 const main = Effect.gen(function* () {
-  const content = yield* Content
+  const content: ContentService = yield* Content
   const allArticles = yield* content.getArticles()
   const articlesMetadata = allArticles.map(({ data, slug }) => ({
     metadata: data,

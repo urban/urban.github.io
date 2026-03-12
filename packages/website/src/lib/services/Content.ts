@@ -12,9 +12,12 @@ import {
   ServiceMap,
 } from "effect"
 import matter from "gray-matter"
+import { createElement } from "react"
+import type { JSX } from "react"
 import { glob } from "tinyglobby"
 import { VFile } from "vfile"
-import { CollectionEntry } from "../schemas"
+import { Article, CollectionEntry, CompiledVFileData, Project, Work } from "../schemas"
+import type { VaultData } from "../vault"
 import { Mdx } from "./Mdx"
 import { Metadata } from "./Metadata"
 
@@ -26,6 +29,42 @@ class FileGlobError extends Schema.TaggedErrorClass<FileGlobError>()("FileGlobEr
   error: Schema.Unknown,
 }) {}
 
+type MdxContentComponent = () => JSX.Element
+
+type CompiledCollectionEntry<TData> = {
+  readonly source: string
+  readonly filepath: string
+  readonly slug: string
+  readonly data: TData
+  readonly Content: MdxContentComponent
+}
+
+export type VaultEntry = CompiledCollectionEntry<VaultData> & {
+  readonly rawSource: string
+}
+
+export type ContentService = {
+  readonly getCollection: (
+    collection: "articles" | "projects" | "work",
+  ) => Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError>
+  readonly getArticles: () => Effect.Effect<
+    ReadonlyArray<CompiledCollectionEntry<typeof Article.Type>>,
+    ContentError
+  >
+  readonly getProjects: () => Effect.Effect<
+    ReadonlyArray<CompiledCollectionEntry<typeof Project.Type>>,
+    ContentError
+  >
+  readonly getWork: () => Effect.Effect<
+    ReadonlyArray<CompiledCollectionEntry<typeof Work.Type>>,
+    ContentError
+  >
+  readonly getVault: () => Effect.Effect<ReadonlyArray<VaultEntry>, ContentError>
+  readonly getPublishedVault: () => Effect.Effect<ReadonlyArray<VaultEntry>, ContentError, Content>
+  readonly findPublishedVaultBySlug: (
+    pathSlug: string,
+  ) => Effect.Effect<VaultEntry | undefined, ContentError, Content>
+}
 export class Content extends ServiceMap.Service<Content>()("service/Content", {
   make: Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
@@ -66,11 +105,17 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
               // Compile MDX
               Effect.flatMap((data) =>
                 mdx.compile(new VFile({ data: { filepath }, value: data.source })).pipe(
-                  Effect.flatMap((compiled) => mdx.run(compiled)),
-                  Effect.map(({ default: Content }) => ({
-                    ...data,
-                    Content,
-                  })),
+                  Effect.flatMap((compiled) =>
+                    mdx.run(compiled).pipe(
+                      Effect.map(({ default: MdxContent }) => {
+                        const RenderContent: MdxContentComponent = () => createElement(MdxContent)
+                        return {
+                          ...data,
+                          Content: RenderContent,
+                        }
+                      }),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -79,12 +124,17 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
       })
 
     return {
-      getCollection: (collection: "articles" | "projects" | "work") =>
+      getCollection: (
+        collection: "articles" | "projects" | "work",
+      ): Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError> =>
         getCollection(collection).pipe(
           Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
-      getArticles: () =>
+      getArticles: (): Effect.Effect<
+        ReadonlyArray<CompiledCollectionEntry<typeof Article.Type>>,
+        ContentError
+      > =>
         getCollection("articles").pipe(
           Effect.flatMap((entries) =>
             Effect.all(
@@ -96,7 +146,10 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
-      getProjects: () =>
+      getProjects: (): Effect.Effect<
+        ReadonlyArray<CompiledCollectionEntry<typeof Project.Type>>,
+        ContentError
+      > =>
         getCollection("projects").pipe(
           Effect.flatMap((entries) =>
             Effect.all(
@@ -108,7 +161,10 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
-      getWork: () =>
+      getWork: (): Effect.Effect<
+        ReadonlyArray<CompiledCollectionEntry<typeof Work.Type>>,
+        ContentError
+      > =>
         getCollection("work").pipe(
           Effect.flatMap((entries) =>
             Effect.all(
@@ -128,6 +184,81 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
               ),
             ),
           ),
+        ),
+      getVault: (): Effect.Effect<ReadonlyArray<VaultEntry>, ContentError> =>
+        Effect.gen(function* () {
+          const filepaths = yield* Effect.tryPromise({
+            try: () => glob([path.join(contentDir, "vault", "*.md")]),
+            catch: (error) => new FileGlobError({ error }),
+          }).pipe(Effect.tapError((error) => Console.log(error)))
+
+          return yield* Effect.all(
+            filepaths.map((filepath) =>
+              fs.readFileString(filepath, "utf-8").pipe(
+                Effect.map((rawSource) => {
+                  const { content: source, data } = matter(rawSource)
+                  return {
+                    rawSource,
+                    source,
+                    data,
+                    filepath,
+                  }
+                }),
+                Effect.flatMap((entry) =>
+                  mdx.compile(new VFile({ data: { filepath }, value: entry.source })).pipe(
+                    Effect.flatMap((compiled) =>
+                      mdx.run(compiled).pipe(
+                        Effect.flatMap(({ default: MdxContent }) =>
+                          metadata
+                            .vault(
+                              entry.data,
+                              Schema.decodeUnknownSync(CompiledVFileData)(compiled.data)
+                                .descriptionExcerpt,
+                            )
+                            .pipe(
+                              Effect.map((data) => {
+                                const RenderContent: MdxContentComponent = () =>
+                                  createElement(MdxContent)
+                                return {
+                                  ...entry,
+                                  slug: data.slug,
+                                  data,
+                                  Content: RenderContent,
+                                }
+                              }),
+                            ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        }).pipe(
+          Effect.tapError((error) => Console.log(error)),
+          Effect.mapError((error) => new ContentError({ error })),
+          Effect.map(Array.sortBy(Order.mapInput(Order.String, ({ slug }) => slug))),
+        ),
+      getPublishedVault: (): Effect.Effect<ReadonlyArray<VaultEntry>, ContentError, Content> =>
+        Effect.gen(function* () {
+          const content: ContentService = yield* Content
+          const vaultEntries = yield* content.getVault()
+          return vaultEntries.filter(({ data }) => data.published)
+        }).pipe(
+          Effect.tapError((error) => Console.log(error)),
+          Effect.mapError((error) => new ContentError({ error })),
+        ),
+      findPublishedVaultBySlug: (
+        pathSlug: string,
+      ): Effect.Effect<VaultEntry | undefined, ContentError, Content> =>
+        Effect.gen(function* () {
+          const content: ContentService = yield* Content
+          const vaultEntries = yield* content.getPublishedVault()
+          return vaultEntries.find(({ slug }) => slug === pathSlug)
+        }).pipe(
+          Effect.tapError((error) => Console.log(error)),
+          Effect.mapError((error) => new ContentError({ error })),
         ),
     }
   }),

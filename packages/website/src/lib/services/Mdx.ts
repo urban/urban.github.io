@@ -4,6 +4,7 @@ import * as runtime from "react/jsx-runtime"
 import rehypeUnwrapImages from "rehype-unwrap-images"
 import rehypeCallouts from "rehype-callouts"
 import remarkGfm from "remark-gfm"
+import { DescriptionExcerptPlugin } from "./DescriptionExcerptPlugin"
 import { HeadingsPlugin } from "./HeadingsPlugin"
 import { LocalImagePlugin } from "./LocalImagePlugin"
 import type { MDXModule } from "mdx/types"
@@ -18,6 +19,7 @@ export class MdxError extends Schema.TaggedErrorClass<MdxError>()("MdxError", {
 export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
   make: Effect.gen(function* () {
     const headings = yield* HeadingsPlugin
+    const descriptionExcerptPlugin = yield* DescriptionExcerptPlugin
     const localImagePlugin = yield* LocalImagePlugin
 
     // wrap the compile and run functions from @mdx-js/mdx
@@ -28,7 +30,7 @@ export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
           try: () =>
             compile(content, {
               outputFormat: "function-body",
-              remarkPlugins: [remarkGfm],
+              remarkPlugins: [remarkGfm, descriptionExcerptPlugin],
               rehypePlugins: [
                 [
                   rehypeShiki,
@@ -55,7 +57,11 @@ export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
           catch: (error) => new MdxError({ error, type: "run" }),
         }).pipe(Effect.tapError(Effect.logError)),
     }
-  }).pipe(Effect.provide(Layer.mergeAll(HeadingsPlugin.layer, LocalImagePlugin.layer))),
+  }).pipe(
+    Effect.provide(
+      Layer.mergeAll(DescriptionExcerptPlugin.layer, HeadingsPlugin.layer, LocalImagePlugin.layer),
+    ),
+  ),
 }) {
   static readonly layer = Layer.effect(this)(this.make)
 }

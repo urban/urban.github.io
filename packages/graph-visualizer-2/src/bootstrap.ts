@@ -1,5 +1,5 @@
 import * as d3 from "d3-force"
-import type { GraphSnapshotNode } from "@urban/build-graph/src/domain/schema"
+import type { GraphSnapshotNode } from "@urban/build-graph/schema"
 import { createAppState, reduceAppStateWithCommands } from "./app-state"
 import { bindPointerInteractions } from "./interaction"
 import { createLifecycle } from "./lifecycle"

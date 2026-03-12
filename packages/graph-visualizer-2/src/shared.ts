@@ -1,6 +1,6 @@
 import * as d3 from "d3-force"
 import * as PIXI from "pixi.js"
-import type { GraphSnapshotNode } from "@urban/build-graph/src/domain/schema"
+import type { GraphSnapshotNode } from "@urban/build-graph/schema"
 
 export type NodeId = string
 export type NodeState = "default" | "selected" | "muted"

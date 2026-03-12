@@ -3,7 +3,7 @@ import {
   GraphSnapshotSchema,
   type GraphSnapshot,
   type GraphSnapshotNode,
-} from "@urban/build-graph/src/domain/schema"
+} from "@urban/build-graph/schema"
 import {
   GRAPH_CONFIG,
   GRAPH_RENDER_DEPTH,
