@@ -68,8 +68,8 @@ export default async function Page({ params }: PageProps) {
         <div className="animate">
           <BackToPrev href="/vault">Back to vault</BackToPrev>
         </div>
-        <div className="my-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,480px)]">
-          <div>
+        <div className="my-10 flex flex-col gap-10">
+          <div className="max-w-3xl">
             <div className="animate mb-8">
               <div className="flex items-center gap-1.5 text-sm">
                 <FormattedDate date={entry.data.updated} />

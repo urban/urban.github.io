@@ -19,6 +19,7 @@ import {
   type GraphState,
   type SelectionSnapshot,
 } from "./main"
+import { createSimulation, toViewportCenter } from "./simulation"
 
 function makeSnapshotPayload(): GraphSnapshot {
   return {
@@ -844,5 +845,47 @@ describe("centerReleasedSelectedNode", () => {
     expect(nearbyTwo.vy).toBeUndefined()
     expect(farAway.vx).toBeUndefined()
     expect(farAway.vy).toBeUndefined()
+  })
+})
+
+describe("createSimulation", () => {
+  test("centers nodes within the provided viewport instead of the window", () => {
+    const nodes: GraphNode[] = [{ id: "alpha", label: "Alpha" }]
+    const simulationController = createSimulation({
+      nodes,
+      links: [],
+      nodeById: new Map(nodes.map((node) => [node.id, node])),
+      adjacency: new Map([["alpha", new Set<string>()]]),
+      initialViewportSize: { width: 446, height: 722 },
+    })
+
+    simulationController.simulation.stop()
+    simulationController.simulation.tick(300)
+
+    expect(nodes[0]?.x).toBeCloseTo(223, 0)
+    expect(nodes[0]?.y).toBeCloseTo(361, 0)
+
+    simulationController.dispose()
+  })
+
+  test("updates the simulation center when the viewport changes", () => {
+    const nodes: GraphNode[] = [{ id: "alpha", label: "Alpha" }]
+    const simulationController = createSimulation({
+      nodes,
+      links: [],
+      nodeById: new Map(nodes.map((node) => [node.id, node])),
+      adjacency: new Map([["alpha", new Set<string>()]]),
+      initialViewportSize: { width: 446, height: 722 },
+    })
+
+    simulationController.simulation.stop()
+    simulationController.setLayoutCenter(toViewportCenter({ width: 900, height: 400 }))
+    simulationController.simulation.alpha(1)
+    simulationController.simulation.tick(300)
+
+    expect(nodes[0]?.x).toBeCloseTo(450, 0)
+    expect(nodes[0]?.y).toBeCloseTo(200, 0)
+
+    simulationController.dispose()
   })
 })

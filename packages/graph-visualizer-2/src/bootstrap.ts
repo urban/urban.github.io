@@ -1,10 +1,10 @@
-import * as d3 from "d3-force"
+import type { Simulation } from "d3-force"
 import type { GraphSnapshotNode } from "@urban/build-graph/schema"
 import { createAppState, reduceAppStateWithCommands } from "./app-state"
 import { bindPointerInteractions } from "./interaction"
 import { createLifecycle } from "./lifecycle"
 import { createGraphRenderer, createPixiApp, createWorld } from "./renderer"
-import { centerReleasedSelectedNode, createSimulation } from "./simulation"
+import { centerReleasedSelectedNode, createSimulation, toViewportCenter } from "./simulation"
 import {
   createGraphDataFromSnapshotPayload,
   loadGraphDataFromSnapshot,
@@ -236,7 +236,7 @@ function executeAppCommands({
 }: {
   commands: ReadonlyArray<AppCommand>
   onSelectionChange: ((selection: GraphVisualizerSelectionChange) => void) | undefined
-  simulation: d3.Simulation<GraphNode, SimulationGraphLink>
+  simulation: Simulation<GraphNode, SimulationGraphLink>
   simulationController: ReturnType<typeof createSimulation>
   nodeById: ReadonlyMap<NodeId, GraphNode>
   snapshotNodeById: ReadonlyMap<NodeId, GraphSnapshotNode>
@@ -316,6 +316,10 @@ export async function bootstrapGraphVisualizer({
       ? await loadGraphDataFromSnapshot(graphSource.snapshotUrl)
       : createGraphDataFromSnapshotPayload(graphSource.snapshotPayload)
   const app = await createPixiApp("#app")
+  const graphRootElement = app.canvas.parentElement
+  if (!(graphRootElement instanceof HTMLElement)) {
+    throw new Error("Missing graph root element for graph visualizer bootstrap.")
+  }
   const { world, edgeGraphics, nodeLayer, labelLayer } = createWorld(app)
 
   const context = {
@@ -330,6 +334,10 @@ export async function bootstrapGraphVisualizer({
     links: graph.links,
     nodeById: graph.nodeById,
     adjacency: graph.adjacency,
+    initialViewportSize: {
+      width: app.screen.width,
+      height: app.screen.height,
+    },
   })
   const { simulation } = simulationController
 
@@ -382,14 +390,30 @@ export async function bootstrapGraphVisualizer({
   }
   simulation.on("tick", onSimulationTick)
 
-  const onResize = () => {
-    simulation.force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
+  const syncSimulationCenterToViewport = () => {
+    simulationController.setLayoutCenter(
+      toViewportCenter({
+        width: app.screen.width,
+        height: app.screen.height,
+      }),
+    )
     simulation.alpha(0.3).restart()
   }
-  window.addEventListener("resize", onResize)
-  lifecycle.add(() => {
-    window.removeEventListener("resize", onResize)
-  })
+
+  if (typeof ResizeObserver === "function") {
+    const resizeObserver = new ResizeObserver(() => {
+      window.requestAnimationFrame(syncSimulationCenterToViewport)
+    })
+    resizeObserver.observe(graphRootElement)
+    lifecycle.add(() => {
+      resizeObserver.disconnect()
+    })
+  } else {
+    window.addEventListener("resize", syncSimulationCenterToViewport)
+    lifecycle.add(() => {
+      window.removeEventListener("resize", syncSimulationCenterToViewport)
+    })
+  }
 
   lifecycle.add(
     bindPointerInteractions({

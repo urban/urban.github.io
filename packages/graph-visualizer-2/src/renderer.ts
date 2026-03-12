@@ -76,16 +76,17 @@ function createNodeLabel(nodeLabel: string) {
 }
 
 export async function createPixiApp(containerSelector: string) {
+  const root = document.querySelector<HTMLElement>(containerSelector)
+  if (!root) throw new Error(`Missing container element: ${containerSelector}`)
+
   const app = new PIXI.Application()
   await app.init({
-    resizeTo: window,
+    resizeTo: root,
     antialias: true,
     backgroundAlpha: GRAPH_CONFIG.view.backgroundAlpha,
     backgroundColor: GRAPH_CONFIG.view.backgroundColor,
   })
 
-  const root = document.querySelector<HTMLElement>(containerSelector)
-  if (!root) throw new Error(`Missing container element: ${containerSelector}`)
   if (!(app.canvas instanceof HTMLCanvasElement)) {
     throw new Error("Expected PIXI canvas to be HTMLCanvasElement")
   }
