@@ -7,6 +7,7 @@ import {
   type LocalCoordinateSpace,
   type NodeId,
   type Point,
+  type Size,
   type SimulationGraphLink,
   hasPosition,
 } from "./shared"
@@ -20,16 +21,23 @@ function toSimulationLink(link: GraphLink): SimulationGraphLink {
   }
 }
 
+export const toViewportCenter = ({ width, height }: Size): Point => ({
+  x: width / 2,
+  y: height / 2,
+})
+
 export function createSimulation({
   nodes,
   links,
   nodeById,
   adjacency,
+  initialViewportSize,
 }: {
   nodes: GraphNode[]
   links: readonly GraphLink[]
   nodeById: ReadonlyMap<NodeId, GraphNode>
   adjacency: ReadonlyMap<NodeId, ReadonlySet<NodeId>>
+  initialViewportSize: Size
 }): GraphSimulationController {
   const maxNodeVisualRadius = Math.max(
     GRAPH_CONFIG.physics.collisionRadius,
@@ -42,6 +50,7 @@ export function createSimulation({
   )
 
   let selectedNodeId: NodeId | null = null
+  const initialViewportCenter = toViewportCenter(initialViewportSize)
   const selectedNeighborCollisionForce = d3
     .forceCollide<GraphNode>((node) => {
       if (selectedNodeId === null || node.id === selectedNodeId) return maxNodeVisualRadius
@@ -62,8 +71,8 @@ export function createSimulation({
           ? GRAPH_CONFIG.physics.selectedNeighborRingRadius
           : 0
       },
-      window.innerWidth / 2,
-      window.innerHeight / 2,
+      initialViewportCenter.x,
+      initialViewportCenter.y,
     )
     .strength((node) => {
       if (selectedNodeId === null || node.id === selectedNodeId) return 0
@@ -72,6 +81,8 @@ export function createSimulation({
         ? GRAPH_CONFIG.physics.selectedNeighborRingStrength
         : 0
     })
+
+  const centerForce = d3.forceCenter(initialViewportCenter.x, initialViewportCenter.y)
 
   const simulation = d3
     .forceSimulation(nodes)
@@ -86,7 +97,7 @@ export function createSimulation({
     .force("charge", d3.forceManyBody().strength(GRAPH_CONFIG.physics.chargeStrength))
     .force("collide", selectedNeighborCollisionForce)
     .force("selected-neighbor-ring", selectedNeighborRingForce)
-    .force("center", d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2))
+    .force("center", centerForce)
 
   const syncSelectedLayoutCenter = () => {
     if (selectedNodeId === null) return
@@ -98,6 +109,10 @@ export function createSimulation({
 
   return {
     simulation,
+    setLayoutCenter: (center) => {
+      centerForce.x(center.x)
+      centerForce.y(center.y)
+    },
     setSelectedNodeId: (nextSelectedNodeId) => {
       selectedNodeId =
         nextSelectedNodeId !== null && nodeById.has(nextSelectedNodeId) ? nextSelectedNodeId : null

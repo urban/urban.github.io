@@ -6,6 +6,7 @@ export type NodeId = string
 export type NodeState = "default" | "selected" | "muted"
 export type EdgeState = "default" | "muted"
 export type Point = { x: number; y: number }
+export type Size = { width: number; height: number }
 export type RenderDepth = 1 | 2 | 3 | typeof Infinity
 export type Disposer = () => void
 
@@ -37,6 +38,7 @@ export interface GraphData {
 export interface GraphSimulationController {
   simulation: d3.Simulation<GraphNode, SimulationGraphLink>
   setSelectedNodeId: (selectedNodeId: NodeId | null) => void
+  setLayoutCenter: (center: Point) => void
   syncSelectedLayoutCenter: () => void
   dispose: () => void
 }
