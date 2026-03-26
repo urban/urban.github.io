@@ -35,7 +35,7 @@ Objective: Establish the pure lookup and rewrite behavior for supported vault wi
 #### Task VWLR-002
 
 - Title: Complete alias, custom-label, unresolved, and collision handling
-- Status: Not started
+- Status: Completed
 - Blocked by: VWLR-001
 - Plan references:
   - `Stream 1: Resolver and rewrite primitives`

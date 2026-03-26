@@ -2,3 +2,5 @@
 # This file tracks autonomous task completions
 2026-03-26: Claimed VWLR-001. Implementing canonical-slug vault wiki-link rewrite happy path in `packages/website` with focused unit coverage.
 2026-03-26: Completed VWLR-001. Added pure canonical-slug wiki-link rewrite helpers and happy-path unit coverage. Verified with `bun run lint`, `bun run test`, `bun run typecheck`.
+2026-03-26: Claimed VWLR-002. Extending vault wiki-link lookup/rewrite for aliases, custom labels, muted unresolved spans, and explicit alias-collision failure in `packages/website`.
+2026-03-26: Completed VWLR-002. Added alias-aware lookup construction with canonical-slug precedence, muted unresolved span rendering, custom-label support, collision failure, and focused unit coverage. Verified with `bun run lint`, `bun run test`, `bun run typecheck`.
