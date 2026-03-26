@@ -13,6 +13,17 @@ export type VaultData = {
   readonly published: boolean
 }
 
+export type VaultMetadataSeed = {
+  readonly slug: string
+  readonly permalink: string
+  readonly title: string
+  readonly explicitDescription: string | undefined
+  readonly created: Date
+  readonly updated: Date
+  readonly aliases: ReadonlyArray<string>
+  readonly published: boolean
+}
+
 export type PublishedVaultWikiLinkEntry = {
   readonly slug: string
   readonly title: string
@@ -295,6 +306,31 @@ export const rewriteVaultWikiLinksToHtml = (
     })
     .join("")
 
+export const preprocessVaultMarkdownSource = (
+  source: string,
+  lookup: ReadonlyMap<string, PublishedVaultWikiLinkEntry>,
+): string =>
+  parseVaultWikiLinkSegments(source)
+    .map((segment) => {
+      if (segment._tag === "TextSegment") {
+        return segment.value
+      }
+
+      const resolution = resolveVaultWikiLink(segment.link, lookup)
+
+      if (resolution._tag === "UnresolvedVaultWikiLink") {
+        return `<span className="${escapeHtml(UNRESOLVED_VAULT_WIKI_LINK_CLASS)}">${escapeHtml(getVaultWikiLinkVisibleText(resolution.link))}</span>`
+      }
+
+      const visibleText =
+        resolution.link.label._tag === "ExplicitVaultWikiLinkLabel"
+          ? resolution.link.label.text
+          : resolution.entry.title
+
+      return `<a href="${escapeHtml(toVaultRoutePath(resolution.entry.slug))}">${escapeHtml(visibleText)}</a>`
+    })
+    .join("")
+
 export const toVaultRoutePath = (slug: string): string => `/vault/${slug}`
 
 export const humanizeVaultSlug = (slug: string): string =>
@@ -307,3 +343,17 @@ export const resolveVaultDescription = (
   explicitDescription: string | undefined,
   excerpt: string | undefined,
 ): string => explicitDescription ?? excerpt ?? ""
+
+export const finalizeVaultData = (
+  metadata: VaultMetadataSeed,
+  excerpt: string | undefined,
+): VaultData => ({
+  slug: metadata.slug,
+  permalink: metadata.permalink,
+  title: metadata.title,
+  description: resolveVaultDescription(metadata.explicitDescription, excerpt),
+  created: metadata.created,
+  updated: metadata.updated,
+  aliases: metadata.aliases,
+  published: metadata.published,
+})

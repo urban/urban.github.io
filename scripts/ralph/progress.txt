@@ -4,3 +4,5 @@
 2026-03-26: Completed VWLR-001. Added pure canonical-slug wiki-link rewrite helpers and happy-path unit coverage. Verified with `bun run lint`, `bun run test`, `bun run typecheck`.
 2026-03-26: Claimed VWLR-002. Extending vault wiki-link lookup/rewrite for aliases, custom labels, muted unresolved spans, and explicit alias-collision failure in `packages/website`.
 2026-03-26: Completed VWLR-002. Added alias-aware lookup construction with canonical-slug precedence, muted unresolved span rendering, custom-label support, collision failure, and focused unit coverage. Verified with `bun run lint`, `bun run test`, `bun run typecheck`.
+2026-03-26: Claimed VWLR-003. Refactoring `packages/website` vault loading into metadata-first preprocessing so published lookup builds once before per-entry MDX compile.
+2026-03-26: Completed VWLR-003. Split vault metadata decode from description finalization, built one published wiki-link lookup per `getVault()` run, preprocessed vault-only MDX sources before compile, and added integration coverage. Verified with `bun run lint`, `bun run test`, `bun run typecheck`.

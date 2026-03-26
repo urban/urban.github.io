@@ -2,6 +2,8 @@ import { afterEach, expect, test } from "bun:test"
 import { unlink, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { Effect } from "effect"
+import { createElement } from "react"
+import { renderToStaticMarkup } from "react-dom/server"
 import { RuntimeServer } from "./RuntimeServer"
 import { Content } from "./services/Content"
 import type { ContentService } from "./services/Content"
@@ -220,6 +222,54 @@ First paragraph for the unpublished fixture.
   expect(publishedVault.find((entry) => entry.slug === "fixture-published")?.data.description).toBe(
     "First paragraph for the published fixture.",
   )
+})
+
+test("content service preprocesses vault wiki-links before vault mdx compile", async () => {
+  await writeVaultFixture(
+    "Fixture Target.md",
+    `---
+title: Fixture Target
+permalink: fixture-target
+created: 2026-03-01
+updated: 2026-03-01
+published: true
+---
+
+# Fixture Target
+
+Target paragraph.
+`,
+  )
+  await writeVaultFixture(
+    "Fixture Source.md",
+    `---
+title: Fixture Source
+permalink: fixture-source
+created: 2026-03-01
+updated: 2026-03-01
+published: true
+---
+
+See [[fixture-target]].
+`,
+  )
+
+  const program = Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    return yield* content.findPublishedVaultBySlug("fixture-source")
+  })
+  const entry = await RuntimeServer.runPromise(program)
+
+  expect(entry).toBeDefined()
+
+  if (entry === undefined) {
+    throw new Error("Missing fixture-source vault entry")
+  }
+
+  expect(entry.source).toContain("[[fixture-target]]")
+
+  const markup = renderToStaticMarkup(createElement(entry.Content))
+  expect(markup).toContain('<p>See <a href="/vault/fixture-target">Fixture Target</a>.</p>')
 })
 
 test("content service fails on invalid vault frontmatter", async () => {
