@@ -1,5 +1,5 @@
 {
-  "name": "@urban/graph-visualizer-2",
+  "name": "@urban/graph-view",
   "version": "0.0.0",
   "private": true,
   "type": "module",
