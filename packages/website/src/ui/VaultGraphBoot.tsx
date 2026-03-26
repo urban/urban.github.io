@@ -7,15 +7,13 @@ export const VaultGraphBoot = () => {
     let disposed = false
     let dispose: (() => void) | undefined
 
-    void import("@urban/graph-visualizer-2/bootstrap").then(
-      async ({ bootstrapGraphVisualizer }) => {
-        if (disposed) {
-          return
-        }
+    void import("@urban/graph-view/bootstrap").then(async ({ bootstrapGraphVisualizer }) => {
+      if (disposed) {
+        return
+      }
 
-        dispose = await bootstrapGraphVisualizer()
-      },
-    )
+      dispose = await bootstrapGraphVisualizer()
+    })
 
     return () => {
       disposed = true

@@ -1,4 +1,4 @@
-# `@urban/graph-visualizer-2`
+# `@urban/graph-view`
 
 Browser-first graph visualizer for `@urban/build-graph` snapshots.
 
@@ -7,7 +7,7 @@ Browser-first graph visualizer for `@urban/build-graph` snapshots.
 `bootstrapGraphVisualizer` accepts optional `onSelectionChange` for real post-bootstrap selection changes.
 
 ```ts
-import { bootstrapGraphVisualizer } from "@urban/graph-visualizer-2/src/main"
+import { bootstrapGraphVisualizer } from "@urban/graph-view/src/main"
 
 await bootstrapGraphVisualizer({
   selectedNodeId: currentNodeId,
