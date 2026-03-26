@@ -336,6 +336,71 @@ See [[fixture-target]].
   expect(markup).toContain('<p>See <a href="/vault/fixture-target">Fixture Target</a>.</p>')
 })
 
+test("content service renders resolved and unresolved vault wiki-links across mixed inline content", async () => {
+  await writeVaultFixture(
+    "Fixture Target Alpha.md",
+    `---
+title: Fixture Target Alpha
+permalink: fixture-target-alpha
+created: 2026-03-01
+updated: 2026-03-01
+published: true
+---
+
+# Fixture Target Alpha
+
+Alpha paragraph.
+`,
+  )
+  await writeVaultFixture(
+    "Fixture Target Beta.md",
+    `---
+title: Fixture Target Beta
+permalink: fixture-target-beta
+created: 2026-03-01
+updated: 2026-03-01
+published: true
+---
+
+# Fixture Target Beta
+
+Beta paragraph.
+`,
+  )
+  await writeVaultFixture(
+    "Fixture Mixed Source.md",
+    `---
+title: Fixture Mixed Source
+permalink: fixture-mixed-source
+created: 2026-03-01
+updated: 2026-03-01
+published: true
+---
+
+Start [[fixture-target-alpha]], continue with [[fixture-target-beta|Beta Label]], and end on [[missing-target|Missing Target]].
+`,
+  )
+
+  const program = Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    return yield* content.findPublishedVaultBySlug("fixture-mixed-source")
+  })
+  const entry = await RuntimeServer.runPromise(program)
+
+  expect(entry).toBeDefined()
+
+  if (entry === undefined) {
+    throw new Error("Missing fixture-mixed-source vault entry")
+  }
+
+  const markup = renderToStaticMarkup(createElement(entry.Content))
+
+  expect(markup).toContain(
+    `<p>Start <a href="/vault/fixture-target-alpha">Fixture Target Alpha</a>, continue with <a href="/vault/fixture-target-beta">Beta Label</a>, and end on <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Missing Target</span>.</p>`,
+  )
+  expect(markup).not.toContain("[[")
+})
+
 test("content service leaves non-vault collections on the existing mdx path", async () => {
   await writeArticleFixture(
     "fixture-article-wiki-link",
