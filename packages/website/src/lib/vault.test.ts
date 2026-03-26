@@ -5,7 +5,12 @@ import { Effect } from "effect"
 import { RuntimeServer } from "./RuntimeServer"
 import { Content } from "./services/Content"
 import type { ContentService } from "./services/Content"
-import { normalizeVaultSlug, resolveVaultDescription } from "./vault"
+import {
+  buildPublishedVaultWikiLinkLookup,
+  normalizeVaultSlug,
+  resolveVaultDescription,
+  rewriteVaultWikiLinksToHtml,
+} from "./vault"
 
 const vaultDir = join(process.cwd(), "content", "vault")
 const createdFiles: string[] = []
@@ -32,6 +37,19 @@ test("normalizes canonical vault slugs and rejects blank-root permalinks", () =>
 test("prefers explicit vault description over derived excerpt", () => {
   expect(resolveVaultDescription("Explicit", "Derived")).toBe("Explicit")
   expect(resolveVaultDescription(undefined, "Derived")).toBe("Derived")
+})
+
+test("rewrites canonical vault wiki-links to canonical vault route anchors", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([
+    {
+      slug: "harness-loop",
+      title: "Harness Loop",
+    },
+  ])
+
+  expect(rewriteVaultWikiLinksToHtml("See [[harness-loop]] next.", lookup)).toBe(
+    'See <a href="/vault/harness-loop">Harness Loop</a> next.',
+  )
 })
 
 test("content service discovers published vault fixtures and excludes unpublished ones", async () => {
