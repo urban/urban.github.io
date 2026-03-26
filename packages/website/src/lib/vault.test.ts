@@ -10,9 +10,11 @@ import {
   normalizeVaultSlug,
   resolveVaultDescription,
   rewriteVaultWikiLinksToHtml,
+  UNRESOLVED_VAULT_WIKI_LINK_CLASS,
+  VaultWikiLinkAliasCollisionError,
 } from "./vault"
 
-const vaultDir = join(process.cwd(), "content", "vault")
+const vaultDir = join(import.meta.dir, "..", "..", "content", "vault")
 const createdFiles: string[] = []
 
 afterEach(async () => {
@@ -44,11 +46,130 @@ test("rewrites canonical vault wiki-links to canonical vault route anchors", () 
     {
       slug: "harness-loop",
       title: "Harness Loop",
+      aliases: ["harness loop"],
     },
   ])
 
   expect(rewriteVaultWikiLinksToHtml("See [[harness-loop]] next.", lookup)).toBe(
     'See <a href="/vault/harness-loop">Harness Loop</a> next.',
+  )
+})
+
+test("resolves published vault aliases to canonical vault routes", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([
+    {
+      slug: "ai-harness-learning",
+      title: "AI Harness Learning",
+      aliases: ["vault index"],
+    },
+  ])
+
+  expect(rewriteVaultWikiLinksToHtml("Start at [[vault index]].", lookup)).toBe(
+    'Start at <a href="/vault/ai-harness-learning">AI Harness Learning</a>.',
+  )
+})
+
+test("uses custom labels while keeping canonical vault hrefs", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([
+    {
+      slug: "trace-and-replay",
+      title: "Trace And Replay",
+      aliases: ["trace replay"],
+    },
+  ])
+
+  expect(rewriteVaultWikiLinksToHtml("Read [[trace replay|Replay Traces]].", lookup)).toBe(
+    'Read <a href="/vault/trace-and-replay">Replay Traces</a>.',
+  )
+})
+
+test("renders unresolved vault wiki-links as muted spans", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([])
+
+  expect(rewriteVaultWikiLinksToHtml("Missing [[missing-note]] here.", lookup)).toBe(
+    `Missing <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">missing-note</span> here.`,
+  )
+})
+
+test("renders unresolved custom labels as muted spans", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([])
+
+  expect(rewriteVaultWikiLinksToHtml("Missing [[missing-note|Missing Note]] here.", lookup)).toBe(
+    `Missing <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Missing Note</span> here.`,
+  )
+})
+
+test("rewrites multiple vault wiki-links in one block independently", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([
+    {
+      slug: "harness-loop",
+      title: "Harness Loop",
+      aliases: ["harness loop"],
+    },
+    {
+      slug: "trace-and-replay",
+      title: "Trace And Replay",
+      aliases: ["trace replay"],
+    },
+  ])
+
+  expect(
+    rewriteVaultWikiLinksToHtml(
+      "See [[harness loop]], [[trace-and-replay|Replay]], and [[missing-note]].",
+      lookup,
+    ),
+  ).toBe(
+    `See <a href="/vault/harness-loop">Harness Loop</a>, <a href="/vault/trace-and-replay">Replay</a>, and <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">missing-note</span>.`,
+  )
+})
+
+test("prefers canonical slugs over alias matches for the same token", () => {
+  const lookup = buildPublishedVaultWikiLinkLookup([
+    {
+      slug: "harness-loop",
+      title: "Harness Loop",
+      aliases: [],
+    },
+    {
+      slug: "other-entry",
+      title: "Other Entry",
+      aliases: ["harness-loop"],
+    },
+  ])
+
+  expect(rewriteVaultWikiLinksToHtml("See [[harness-loop]].", lookup)).toBe(
+    'See <a href="/vault/harness-loop">Harness Loop</a>.',
+  )
+})
+
+test("fails fast on published vault alias collisions and names both entries", () => {
+  expect(() =>
+    buildPublishedVaultWikiLinkLookup([
+      {
+        slug: "alpha",
+        title: "Alpha",
+        aliases: ["shared alias"],
+      },
+      {
+        slug: "beta",
+        title: "Beta",
+        aliases: ["shared alias"],
+      },
+    ]),
+  ).toThrow(
+    new VaultWikiLinkAliasCollisionError({
+      alias: "shared alias",
+      first: {
+        slug: "alpha",
+        title: "Alpha",
+        aliases: ["shared alias"],
+      },
+      second: {
+        slug: "beta",
+        title: "Beta",
+        aliases: ["shared alias"],
+      },
+    }).message,
   )
 })
 
