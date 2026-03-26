@@ -12,12 +12,13 @@ notify() {
 }
 
 print_help() {
-  echo "Usage: ./scripts/ralph/loop.sh <github-prd-issue-number-or-url> [options]"
+  echo "Usage: packages/agent-skills/scripts/ralph/loop.sh [input-file-path] [options]"
   echo ""
-  echo "Run multiple Codex passes against a PRD GitHub issue tasks using prompt-once-yolo.md."
+  echo "Run multiple Codex passes against a local input file."
   echo ""
   echo "Arguments:"
-  echo "  <github-prd-issue-number-or-url>  Issue number (e.g. 123) or full GitHub issue URL"
+  echo "  [input-file-path]                 Local file passed to Codex with @file syntax"
+  echo "                                    Default: packages/ralph/scripts/ralph/CHECKLIST.md"
   echo ""
   echo "Options:"
   echo "  -i, --iterations <count>           Number of iterations to run (default: 10)"
@@ -52,33 +53,31 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-require_single_issue_ref \
-  "${#positionals[@]}" \
-  "./scripts/ralph/loop.sh <github-prd-issue-number-or-url> [options]"
+if [[ "${#positionals[@]}" -gt 1 ]]; then
+  echo "Error: At most one input file path is allowed" >&2
+  echo "Usage: packages/ralph/scripts/ralph/loop.sh [input-file-path] [options]" >&2
+  exit 1
+fi
 
 if ! [[ "$iterations" =~ ^[1-9][0-9]*$ ]]; then
   echo "Error: --iterations must be a positive integer, got: $iterations" >&2
   exit 1
 fi
 
-require_core_commands
+require_command "codex" "Codex CLI"
 
-issue_ref="${positionals[0]}"
-issue_number="$(issue_number_from_ref "$issue_ref")"
-prd_issues_file="$(mktemp -t prd-issue.XXXXXX.md)"
-trap 'rm -f "$prd_issues_file"' EXIT
-prompt_file="$script_dir/PROMPT.md"
-progress_file="$script_dir/PROGRESS.txt"
+input_file="${positionals[0]:-$script_dir/CHECKLIST.md}"
+instruction_file="$script_dir/INSTRUCTIONS.md"
+progress_file="$script_dir/progress.txt"
 
-require_file "$prompt_file" "Prompt file"
+require_file "$input_file" "Input file"
+require_file "$instruction_file" "Prompt file"
 require_file "$progress_file" "Progress file"
-write_prd_issue_list "$issue_number" "$prd_issues_file" "1000"
-echo "PRD issue file: $prd_issues_file"
 
 for ((i=1; i<=iterations; i++)); do
   echo "Iteration $i"
   echo "--------------------------------"
-  result=$(codex exec --dangerously-bypass-approvals-and-sandbox "@$prd_issues_file @$progress_file @$prompt_file")
+  result=$(codex exec --dangerously-bypass-approvals-and-sandbox "@$input_file @$progress_file @$instruction_file")
 
   echo "$result"
 
