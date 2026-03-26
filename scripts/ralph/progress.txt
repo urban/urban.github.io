@@ -1,2 +1,4 @@
 # Ralph Auto Progress Log
 # This file tracks autonomous task completions
+2026-03-26: Claimed VWLR-001. Implementing canonical-slug vault wiki-link rewrite happy path in `packages/website` with focused unit coverage.
+2026-03-26: Completed VWLR-001. Added pure canonical-slug wiki-link rewrite helpers and happy-path unit coverage. Verified with `bun run lint`, `bun run test`, `bun run typecheck`.
