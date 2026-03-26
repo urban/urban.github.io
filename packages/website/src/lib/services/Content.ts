@@ -17,7 +17,12 @@ import type { JSX } from "react"
 import { glob } from "tinyglobby"
 import { VFile } from "vfile"
 import { Article, CollectionEntry, CompiledVFileData, Project, Work } from "../schemas"
-import type { VaultData } from "../vault"
+import {
+  buildPublishedVaultWikiLinkLookup,
+  finalizeVaultData,
+  preprocessVaultMarkdownSource,
+} from "../vault"
+import type { VaultData, VaultMetadataSeed } from "../vault"
 import { Mdx } from "./Mdx"
 import { Metadata } from "./Metadata"
 
@@ -41,6 +46,17 @@ type CompiledCollectionEntry<TData> = {
 
 export type VaultEntry = CompiledCollectionEntry<VaultData> & {
   readonly rawSource: string
+}
+
+type VaultSourceEntry = {
+  readonly rawSource: string
+  readonly source: string
+  readonly data: unknown
+  readonly filepath: string
+}
+
+type PreparedVaultEntry = VaultSourceEntry & {
+  readonly metadata: VaultMetadataSeed
 }
 
 export type ContentService = {
@@ -192,7 +208,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
             catch: (error) => new FileGlobError({ error }),
           }).pipe(Effect.tapError((error) => Console.log(error)))
 
-          return yield* Effect.all(
+          const sourceEntries: ReadonlyArray<VaultSourceEntry> = yield* Effect.all(
             filepaths.map((filepath) =>
               fs.readFileString(filepath, "utf-8").pipe(
                 Effect.map((rawSource) => {
@@ -204,36 +220,63 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
                     filepath,
                   }
                 }),
-                Effect.flatMap((entry) =>
-                  mdx.compile(new VFile({ data: { filepath }, value: entry.source })).pipe(
-                    Effect.flatMap((compiled) =>
-                      mdx.run(compiled).pipe(
-                        Effect.flatMap(({ default: MdxContent }) =>
-                          metadata
-                            .vault(
-                              entry.data,
-                              Schema.decodeUnknownSync(CompiledVFileData)(compiled.data)
-                                .descriptionExcerpt,
-                            )
-                            .pipe(
-                              Effect.map((data) => {
-                                const RenderContent: MdxContentComponent = () =>
-                                  createElement(MdxContent)
-                                return {
-                                  ...entry,
-                                  slug: data.slug,
-                                  data,
-                                  Content: RenderContent,
-                                }
-                              }),
-                            ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ),
+          )
+
+          const preparedEntries: ReadonlyArray<PreparedVaultEntry> = yield* Effect.all(
+            sourceEntries.map((entry) =>
+              metadata
+                .vaultSeed(entry.data)
+                .pipe(Effect.map((vaultMetadata) => ({ ...entry, metadata: vaultMetadata }))),
+            ),
+          )
+
+          const publishedLookup = buildPublishedVaultWikiLinkLookup(
+            preparedEntries
+              .filter(({ metadata }) => metadata.published)
+              .map(({ metadata }) => ({
+                slug: metadata.slug,
+                title: metadata.title,
+                aliases: metadata.aliases,
+              })),
+          )
+
+          return yield* Effect.all(
+            preparedEntries.map((entry) => {
+              const preprocessedSource = preprocessVaultMarkdownSource(
+                entry.source,
+                publishedLookup,
+              )
+
+              return mdx
+                .compile(
+                  new VFile({ data: { filepath: entry.filepath }, value: preprocessedSource }),
+                )
+                .pipe(
+                  Effect.flatMap((compiled) =>
+                    mdx.run(compiled).pipe(
+                      Effect.map(({ default: MdxContent }) => {
+                        const data = finalizeVaultData(
+                          entry.metadata,
+                          Schema.decodeUnknownSync(CompiledVFileData)(compiled.data)
+                            .descriptionExcerpt,
+                        )
+                        const RenderContent: MdxContentComponent = () => createElement(MdxContent)
+
+                        return {
+                          rawSource: entry.rawSource,
+                          source: entry.source,
+                          filepath: entry.filepath,
+                          slug: data.slug,
+                          data,
+                          Content: RenderContent,
+                        }
+                      }),
+                    ),
+                  ),
+                )
+            }),
           )
         }).pipe(
           Effect.tapError((error) => Console.log(error)),
