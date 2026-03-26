@@ -14,9 +14,7 @@ bun run build        # Build all packages/apps
 bun run serve        # Serve built static files
 
 # Testing & Linting
-bun run test         # Run tests across all packages
-bun run lint         # Lint all packages
-bun run typecheck    # TypeScript type checking
+bun run check        # Runs linter, formater, type checker, and tests.
 ```
 
 ## Website Architecture

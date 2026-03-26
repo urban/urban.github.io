@@ -1,4 +1,19 @@
-In all interaction and commit messages, be extremely concise and sacrifice grammar for the sake of concision.
+## Development Workflow
+
+- The git base branch is `main`
+- Use `bun` as the package manager
+
+### Mandatory Validation Steps
+
+After making changes, run `bun run check` to run all validations. This will check
+for linting errors, formatting issues, type errors, and run test.
+
+# Changesets
+
+Every pull request should include a changeset describing the changes made.
+Changesets are added to the `.changeset/` directory.
+
+There should one be ONE changeset per pull request.
 
 ## Code Quality Standards
 
