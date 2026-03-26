@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test"
-import { unlink, writeFile } from "node:fs/promises"
+import { mkdir, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { Effect } from "effect"
 import { createElement } from "react"
@@ -16,13 +16,15 @@ import {
   VaultWikiLinkAliasCollisionError,
 } from "./vault"
 
-const vaultDir = join(import.meta.dir, "..", "..", "content", "vault")
-const createdFiles: string[] = []
+const contentDir = join(import.meta.dir, "..", "..", "content")
+const vaultDir = join(contentDir, "vault")
+const articlesDir = join(contentDir, "articles")
+const createdPaths: string[] = []
 
 afterEach(async () => {
   await Promise.all(
-    createdFiles.splice(0, createdFiles.length).map(async (filepath) => {
-      await unlink(filepath)
+    createdPaths.splice(0, createdPaths.length).map(async (filepath) => {
+      await rm(filepath, { force: true, recursive: true })
     }),
   )
 })
@@ -30,7 +32,14 @@ afterEach(async () => {
 const writeVaultFixture = async (filename: string, source: string): Promise<void> => {
   const filepath = join(vaultDir, filename)
   await writeFile(filepath, source, "utf8")
-  createdFiles.push(filepath)
+  createdPaths.push(filepath)
+}
+
+const writeArticleFixture = async (slug: string, source: string): Promise<void> => {
+  const dirpath = join(articlesDir, slug)
+  await mkdir(dirpath, { recursive: true })
+  await writeFile(join(dirpath, "index.md"), source, "utf8")
+  createdPaths.push(dirpath)
 }
 
 test("normalizes canonical vault slugs and rejects blank-root permalinks", () => {
@@ -183,6 +192,8 @@ title: Fixture Published
 permalink: fixture-published
 created: 2026-03-01
 updated: 2026-03-01
+aliases:
+  - fixture alias
 published: true
 ---
 
@@ -214,13 +225,66 @@ First paragraph for the unpublished fixture.
     return { vault, publishedVault }
   })
   const { vault, publishedVault } = await RuntimeServer.runPromise(program)
+  const publishedEntry = vault.find((entry) => entry.slug === "fixture-published")
 
   expect(vault.some((entry) => entry.slug === "fixture-published")).toBe(true)
   expect(vault.some((entry) => entry.slug === "fixture-draft")).toBe(true)
   expect(publishedVault.some((entry) => entry.slug === "fixture-published")).toBe(true)
   expect(publishedVault.some((entry) => entry.slug === "fixture-draft")).toBe(false)
-  expect(publishedVault.find((entry) => entry.slug === "fixture-published")?.data.description).toBe(
-    "First paragraph for the published fixture.",
+  expect(publishedEntry?.data.title).toBe("Fixture Published")
+  expect(publishedEntry?.data.permalink).toBe("fixture-published")
+  expect(publishedEntry?.data.aliases).toEqual(["fixture alias"])
+  expect(publishedEntry?.data.published).toBe(true)
+  expect(publishedEntry?.data.created).toBeInstanceOf(Date)
+  expect(publishedEntry?.data.updated).toBeInstanceOf(Date)
+  expect(publishedEntry?.data.description).toBe("First paragraph for the published fixture.")
+})
+
+test("content service keeps unpublished vault targets unresolved after preprocessing", async () => {
+  await writeVaultFixture(
+    "Fixture Hidden.md",
+    `---
+title: Fixture Hidden
+permalink: fixture-hidden
+created: 2026-03-01
+updated: 2026-03-01
+published: false
+---
+
+# Fixture Hidden
+
+Hidden paragraph.
+`,
+  )
+  await writeVaultFixture(
+    "Fixture Source With Draft Link.md",
+    `---
+title: Fixture Source With Draft Link
+permalink: fixture-source-with-draft-link
+created: 2026-03-01
+updated: 2026-03-01
+published: true
+---
+
+See [[fixture-hidden|Hidden Draft]].
+`,
+  )
+
+  const program = Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    return yield* content.findPublishedVaultBySlug("fixture-source-with-draft-link")
+  })
+  const entry = await RuntimeServer.runPromise(program)
+
+  expect(entry).toBeDefined()
+
+  if (entry === undefined) {
+    throw new Error("Missing fixture-source-with-draft-link vault entry")
+  }
+
+  const markup = renderToStaticMarkup(createElement(entry.Content))
+  expect(markup).toContain(
+    `<p>See <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Hidden Draft</span>.</p>`,
   )
 })
 
@@ -270,6 +334,39 @@ See [[fixture-target]].
 
   const markup = renderToStaticMarkup(createElement(entry.Content))
   expect(markup).toContain('<p>See <a href="/vault/fixture-target">Fixture Target</a>.</p>')
+})
+
+test("content service leaves non-vault collections on the existing mdx path", async () => {
+  await writeArticleFixture(
+    "fixture-article-wiki-link",
+    `---
+title: Fixture Article Wiki Link
+description: Article fixture for wiki-link regression.
+date: "2026-03-01"
+updatedAt: "2026-03-01"
+---
+
+See [[fixture-target]].
+`,
+  )
+
+  const program = Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    return yield* content.getArticles()
+  })
+  const articles = await RuntimeServer.runPromise(program)
+  const entry = articles.find(({ slug }) => slug === "fixture-article-wiki-link")
+
+  expect(entry).toBeDefined()
+
+  if (entry === undefined) {
+    throw new Error("Missing fixture-article-wiki-link article entry")
+  }
+
+  expect(entry.source).toContain("[[fixture-target]]")
+  expect(renderToStaticMarkup(createElement(entry.Content))).toContain(
+    "<p>See [[fixture-target]].</p>",
+  )
 })
 
 test("content service fails on invalid vault frontmatter", async () => {
