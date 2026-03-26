@@ -1,4 +1,4 @@
-1. Check @.scripts/ralph/STEERING.md for critical work.
+1. Check @scripts/ralph/STEERING.md for critical work.
    Complete items in sequence, remove when done. Only proceed to implement tasks if no critical work pending.
 2. Find the highest-priority task to work on and work only on that task.
    This should be the one YOU decide has the highest priority - not necessarily the first in the list.
