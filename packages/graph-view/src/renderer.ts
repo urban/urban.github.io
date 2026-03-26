@@ -7,13 +7,14 @@ import {
   clamp,
   type GraphNode,
   type GraphRenderModel,
+  type GraphTheme,
   type NodeId,
   type NodeSpriteController,
   type NodeState,
 } from "./shared"
 
-function applyNodeVariant(sprite: PIXI.Graphics, nodeState: NodeState) {
-  const variant = GRAPH_CONFIG.node.variants[nodeState]
+function applyNodeVariant(sprite: PIXI.Graphics, nodeState: NodeState, theme: GraphTheme) {
+  const variant = theme.node.variants[nodeState]
   sprite.clear()
   sprite.circle(0, 0, GRAPH_CONFIG.node.radius).fill(variant.fill)
   sprite
@@ -23,19 +24,22 @@ function applyNodeVariant(sprite: PIXI.Graphics, nodeState: NodeState) {
   sprite.alpha = variant.alpha
 }
 
-function createNodeSprite(): NodeSpriteController {
+function createNodeSprite(theme: GraphTheme): NodeSpriteController {
   const sprite = new PIXI.Graphics()
-  applyNodeVariant(sprite, "default")
+  applyNodeVariant(sprite, "default", theme)
   sprite.eventMode = "static"
   sprite.cursor = "pointer"
 
   const controller: NodeSpriteController = {
     sprite,
     state: "default",
-    setState: (nodeState) => {
-      if (controller.state === nodeState) return
+    setState: (nodeState, nextTheme) => {
+      if (controller.state === nodeState) {
+        applyNodeVariant(sprite, nodeState, nextTheme)
+        return
+      }
       controller.state = nodeState
-      applyNodeVariant(sprite, nodeState)
+      applyNodeVariant(sprite, nodeState, nextTheme)
     },
     setPosition: (x, y) => sprite.position.set(x, y),
     onPointerDown: (onDown) => {
@@ -61,11 +65,11 @@ function createNodeSprite(): NodeSpriteController {
   return controller
 }
 
-function createNodeLabel(nodeLabel: string) {
+function createNodeLabel(nodeLabel: string, theme: GraphTheme) {
   const label = new PIXI.Text({
     text: nodeLabel,
     style: {
-      ...GRAPH_CONFIG.label.style,
+      ...theme.label.style,
     },
   })
   label.eventMode = "none"
@@ -75,7 +79,13 @@ function createNodeLabel(nodeLabel: string) {
   return label
 }
 
-export async function createPixiApp(containerSelector: string) {
+export async function createPixiApp({
+  containerSelector,
+  theme,
+}: {
+  containerSelector: string
+  theme: GraphTheme
+}) {
   const root = document.querySelector<HTMLElement>(containerSelector)
   if (!root) throw new Error(`Missing container element: ${containerSelector}`)
 
@@ -83,8 +93,8 @@ export async function createPixiApp(containerSelector: string) {
   await app.init({
     resizeTo: root,
     antialias: true,
-    backgroundAlpha: GRAPH_CONFIG.view.backgroundAlpha,
-    backgroundColor: GRAPH_CONFIG.view.backgroundColor,
+    backgroundAlpha: theme.view.backgroundAlpha,
+    backgroundColor: theme.view.backgroundColor,
   })
 
   if (!(app.canvas instanceof HTMLCanvasElement)) {
@@ -127,12 +137,14 @@ export function createGraphRenderer({
   labelLayer,
   edgeGraphics,
   ticker,
+  getTheme,
 }: {
   nodes: readonly GraphNode[]
   nodeLayer: PIXI.Container
   labelLayer: PIXI.Container
   edgeGraphics: PIXI.Graphics
   ticker: PIXI.Ticker
+  getTheme: () => GraphTheme
 }) {
   const nodeSprites = new Map<NodeId, NodeSpriteController>()
   const nodeLabels = new Map<NodeId, PIXI.Text>()
@@ -141,8 +153,9 @@ export function createGraphRenderer({
   const visibleLabelIds = new Set<NodeId>()
 
   for (const node of nodes) {
-    const nodeSprite = createNodeSprite()
-    const nodeLabel = createNodeLabel(node.label)
+    const theme = getTheme()
+    const nodeSprite = createNodeSprite(theme)
+    const nodeLabel = createNodeLabel(node.label, theme)
     nodeLayer.addChild(nodeSprite.sprite)
     labelLayer.addChild(nodeLabel)
     nodeSprites.set(node.id, nodeSprite)
@@ -153,8 +166,8 @@ export function createGraphRenderer({
       currentOffset: 0,
       targetOffset: 0,
       baseAlpha: 0,
-      currentVisibility: GRAPH_CONFIG.label.variants.default.alpha,
-      targetVisibility: GRAPH_CONFIG.label.variants.default.alpha,
+      currentVisibility: 1,
+      targetVisibility: 1,
     })
   }
 
@@ -188,6 +201,7 @@ export function createGraphRenderer({
     edges: renderEdges,
     labels: renderLabels,
   }: GraphRenderModel) => {
+    const theme = getTheme()
     const devicePixelRatio = window.devicePixelRatio || 1
     const parentScale = edgeGraphics.parent?.scale.x
     const worldScale = typeof parentScale === "number" && parentScale > 0 ? parentScale : 1
@@ -207,13 +221,13 @@ export function createGraphRenderer({
       if (!nodeSprite) continue
       visibleNodeIds.add(node.id)
       if (!nodeSprite.sprite.visible) nodeSprite.sprite.visible = true
-      nodeSprite.setState(node.visual)
+      nodeSprite.setState(node.visual, theme)
       if (node.position) nodeSprite.setPosition(node.position.x, node.position.y)
     }
 
     edgeGraphics.clear()
     for (const edge of renderEdges) {
-      const variant = GRAPH_CONFIG.edge.variants[edge.visual]
+      const variant = theme.edge.variants[edge.visual]
       edgeGraphics.moveTo(edge.source.x, edge.source.y)
       edgeGraphics.lineTo(edge.target.x, edge.target.y)
       edgeGraphics.stroke({
@@ -230,8 +244,9 @@ export function createGraphRenderer({
       visibleLabelIds.add(label.id)
       if (!labelSprite.visible) labelSprite.visible = true
       if (labelSprite.resolution !== labelResolution) labelSprite.resolution = labelResolution
+      labelSprite.style.fill = theme.label.fill
       const animation = labelAnimationByNodeId.get(label.id)
-      const variant = GRAPH_CONFIG.label.variants[label.state]
+      const variant = theme.label.variants[label.state]
       const baseAlpha = labelZoomAlpha
       const targetVisibility = variant.alpha
       if (labelSprite.tint !== variant.tint) labelSprite.tint = variant.tint

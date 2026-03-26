@@ -41,12 +41,7 @@ export function createSimulation({
 }): GraphSimulationController {
   const maxNodeVisualRadius = Math.max(
     GRAPH_CONFIG.physics.collisionRadius,
-    GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.variants.default.scale +
-      GRAPH_CONFIG.node.variants.default.strokeWidth / 2,
-    GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.variants.selected.scale +
-      GRAPH_CONFIG.node.variants.selected.strokeWidth / 2,
-    GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.variants.muted.scale +
-      GRAPH_CONFIG.node.variants.muted.strokeWidth / 2,
+    GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.maxScale + GRAPH_CONFIG.node.maxStrokeWidth / 2,
   )
 
   let selectedNodeId: NodeId | null = null

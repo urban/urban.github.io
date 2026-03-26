@@ -4,37 +4,224 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Graph View</title>
+    <script>
+      ;(function preloadColorScheme() {
+        const isDark =
+          localStorage.colorScheme === "dark" ||
+          (!("colorScheme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+
+        if (isDark) {
+          document.documentElement.classList.add("dark")
+        } else {
+          document.documentElement.classList.remove("dark")
+        }
+      })()
+    </script>
     <style>
+      :root {
+        color-scheme: light;
+        --page-bg: #f5f5f4;
+        --panel-bg: rgba(255, 255, 255, 0.78);
+        --panel-border: rgba(12, 10, 9, 0.12);
+        --text: rgba(12, 10, 9, 0.72);
+        --text-strong: #0c0a09;
+        --button-hover: rgba(12, 10, 9, 0.05);
+      }
+
+      html.dark {
+        color-scheme: dark;
+        --page-bg: #0c0a09;
+        --panel-bg: rgba(28, 25, 23, 0.72);
+        --panel-border: rgba(245, 245, 244, 0.16);
+        --text: rgba(245, 245, 244, 0.72);
+        --text-strong: #f5f5f4;
+        --button-hover: rgba(245, 245, 244, 0.08);
+      }
+
       html,
       body {
         height: 100%;
         margin: 0;
-        overflow: hidden;
-        background: #0b0f14;
       }
+
+      body {
+        overflow: hidden;
+        background: var(--page-bg);
+        color: var(--text);
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
       #app {
         width: 100%;
         height: 100%;
       }
-      .hint {
+
+      .hint,
+      .theme-controls {
         position: fixed;
+        z-index: 1;
+        backdrop-filter: blur(8px) saturate(160%);
+        -webkit-backdrop-filter: blur(8px) saturate(160%);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 999px;
+      }
+
+      .hint {
         left: 12px;
         top: 12px;
-        color: #cbd5e1;
-        font:
-          12px/1.4 system-ui,
-          -apple-system,
-          Segoe UI,
-          Roboto,
-          sans-serif;
-        opacity: 0.9;
+        padding: 8px 12px;
+        font-size: 12px;
+        line-height: 1.4;
         user-select: none;
+      }
+
+      .theme-controls {
+        right: 12px;
+        bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+        padding: 4px;
+      }
+
+      .theme-button {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--text-strong);
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      .theme-button:hover {
+        background: var(--button-hover);
+      }
+
+      .theme-button:focus-visible {
+        outline: 2px solid var(--text-strong);
+        outline-offset: 2px;
+      }
+
+      .theme-button svg {
+        width: 21px;
+        height: 21px;
+        fill: currentColor;
       }
     </style>
   </head>
   <body>
     <div id="app" data-graph-snapshot-url="/graph-snapshot.json"></div>
     <div class="hint">Drag nodes. Drag background to pan. Use mouse wheel to zoom.</div>
+    <div class="theme-controls" aria-label="Color scheme controls">
+      <button id="light-theme-button" class="theme-button" aria-label="Light theme" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-hidden="true">
+          <path
+            d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"
+          ></path>
+        </svg>
+      </button>
+      <button id="dark-theme-button" class="theme-button" aria-label="Dark theme" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-hidden="true">
+          <path
+            d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"
+          ></path>
+        </svg>
+      </button>
+      <button id="system-theme-button" class="theme-button" aria-label="System theme" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-hidden="true">
+          <path
+            d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H208a8,8,0,0,1,8,8Zm-48,48a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,224Z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <script>
+      const disableCSSTransitions = () => {
+        const css = document.createElement("style")
+        css.appendChild(
+          document.createTextNode(
+            `* {
+              -webkit-transition: none !important;
+              -moz-transition: none !important;
+              -o-transition: none !important;
+              -ms-transition: none !important;
+              transition: none !important;
+            }`,
+          ),
+        )
+        document.head.appendChild(css)
+
+        return () => {
+          const opacity = window.getComputedStyle(css).opacity
+          if (opacity) {
+            document.head.removeChild(css)
+          }
+        }
+      }
+
+      const toggleColorScheme = (isDark) => {
+        const resetTransitions = disableCSSTransitions()
+
+        if (isDark) {
+          document.documentElement.classList.add("dark")
+        } else {
+          document.documentElement.classList.remove("dark")
+        }
+
+        resetTransitions()
+      }
+
+      const handleSelectColorScheme = (colorScheme) => {
+        localStorage.setItem("colorScheme", colorScheme)
+        switch (colorScheme) {
+          case "light":
+            toggleColorScheme(false)
+            break
+          case "dark":
+            toggleColorScheme(true)
+            break
+          case "system":
+            toggleColorScheme(window.matchMedia("(prefers-color-scheme: dark)").matches)
+            break
+        }
+      }
+
+      document
+        .getElementById("light-theme-button")
+        .addEventListener("click", () => handleSelectColorScheme("light"))
+      document
+        .getElementById("dark-theme-button")
+        .addEventListener("click", () => handleSelectColorScheme("dark"))
+      document
+        .getElementById("system-theme-button")
+        .addEventListener("click", () => handleSelectColorScheme("system"))
+
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        if (localStorage.colorScheme === "system" || !localStorage.colorScheme) {
+          toggleColorScheme(event.matches)
+        }
+      })
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
