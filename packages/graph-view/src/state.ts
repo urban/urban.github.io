@@ -185,7 +185,7 @@ export function deriveRenderModel({
     if (visibleNodeIds !== null && !visibleNodeIds.has(node.id)) continue
     if (!hasPosition(node)) continue
     const nodeVisual = nodeStateById.get(node.id) ?? "default"
-    const nodeRadius = GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.variants[nodeVisual].scale
+    const nodeRadius = GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.scales[nodeVisual]
     const isWithinHoverDepthOne =
       focusNodeId === null || focusNodeId === node.id || focusNodeNeighbors?.has(node.id) === true
     labels.push({

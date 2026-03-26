@@ -12,6 +12,7 @@ import {
 } from "./state"
 import {
   GRAPH_CONFIG,
+  resolveGraphTheme,
   selectedNodeIdFromSelection,
   type AppAction,
   type AppCommand,
@@ -315,7 +316,8 @@ export async function bootstrapGraphVisualizer({
     graphSource.type === "snapshot-url"
       ? await loadGraphDataFromSnapshot(graphSource.snapshotUrl)
       : createGraphDataFromSnapshotPayload(graphSource.snapshotPayload)
-  const app = await createPixiApp("#app")
+  const getTheme = () => resolveGraphTheme(documentObject)
+  const app = await createPixiApp({ containerSelector: "#app", theme: getTheme() })
   const graphRootElement = app.canvas.parentElement
   if (!(graphRootElement instanceof HTMLElement)) {
     throw new Error("Missing graph root element for graph visualizer bootstrap.")
@@ -347,6 +349,7 @@ export async function bootstrapGraphVisualizer({
     labelLayer,
     edgeGraphics,
     ticker: app.ticker,
+    getTheme,
   })
 
   const lifecycle = createLifecycle()
@@ -412,6 +415,19 @@ export async function bootstrapGraphVisualizer({
     window.addEventListener("resize", syncSimulationCenterToViewport)
     lifecycle.add(() => {
       window.removeEventListener("resize", syncSimulationCenterToViewport)
+    })
+  }
+
+  if (typeof MutationObserver === "function") {
+    const themeObserver = new MutationObserver(() => {
+      renderer.render(appState.graph.renderModel)
+    })
+    themeObserver.observe(documentObject.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-color-scheme"],
+    })
+    lifecycle.add(() => {
+      themeObserver.disconnect()
     })
   }
 

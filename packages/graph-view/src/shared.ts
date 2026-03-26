@@ -10,6 +10,24 @@ export type Size = { width: number; height: number }
 export type RenderDepth = 1 | 2 | 3 | typeof Infinity
 export type Disposer = () => void
 
+export type GraphTheme = {
+  view: { backgroundAlpha: number; backgroundColor: number }
+  node: {
+    variants: Record<
+      NodeState,
+      { fill: number; stroke: number; strokeWidth: number; scale: number; alpha: number }
+    >
+  }
+  edge: {
+    variants: Record<EdgeState, { width: number; color: number; alpha: number }>
+  }
+  label: {
+    fill: number
+    variants: Record<NodeState, { tint: number; alpha: number }>
+    style: PIXI.TextStyleOptions
+  }
+}
+
 export interface GraphNode extends d3.SimulationNodeDatum {
   id: NodeId
   label: string
@@ -125,7 +143,7 @@ export type AppCommand =
 export interface NodeSpriteController {
   sprite: PIXI.Graphics
   state: NodeState
-  setState: (nodeState: NodeState) => void
+  setState: (nodeState: NodeState, theme: GraphTheme) => void
   setPosition: (x: number, y: number) => void
   onPointerDown: (onDown: (event: PIXI.FederatedPointerEvent) => void) => Disposer
   onPointerOver: (onOver: () => void) => Disposer
@@ -135,37 +153,90 @@ export interface NodeSpriteController {
 export type LocalCoordinateSpace = { toLocal: (point: Point) => Point }
 
 const GRAPH_LABEL_STYLE: PIXI.TextStyleOptions = {
-  fill: 0xe2e8f0,
   fontFamily: "Arial",
   fontSize: 14,
   fontWeight: "400",
 }
 
-export const GRAPH_CONFIG = {
-  view: { backgroundAlpha: 1, backgroundColor: 0x0b0f14 },
+const LIGHT_GRAPH_THEME: GraphTheme = {
+  view: { backgroundAlpha: 0, backgroundColor: 0xffffff },
   node: {
-    radius: 6,
     variants: {
-      default: { fill: 0x94a3b8, stroke: 0x0f172a, strokeWidth: 1, scale: 1, alpha: 1 },
-      selected: { fill: 0x7dd3fc, stroke: 0x082f49, strokeWidth: 2, scale: 2, alpha: 1 },
-      muted: { fill: 0x64748b, stroke: 0x0f172a, strokeWidth: 1, scale: 1, alpha: 0.2 },
+      default: { fill: 0x78716c, stroke: 0xf5f5f4, strokeWidth: 1, scale: 1, alpha: 1 },
+      selected: { fill: 0x0c0a09, stroke: 0xf5f5f4, strokeWidth: 2, scale: 2, alpha: 1 },
+      muted: { fill: 0xd6d3d1, stroke: 0xf5f5f4, strokeWidth: 1, scale: 1, alpha: 0.45 },
     },
   },
   edge: {
     variants: {
-      default: { width: 2, color: 0x93c5fd, alpha: 0.9 },
-      muted: { width: 2, color: 0x93c5fd, alpha: 0.1 },
+      default: { width: 2, color: 0x57534e, alpha: 0.55 },
+      muted: { width: 2, color: 0xa8a29e, alpha: 0.18 },
     },
+  },
+  label: {
+    fill: 0x0c0a09,
+    variants: {
+      default: { tint: 0x0c0a09, alpha: 1 },
+      selected: { tint: 0x0c0a09, alpha: 1 },
+      muted: { tint: 0x78716c, alpha: 0.45 },
+    },
+    style: {
+      ...GRAPH_LABEL_STYLE,
+      fill: 0x0c0a09,
+    },
+  },
+}
+
+const DARK_GRAPH_THEME: GraphTheme = {
+  view: { backgroundAlpha: 0, backgroundColor: 0x000000 },
+  node: {
+    variants: {
+      default: { fill: 0xa8a29e, stroke: 0x0c0a09, strokeWidth: 1, scale: 1, alpha: 1 },
+      selected: { fill: 0xf5f5f4, stroke: 0x0c0a09, strokeWidth: 2, scale: 2, alpha: 1 },
+      muted: { fill: 0x44403c, stroke: 0x0c0a09, strokeWidth: 1, scale: 1, alpha: 0.45 },
+    },
+  },
+  edge: {
+    variants: {
+      default: { width: 2, color: 0xd6d3d1, alpha: 0.5 },
+      muted: { width: 2, color: 0x57534e, alpha: 0.25 },
+    },
+  },
+  label: {
+    fill: 0xf5f5f4,
+    variants: {
+      default: { tint: 0xf5f5f4, alpha: 1 },
+      selected: { tint: 0xf5f5f4, alpha: 1 },
+      muted: { tint: 0xa8a29e, alpha: 0.45 },
+    },
+    style: {
+      ...GRAPH_LABEL_STYLE,
+      fill: 0xf5f5f4,
+    },
+  },
+}
+
+export function resolveGraphTheme(documentObject: Document): GraphTheme {
+  return documentObject.documentElement.classList.contains("dark")
+    ? DARK_GRAPH_THEME
+    : LIGHT_GRAPH_THEME
+}
+
+export const GRAPH_CONFIG = {
+  node: {
+    radius: 6,
+    scales: {
+      default: 1,
+      selected: 2,
+      muted: 1,
+    },
+    maxScale: 2,
+    maxStrokeWidth: 2,
   },
   label: {
     offset: 6,
     hoverOffset: 10,
     hoverAnimationSpeed: 8,
-    variants: {
-      default: { tint: 0xe2e8f0, alpha: 1 },
-      selected: { tint: 0xe2e8f0, alpha: 1 },
-      muted: { tint: 0x94a3b8, alpha: 0.3 },
-    },
     lineHeight: 1.2,
     approximateCharWidth: 8,
     horizontalPadding: 4,
@@ -175,7 +246,6 @@ export const GRAPH_CONFIG = {
     nodeClearance: 2,
     fadeStartZoom: 1,
     fadeExponent: 2,
-    style: GRAPH_LABEL_STYLE,
   },
   zoom: { min: 0.2, max: 3 },
   physics: {
