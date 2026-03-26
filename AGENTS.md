@@ -30,8 +30,9 @@ Package-local checks fine during iteration, but never sufficient for task comple
 - The base branch for this repository is 'main'.
 - The package manager is Bun.
 
-# Learning more about the "effect" library
+# Learning more about the "effect" & "@effect/\*" packages
 
-The full source code for the `effect` library is in `.repos/effect-smol/`. Agent instructions can be found in `./repos/effect-smol/LLMS.md`. Effect native development patterns can be found in the `.repos/effect-smol/.patterns` directory.
+`.repos/effect/LLMS.md` is an authoritative source of information about the "effect" and "@effect/\*" packages. Read this before looking elsewhere for
+information about these packages. It contains the best practices for using effect.
 
-**Use local libraries in the `./repos` director to learn more, rather than browsing the code in `node_modules/`.**
+Use this for learning more about the library, rather than browsing the code in `node_modules/`.

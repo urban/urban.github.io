@@ -4,8 +4,8 @@
   "private": true,
   "workspaces": {
     "catalog": {
-      "@effect/platform-node": "4.0.0-beta.27",
-      "effect": "4.0.0-beta.27",
+      "@effect/platform-node": "4.0.0-beta.35",
+      "effect": "4.0.0-beta.35",
       "typescript": "^5.9.3"
     },
     "packages": [
@@ -31,13 +31,13 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@changesets/cli": "2.29.8",
-    "@effect/language-service": "^0.77.0",
+    "@changesets/cli": "2.30.0",
+    "@effect/language-service": "^0.80.0",
     "husky": "9.1.7",
-    "lint-staged": "16.2.7",
-    "oxfmt": "0.35.0",
-    "oxlint": "1.50.0",
-    "turbo": "2.8.16",
+    "lint-staged": "16.4.0",
+    "oxfmt": "0.41.0",
+    "oxlint": "1.56.0",
+    "turbo": "2.8.19",
     "typescript": "catalog:"
   },
   "lint-staged": {
