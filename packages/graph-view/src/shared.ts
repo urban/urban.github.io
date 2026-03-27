@@ -11,7 +11,7 @@ export type RenderDepth = 1 | 2 | 3 | typeof Infinity
 export type Disposer = () => void
 
 export type GraphTheme = {
-  view: { backgroundAlpha: number; backgroundColor: number }
+  view: { backgroundColor: number }
   node: {
     variants: Record<
       NodeState,
@@ -22,8 +22,7 @@ export type GraphTheme = {
     variants: Record<EdgeState, { width: number; color: number; alpha: number }>
   }
   label: {
-    fill: number
-    variants: Record<NodeState, { tint: number; alpha: number }>
+    variants: Record<NodeState, { fill: number; alpha: number }>
     style: PIXI.TextStyleOptions
   }
 }
@@ -159,7 +158,7 @@ const GRAPH_LABEL_STYLE: PIXI.TextStyleOptions = {
 }
 
 const LIGHT_GRAPH_THEME: GraphTheme = {
-  view: { backgroundAlpha: 0, backgroundColor: 0xffffff },
+  view: { backgroundColor: 0xffffff },
   node: {
     variants: {
       default: { fill: 0x78716c, stroke: 0xf5f5f4, strokeWidth: 1, scale: 1, alpha: 1 },
@@ -174,21 +173,19 @@ const LIGHT_GRAPH_THEME: GraphTheme = {
     },
   },
   label: {
-    fill: 0x0c0a09,
     variants: {
-      default: { tint: 0x0c0a09, alpha: 1 },
-      selected: { tint: 0x0c0a09, alpha: 1 },
-      muted: { tint: 0x78716c, alpha: 0.45 },
+      default: { fill: 0x0c0a09, alpha: 1 },
+      selected: { fill: 0x0c0a09, alpha: 1 },
+      muted: { fill: 0x78716c, alpha: 0.45 },
     },
     style: {
       ...GRAPH_LABEL_STYLE,
-      fill: 0x0c0a09,
     },
   },
 }
 
 const DARK_GRAPH_THEME: GraphTheme = {
-  view: { backgroundAlpha: 0, backgroundColor: 0x000000 },
+  view: { backgroundColor: 0x000000 },
   node: {
     variants: {
       default: { fill: 0xa8a29e, stroke: 0x0c0a09, strokeWidth: 1, scale: 1, alpha: 1 },
@@ -203,15 +200,13 @@ const DARK_GRAPH_THEME: GraphTheme = {
     },
   },
   label: {
-    fill: 0xf5f5f4,
     variants: {
-      default: { tint: 0xf5f5f4, alpha: 1 },
-      selected: { tint: 0xf5f5f4, alpha: 1 },
-      muted: { tint: 0xa8a29e, alpha: 0.45 },
+      default: { fill: 0xf5f5f4, alpha: 1 },
+      selected: { fill: 0xf5f5f4, alpha: 1 },
+      muted: { fill: 0xa8a29e, alpha: 0.45 },
     },
     style: {
       ...GRAPH_LABEL_STYLE,
-      fill: 0xf5f5f4,
     },
   },
 }

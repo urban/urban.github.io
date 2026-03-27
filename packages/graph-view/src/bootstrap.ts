@@ -3,7 +3,7 @@ import type { GraphSnapshotNode } from "@urban/build-graph/schema"
 import { createAppState, reduceAppStateWithCommands } from "./app-state"
 import { bindPointerInteractions } from "./interaction"
 import { createLifecycle } from "./lifecycle"
-import { createGraphRenderer, createPixiApp, createWorld } from "./renderer"
+import { applyAppTheme, createGraphRenderer, createPixiApp, createWorld } from "./renderer"
 import { centerReleasedSelectedNode, createSimulation, toViewportCenter } from "./simulation"
 import {
   createGraphDataFromSnapshotPayload,
@@ -420,6 +420,7 @@ export async function bootstrapGraphVisualizer({
 
   if (typeof MutationObserver === "function") {
     const themeObserver = new MutationObserver(() => {
+      applyAppTheme(app, getTheme())
       renderer.render(appState.graph.renderModel)
     })
     themeObserver.observe(documentObject.documentElement, {

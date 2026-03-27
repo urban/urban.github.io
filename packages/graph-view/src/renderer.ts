@@ -70,6 +70,7 @@ function createNodeLabel(nodeLabel: string, theme: GraphTheme) {
     text: nodeLabel,
     style: {
       ...theme.label.style,
+      fill: theme.label.variants.default.fill,
     },
   })
   label.eventMode = "none"
@@ -77,6 +78,10 @@ function createNodeLabel(nodeLabel: string, theme: GraphTheme) {
   label.roundPixels = true
   label.visible = false
   return label
+}
+
+export function applyAppTheme(app: PIXI.Application, theme: GraphTheme) {
+  app.renderer.background.color = theme.view.backgroundColor
 }
 
 export async function createPixiApp({
@@ -93,7 +98,6 @@ export async function createPixiApp({
   await app.init({
     resizeTo: root,
     antialias: true,
-    backgroundAlpha: theme.view.backgroundAlpha,
     backgroundColor: theme.view.backgroundColor,
   })
 
@@ -101,6 +105,7 @@ export async function createPixiApp({
     throw new Error("Expected PIXI canvas to be HTMLCanvasElement")
   }
 
+  applyAppTheme(app, theme)
   root.appendChild(app.canvas)
   return app
 }
@@ -244,12 +249,11 @@ export function createGraphRenderer({
       visibleLabelIds.add(label.id)
       if (!labelSprite.visible) labelSprite.visible = true
       if (labelSprite.resolution !== labelResolution) labelSprite.resolution = labelResolution
-      labelSprite.style.fill = theme.label.fill
       const animation = labelAnimationByNodeId.get(label.id)
       const variant = theme.label.variants[label.state]
+      labelSprite.style.fill = variant.fill
       const baseAlpha = labelZoomAlpha
       const targetVisibility = variant.alpha
-      if (labelSprite.tint !== variant.tint) labelSprite.tint = variant.tint
       if (animation) {
         animation.baseX = label.x
         animation.baseY = label.y
