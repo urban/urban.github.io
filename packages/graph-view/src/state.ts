@@ -148,12 +148,15 @@ export function deriveRenderModel({
   const nodeStateById = new Map(nodes.map((node) => [node.id, getNodeState(node.id, selection)]))
   const focusNodeId = draggedNodeId ?? hoveredNodeId
   const focusNodeNeighbors = focusNodeId === null ? null : adjacency.get(focusNodeId)
+  const isWithinFocusDepthOne = (nodeId: NodeId) =>
+    focusNodeId === null || focusNodeId === nodeId || focusNodeNeighbors?.has(nodeId) === true
   const renderNodes: RenderNodeModel[] = []
   for (const node of nodes) {
     if (visibleNodeIds !== null && !visibleNodeIds.has(node.id)) continue
+    const baseNodeVisual = nodeStateById.get(node.id) ?? "default"
     renderNodes.push({
       id: node.id,
-      visual: nodeStateById.get(node.id) ?? "default",
+      visual: isWithinFocusDepthOne(node.id) ? baseNodeVisual : "muted",
       position: hasPosition(node) ? { x: node.x, y: node.y } : null,
     })
   }
@@ -186,14 +189,12 @@ export function deriveRenderModel({
     if (!hasPosition(node)) continue
     const nodeVisual = nodeStateById.get(node.id) ?? "default"
     const nodeRadius = GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.scales[nodeVisual]
-    const isWithinHoverDepthOne =
-      focusNodeId === null || focusNodeId === node.id || focusNodeNeighbors?.has(node.id) === true
     labels.push({
       id: node.id,
       text: node.label,
       x: node.x,
       y: node.y + nodeRadius + GRAPH_CONFIG.label.offset,
-      state: isWithinHoverDepthOne ? nodeVisual : "muted",
+      state: isWithinFocusDepthOne(node.id) ? nodeVisual : "muted",
       isHovered: draggedNodeId === null && hoveredNodeId === node.id,
     })
   }

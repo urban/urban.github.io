@@ -727,6 +727,30 @@ describe("deriveRenderModel", () => {
     ])
   })
 
+  test("hovered node mutes a selected node outside the hover neighborhood", () => {
+    const { nodes, links, nodeById, context } = makeGraphFixtures()
+    const selection: SelectionSnapshot = {
+      type: "selected",
+      nodeId: "c",
+      unmutedNodeIds: new Set(["a", "b", "c"]),
+    }
+
+    const model = deriveRenderModel({
+      nodes,
+      links,
+      nodeById,
+      adjacency: context.adjacency,
+      selection,
+      hoveredNodeId: "a",
+      draggedNodeId: null,
+    })
+
+    const nodeVisualById = new Map(model.nodes.map((node) => [node.id, node.visual]))
+    expect(nodeVisualById.get("a")).toBe("default")
+    expect(nodeVisualById.get("b")).toBe("default")
+    expect(nodeVisualById.get("c")).toBe("muted")
+  })
+
   test("hovered node mutes labels beyond depth one", () => {
     const { nodes, links, nodeById, context } = makeGraphFixtures()
 
