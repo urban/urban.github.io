@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Graph View Playwright Harness</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --page-bg: #f5f5f4;
+      }
+
+      html.dark {
+        color-scheme: dark;
+        --page-bg: #0c0a09;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        overflow: hidden;
+        background: var(--page-bg);
+      }
+
+      #app {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="app"
+      data-graph-snapshot-script-id="playwright-graph-snapshot"
+      data-selected-node-id="alpha"
+    ></div>
+    <script id="playwright-graph-snapshot" type="application/json">
+      {
+        "schemaVersion": "2",
+        "nodes": [
+          {
+            "id": "alpha",
+            "kind": "note",
+            "relativePath": "alpha.md",
+            "permalink": "/alpha/",
+            "label": "Alpha",
+            "routePath": "/alpha"
+          },
+          {
+            "id": "beta",
+            "kind": "note",
+            "relativePath": "beta.md",
+            "permalink": "/beta/",
+            "label": "Beta",
+            "routePath": "/beta"
+          },
+          {
+            "id": "gamma",
+            "kind": "note",
+            "relativePath": "gamma.md",
+            "permalink": "/gamma/",
+            "label": "Gamma",
+            "routePath": "/gamma"
+          },
+          {
+            "id": "delta",
+            "kind": "note",
+            "relativePath": "delta.md",
+            "permalink": "/delta/",
+            "label": "Delta",
+            "routePath": "/delta"
+          }
+        ],
+        "edges": [
+          {
+            "sourceNodeId": "alpha",
+            "targetNodeId": "beta",
+            "sourceRelativePath": "alpha.md",
+            "rawWikilink": "[[beta]]",
+            "target": "beta",
+            "resolutionStrategy": "path"
+          },
+          {
+            "sourceNodeId": "alpha",
+            "targetNodeId": "gamma",
+            "sourceRelativePath": "alpha.md",
+            "rawWikilink": "[[gamma]]",
+            "target": "gamma",
+            "resolutionStrategy": "path"
+          },
+          {
+            "sourceNodeId": "gamma",
+            "targetNodeId": "delta",
+            "sourceRelativePath": "gamma.md",
+            "rawWikilink": "[[delta]]",
+            "target": "delta",
+            "resolutionStrategy": "path"
+          }
+        ],
+        "diagnostics": [],
+        "indexes": {
+          "nodesById": {
+            "alpha": {
+              "id": "alpha",
+              "kind": "note",
+              "relativePath": "alpha.md",
+              "permalink": "/alpha/",
+              "label": "Alpha",
+              "routePath": "/alpha"
+            },
+            "beta": {
+              "id": "beta",
+              "kind": "note",
+              "relativePath": "beta.md",
+              "permalink": "/beta/",
+              "label": "Beta",
+              "routePath": "/beta"
+            },
+            "gamma": {
+              "id": "gamma",
+              "kind": "note",
+              "relativePath": "gamma.md",
+              "permalink": "/gamma/",
+              "label": "Gamma",
+              "routePath": "/gamma"
+            },
+            "delta": {
+              "id": "delta",
+              "kind": "note",
+              "relativePath": "delta.md",
+              "permalink": "/delta/",
+              "label": "Delta",
+              "routePath": "/delta"
+            }
+          },
+          "edgesBySourceNodeId": {
+            "alpha": [
+              {
+                "sourceNodeId": "alpha",
+                "targetNodeId": "beta",
+                "sourceRelativePath": "alpha.md",
+                "rawWikilink": "[[beta]]",
+                "target": "beta",
+                "resolutionStrategy": "path"
+              },
+              {
+                "sourceNodeId": "alpha",
+                "targetNodeId": "gamma",
+                "sourceRelativePath": "alpha.md",
+                "rawWikilink": "[[gamma]]",
+                "target": "gamma",
+                "resolutionStrategy": "path"
+              }
+            ],
+            "gamma": [
+              {
+                "sourceNodeId": "gamma",
+                "targetNodeId": "delta",
+                "sourceRelativePath": "gamma.md",
+                "rawWikilink": "[[delta]]",
+                "target": "delta",
+                "resolutionStrategy": "path"
+              }
+            ]
+          },
+          "edgesByTargetNodeId": {
+            "beta": [
+              {
+                "sourceNodeId": "alpha",
+                "targetNodeId": "beta",
+                "sourceRelativePath": "alpha.md",
+                "rawWikilink": "[[beta]]",
+                "target": "beta",
+                "resolutionStrategy": "path"
+              }
+            ],
+            "gamma": [
+              {
+                "sourceNodeId": "alpha",
+                "targetNodeId": "gamma",
+                "sourceRelativePath": "alpha.md",
+                "rawWikilink": "[[gamma]]",
+                "target": "gamma",
+                "resolutionStrategy": "path"
+              }
+            ],
+            "delta": [
+              {
+                "sourceNodeId": "gamma",
+                "targetNodeId": "delta",
+                "sourceRelativePath": "gamma.md",
+                "rawWikilink": "[[delta]]",
+                "target": "delta",
+                "resolutionStrategy": "path"
+              }
+            ]
+          },
+          "noteNodeIdBySlug": {},
+          "noteNodeIdByRoutePath": {
+            "/alpha": "alpha",
+            "/beta": "beta",
+            "/gamma": "gamma",
+            "/delta": "delta"
+          }
+        }
+      }
+    </script>
+    <script type="module">
+      import { bootstrapGraphVisualizer } from "/src/main.ts"
+
+      const selectionChanges = []
+      let handle = null
+
+      const setTheme = (theme) => {
+        document.documentElement.classList.toggle("dark", theme === "dark")
+      }
+
+      const waitForAnimations = async () => {
+        await new Promise((resolve) => window.setTimeout(resolve, 250))
+      }
+
+      await bootstrapGraphVisualizer({
+        disableAnimations: true,
+        onSelectionChange: (selection) => {
+          selectionChanges.push(selection)
+        },
+        onReady: (graphHandle) => {
+          handle = graphHandle
+          handle.applyStaticLayout([
+            { nodeId: "alpha", x: 320, y: 320 },
+            { nodeId: "beta", x: 180, y: 210 },
+            { nodeId: "gamma", x: 500, y: 190 },
+            { nodeId: "delta", x: 690, y: 320 },
+          ])
+        },
+      })
+
+      window.__graphViewHarness = {
+        getSelectionChanges: () => [...selectionChanges],
+        clearSelectionChanges: () => {
+          selectionChanges.length = 0
+        },
+        getNodePosition: (nodeId) => handle?.getNodePosition(nodeId) ?? null,
+        getCanvasClientRect: () => {
+          const rect = handle?.getCanvasClientRect()
+          return rect
+            ? {
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+                top: rect.top,
+                right: rect.right,
+                bottom: rect.bottom,
+                left: rect.left,
+              }
+            : null
+        },
+        hoverNode: async (nodeId) => {
+          handle?.hoverNode(nodeId)
+          await waitForAnimations()
+        },
+        selectNode: async (nodeId) => {
+          handle?.selectNode(nodeId)
+          await waitForAnimations()
+        },
+        settleLayout: async (tickCount = 400) => {
+          handle?.settleLayout(tickCount)
+          await waitForAnimations()
+        },
+        setTheme: async (theme) => {
+          setTheme(theme)
+          await waitForAnimations()
+        },
+      }
+    </script>
+  </body>
+</html>

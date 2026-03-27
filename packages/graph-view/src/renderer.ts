@@ -143,6 +143,7 @@ export function createGraphRenderer({
   edgeGraphics,
   ticker,
   getTheme,
+  animationsEnabled = true,
 }: {
   nodes: readonly GraphNode[]
   nodeLayer: PIXI.Container
@@ -150,6 +151,7 @@ export function createGraphRenderer({
   edgeGraphics: PIXI.Graphics
   ticker: PIXI.Ticker
   getTheme: () => GraphTheme
+  animationsEnabled?: boolean
 }) {
   const nodeSprites = new Map<NodeId, NodeSpriteController>()
   const nodeLabels = new Map<NodeId, PIXI.Text>()
@@ -217,7 +219,9 @@ export function createGraphRenderer({
     }
   }
 
-  ticker.add(animateVisuals)
+  if (animationsEnabled) {
+    ticker.add(animateVisuals)
+  }
 
   const render = ({
     nodes: renderNodes,
@@ -245,6 +249,9 @@ export function createGraphRenderer({
       visibleNodeIds.add(node.id)
       if (!nodeSprite.sprite.visible) nodeSprite.sprite.visible = true
       nodeSprite.setState(node.visual, node.scaleState, theme)
+      if (!animationsEnabled) {
+        nodeSprite.sprite.scale.set(nodeSprite.targetScale)
+      }
       if (node.position) nodeSprite.setPosition(node.position.x, node.position.y)
     }
 
@@ -282,6 +289,10 @@ export function createGraphRenderer({
         animation.targetOffset = label.isHovered ? GRAPH_CONFIG.label.hoverOffset : 0
         animation.baseAlpha = baseAlpha
         animation.targetVisibility = targetVisibility
+        if (!animationsEnabled) {
+          animation.currentOffset = animation.targetOffset
+          animation.currentVisibility = animation.targetVisibility
+        }
         labelSprite.position.set(animation.baseX, labelY + animation.currentOffset)
         labelSprite.alpha = animation.baseAlpha * animation.currentVisibility
       } else {
