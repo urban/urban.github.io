@@ -13,33 +13,41 @@ import {
   type NodeState,
 } from "./shared"
 
-function applyNodeVariant(sprite: PIXI.Graphics, nodeState: NodeState, theme: GraphTheme) {
+function applyNodeVariant(
+  sprite: PIXI.Graphics,
+  nodeState: NodeState,
+  scaleState: NodeState,
+  theme: GraphTheme,
+) {
   const variant = theme.node.variants[nodeState]
+  const scale = theme.node.scales[scaleState]
   sprite.clear()
   sprite.circle(0, 0, GRAPH_CONFIG.node.radius).fill(variant.fill)
   sprite
     .circle(0, 0, GRAPH_CONFIG.node.radius)
     .stroke({ width: variant.strokeWidth, color: variant.stroke, alpha: 1 })
-  sprite.scale.set(variant.scale)
+  sprite.scale.set(scale)
   sprite.alpha = variant.alpha
 }
 
 function createNodeSprite(theme: GraphTheme): NodeSpriteController {
   const sprite = new PIXI.Graphics()
-  applyNodeVariant(sprite, "default", theme)
+  applyNodeVariant(sprite, "default", "default", theme)
   sprite.eventMode = "static"
   sprite.cursor = "pointer"
 
   const controller: NodeSpriteController = {
     sprite,
     state: "default",
-    setState: (nodeState, nextTheme) => {
-      if (controller.state === nodeState) {
-        applyNodeVariant(sprite, nodeState, nextTheme)
+    scaleState: "default",
+    setState: (nodeState, scaleState, nextTheme) => {
+      if (controller.state === nodeState && controller.scaleState === scaleState) {
+        applyNodeVariant(sprite, nodeState, scaleState, nextTheme)
         return
       }
       controller.state = nodeState
-      applyNodeVariant(sprite, nodeState, nextTheme)
+      controller.scaleState = scaleState
+      applyNodeVariant(sprite, nodeState, scaleState, nextTheme)
     },
     setPosition: (x, y) => sprite.position.set(x, y),
     onPointerDown: (onDown) => {
@@ -226,7 +234,7 @@ export function createGraphRenderer({
       if (!nodeSprite) continue
       visibleNodeIds.add(node.id)
       if (!nodeSprite.sprite.visible) nodeSprite.sprite.visible = true
-      nodeSprite.setState(node.visual, theme)
+      nodeSprite.setState(node.visual, node.scaleState, theme)
       if (node.position) nodeSprite.setPosition(node.position.x, node.position.y)
     }
 
@@ -254,16 +262,20 @@ export function createGraphRenderer({
       labelSprite.style.fill = variant.fill
       const baseAlpha = labelZoomAlpha
       const targetVisibility = variant.alpha
+      const labelY =
+        label.y +
+        GRAPH_CONFIG.node.radius * theme.node.scales[label.scaleState] +
+        GRAPH_CONFIG.label.offset
       if (animation) {
         animation.baseX = label.x
-        animation.baseY = label.y
+        animation.baseY = labelY
         animation.targetOffset = label.isHovered ? GRAPH_CONFIG.label.hoverOffset : 0
         animation.baseAlpha = baseAlpha
         animation.targetVisibility = targetVisibility
         labelSprite.position.set(animation.baseX, animation.baseY + animation.currentOffset)
         labelSprite.alpha = animation.baseAlpha * animation.currentVisibility
       } else {
-        labelSprite.position.set(label.x, label.y)
+        labelSprite.position.set(label.x, labelY)
         labelSprite.alpha = baseAlpha * targetVisibility
       }
     }

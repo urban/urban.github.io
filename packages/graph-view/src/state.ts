@@ -5,7 +5,6 @@ import {
   type GraphSnapshotNode,
 } from "@urban/build-graph/schema"
 import {
-  GRAPH_CONFIG,
   GRAPH_RENDER_DEPTH,
   type GraphAction,
   type GraphData,
@@ -157,6 +156,7 @@ export function deriveRenderModel({
     renderNodes.push({
       id: node.id,
       visual: isWithinFocusDepthOne(node.id) ? baseNodeVisual : "muted",
+      scaleState: baseNodeVisual,
       position: hasPosition(node) ? { x: node.x, y: node.y } : null,
     })
   }
@@ -188,13 +188,13 @@ export function deriveRenderModel({
     if (visibleNodeIds !== null && !visibleNodeIds.has(node.id)) continue
     if (!hasPosition(node)) continue
     const nodeVisual = nodeStateById.get(node.id) ?? "default"
-    const nodeRadius = GRAPH_CONFIG.node.radius * GRAPH_CONFIG.node.scales[nodeVisual]
     labels.push({
       id: node.id,
       text: node.label,
       x: node.x,
-      y: node.y + nodeRadius + GRAPH_CONFIG.label.offset,
+      y: node.y,
       state: isWithinFocusDepthOne(node.id) ? nodeVisual : "muted",
+      scaleState: nodeVisual,
       isHovered: draggedNodeId === null && hoveredNodeId === node.id,
     })
   }

@@ -671,9 +671,33 @@ describe("deriveRenderModel", () => {
     ])
 
     expect(model.labels).toEqual([
-      { id: "a", text: "A", x: 10, y: 32, state: "default", isHovered: false },
-      { id: "b", text: "B", x: 30, y: 58, state: "selected", isHovered: false },
-      { id: "c", text: "C", x: 50, y: 72, state: "default", isHovered: false },
+      {
+        id: "a",
+        text: "A",
+        x: 10,
+        y: 20,
+        state: "default",
+        scaleState: "default",
+        isHovered: false,
+      },
+      {
+        id: "b",
+        text: "B",
+        x: 30,
+        y: 40,
+        state: "selected",
+        scaleState: "selected",
+        isHovered: false,
+      },
+      {
+        id: "c",
+        text: "C",
+        x: 50,
+        y: 60,
+        state: "default",
+        scaleState: "default",
+        isHovered: false,
+      },
     ])
   })
 
@@ -745,10 +769,11 @@ describe("deriveRenderModel", () => {
       draggedNodeId: null,
     })
 
-    const nodeVisualById = new Map(model.nodes.map((node) => [node.id, node.visual]))
-    expect(nodeVisualById.get("a")).toBe("default")
-    expect(nodeVisualById.get("b")).toBe("default")
-    expect(nodeVisualById.get("c")).toBe("muted")
+    const nodeByIdFromModel = new Map(model.nodes.map((node) => [node.id, node]))
+    expect(nodeByIdFromModel.get("a")?.visual).toBe("default")
+    expect(nodeByIdFromModel.get("b")?.visual).toBe("default")
+    expect(nodeByIdFromModel.get("c")?.visual).toBe("muted")
+    expect(nodeByIdFromModel.get("c")?.scaleState).toBe("selected")
   })
 
   test("hovered node mutes labels beyond depth one", () => {
