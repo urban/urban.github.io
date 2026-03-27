@@ -1,7 +1,15 @@
-import { expect, test } from "bun:test"
+import { expect, mock, test } from "bun:test"
 import { renderToStaticMarkup } from "react-dom/server"
 import type { GraphSnapshot } from "@urban/build-graph/schema"
-import { VaultGraphHost } from "./VaultGraphHost"
+
+mock.module("next/navigation", () => ({
+  usePathname: () => "/vault/alpha",
+  useRouter: () => ({
+    push: (_href: string) => undefined,
+  }),
+}))
+
+const { VaultGraphHost } = await import("./VaultGraphHost")
 
 const snapshot: GraphSnapshot = {
   schemaVersion: "2",
