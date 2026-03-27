@@ -162,7 +162,7 @@ export type LocalCoordinateSpace = { toLocal: (point: Point) => Point }
 
 const GRAPH_LABEL_STYLE: PIXI.TextStyleOptions = {
   fontFamily: "Arial",
-  fontSize: 14,
+  fontSize: 16,
   fontWeight: "400",
 }
 
