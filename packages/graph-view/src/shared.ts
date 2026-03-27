@@ -15,8 +15,9 @@ export type GraphTheme = {
   node: {
     variants: Record<
       NodeState,
-      { fill: number; stroke: number; strokeWidth: number; scale: number; alpha: number }
+      { fill: number; stroke: number; strokeWidth: number; alpha: number }
     >
+    scales: Record<NodeState, number>
   }
   edge: {
     variants: Record<EdgeState, { width: number; color: number; alpha: number }>
@@ -77,10 +78,16 @@ export type RenderLabelModel = {
   x: number
   y: number
   state: NodeState
+  scaleState: NodeState
   isHovered: boolean
 }
 
-export type RenderNodeModel = { id: NodeId; visual: NodeState; position: Point | null }
+export type RenderNodeModel = {
+  id: NodeId
+  visual: NodeState
+  scaleState: NodeState
+  position: Point | null
+}
 export type RenderEdgeModel = { source: Point; target: Point; visual: EdgeState }
 
 export type GraphRenderModel = {
@@ -142,7 +149,8 @@ export type AppCommand =
 export interface NodeSpriteController {
   sprite: PIXI.Graphics
   state: NodeState
-  setState: (nodeState: NodeState, theme: GraphTheme) => void
+  scaleState: NodeState
+  setState: (nodeState: NodeState, scaleState: NodeState, theme: GraphTheme) => void
   setPosition: (x: number, y: number) => void
   onPointerDown: (onDown: (event: PIXI.FederatedPointerEvent) => void) => Disposer
   onPointerOver: (onOver: () => void) => Disposer
@@ -158,12 +166,17 @@ const GRAPH_LABEL_STYLE: PIXI.TextStyleOptions = {
 }
 
 const LIGHT_GRAPH_THEME: GraphTheme = {
-  view: { backgroundColor: 0xffffff },
+  view: { backgroundColor: 0xf5f5f5 },
   node: {
     variants: {
-      default: { fill: 0x78716c, stroke: 0xf5f5f4, strokeWidth: 1, scale: 1, alpha: 1 },
-      selected: { fill: 0x0c0a09, stroke: 0xf5f5f4, strokeWidth: 2, scale: 2, alpha: 1 },
-      muted: { fill: 0xd6d3d1, stroke: 0xf5f5f4, strokeWidth: 1, scale: 1, alpha: 0.45 },
+      default: { fill: 0x78716c, stroke: 0xf5f5f4, strokeWidth: 1, alpha: 1 },
+      selected: { fill: 0x0c0a09, stroke: 0xf5f5f4, strokeWidth: 2, alpha: 1 },
+      muted: { fill: 0xd6d3d1, stroke: 0xf5f5f4, strokeWidth: 1, alpha: 0.45 },
+    },
+    scales: {
+      default: 1,
+      selected: 2,
+      muted: 1,
     },
   },
   edge: {
@@ -185,12 +198,17 @@ const LIGHT_GRAPH_THEME: GraphTheme = {
 }
 
 const DARK_GRAPH_THEME: GraphTheme = {
-  view: { backgroundColor: 0x000000 },
+  view: { backgroundColor: 0x1b1917 },
   node: {
     variants: {
-      default: { fill: 0xa8a29e, stroke: 0x0c0a09, strokeWidth: 1, scale: 1, alpha: 1 },
-      selected: { fill: 0xf5f5f4, stroke: 0x0c0a09, strokeWidth: 2, scale: 2, alpha: 1 },
-      muted: { fill: 0x44403c, stroke: 0x0c0a09, strokeWidth: 1, scale: 1, alpha: 0.45 },
+      default: { fill: 0xa8a29e, stroke: 0x0c0a09, strokeWidth: 1, alpha: 1 },
+      selected: { fill: 0xf5f5f4, stroke: 0x0c0a09, strokeWidth: 2, alpha: 1 },
+      muted: { fill: 0x44403c, stroke: 0x0c0a09, strokeWidth: 1, alpha: 0.45 },
+    },
+    scales: {
+      default: 1,
+      selected: 2,
+      muted: 1,
     },
   },
   edge: {
@@ -217,15 +235,15 @@ export function resolveGraphTheme(documentObject: Document): GraphTheme {
     : LIGHT_GRAPH_THEME
 }
 
+const MAX_NODE_SCALE = Math.max(
+  ...Object.values(LIGHT_GRAPH_THEME.node.scales),
+  ...Object.values(DARK_GRAPH_THEME.node.scales),
+)
+
 export const GRAPH_CONFIG = {
   node: {
     radius: 6,
-    scales: {
-      default: 1,
-      selected: 2,
-      muted: 1,
-    },
-    maxScale: 2,
+    maxScale: MAX_NODE_SCALE,
     maxStrokeWidth: 2,
   },
   label: {
