@@ -32,6 +32,7 @@ function makeSnapshotPayload(): GraphSnapshot {
         permalink: "/alpha/",
         slug: "alpha",
         routePath: "/vault/alpha",
+        label: "Alpha Label",
         title: "Alpha Title",
         aliases: ["alpha-alias"],
         published: true,
@@ -65,6 +66,7 @@ function makeSnapshotPayload(): GraphSnapshot {
           permalink: "/alpha/",
           slug: "alpha",
           routePath: "/vault/alpha",
+          label: "Alpha Label",
           title: "Alpha Title",
           aliases: ["alpha-alias"],
           published: true,
@@ -308,7 +310,7 @@ describe("createGraphDataFromSnapshotPayload", () => {
     const graph = createGraphDataFromSnapshotPayload(makeSnapshotPayload())
 
     expect(graph.nodes).toEqual([
-      { id: "alpha", label: "alpha" },
+      { id: "alpha", label: "Alpha Label" },
       { id: "beta", label: "beta" },
     ])
     expect(graph.links).toEqual([{ sourceNodeId: "alpha", targetNodeId: "beta" }])
@@ -330,7 +332,7 @@ describe("createGraphVisualizerSelectionChange", () => {
     ).toEqual({
       type: "note",
       nodeId: "alpha",
-      displayLabel: "alpha",
+      displayLabel: "Alpha Label",
       relativePath: "alpha.md",
       permalink: "/alpha/",
       slug: "alpha",

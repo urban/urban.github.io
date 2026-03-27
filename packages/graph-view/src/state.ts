@@ -35,7 +35,11 @@ function toNodeLabel(relativePath: string) {
 }
 
 export function toSnapshotNodeLabel(node: GraphSnapshotNode) {
-  return node.kind === "note" ? toNodeLabel(node.relativePath) : node.unresolvedTarget
+  if (node.kind !== "note") {
+    return node.unresolvedTarget
+  }
+
+  return node.label ?? node.title ?? toNodeLabel(node.relativePath)
 }
 
 function mapById<T extends { id: NodeId }>(items: readonly T[]) {

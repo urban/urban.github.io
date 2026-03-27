@@ -2,225 +2,306 @@
   "schemaVersion": "2",
   "nodes": [
     {
-      "id": "effect-runtime-boundary.md",
+      "id": "AI Harness Learning.md",
       "kind": "note",
-      "relativePath": "effect-runtime-boundary.md",
-      "permalink": "/vault/effect-runtime-boundary"
+      "relativePath": "AI Harness Learning.md",
+      "permalink": "ai-harness-learning",
+      "sourceRelativePath": "AI Harness Learning.md",
+      "slug": "ai-harness-learning",
+      "routePath": "ai-harness-learning",
+      "label": "AI Harness Learning",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["vault index"],
+      "published": true,
+      "title": "AI Harness Learning"
     },
     {
-      "id": "evaluation-corpus-design.md",
+      "id": "Effect Runtime Boundary.md",
       "kind": "note",
-      "relativePath": "evaluation-corpus-design.md",
-      "permalink": "/vault/evaluation-corpus-design"
+      "relativePath": "Effect Runtime Boundary.md",
+      "permalink": "effect-runtime-boundary",
+      "sourceRelativePath": "Effect Runtime Boundary.md",
+      "slug": "effect-runtime-boundary",
+      "routePath": "effect-runtime-boundary",
+      "label": "Effect Runtime Boundary",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["runtime boundary"],
+      "published": true,
+      "title": "Effect Runtime Boundary"
     },
     {
-      "id": "failure-taxonomy.md",
+      "id": "Evaluation Corpus Design.md",
       "kind": "note",
-      "relativePath": "failure-taxonomy.md",
-      "permalink": "/vault/failure-taxonomy"
+      "relativePath": "Evaluation Corpus Design.md",
+      "permalink": "evaluation-corpus-design",
+      "sourceRelativePath": "Evaluation Corpus Design.md",
+      "slug": "evaluation-corpus-design",
+      "routePath": "evaluation-corpus-design",
+      "label": "Evaluation Corpus Design",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["eval corpus"],
+      "published": true,
+      "title": "Evaluation Corpus Design"
     },
     {
-      "id": "harness-loop.md",
+      "id": "Failure Taxonomy.md",
       "kind": "note",
-      "relativePath": "harness-loop.md",
-      "permalink": "/vault/harness-loop"
+      "relativePath": "Failure Taxonomy.md",
+      "permalink": "failure-taxonomy",
+      "sourceRelativePath": "Failure Taxonomy.md",
+      "slug": "failure-taxonomy",
+      "routePath": "failure-taxonomy",
+      "label": "Failure Taxonomy",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["failure classes"],
+      "published": true,
+      "title": "Failure Taxonomy"
     },
     {
-      "id": "index.md",
+      "id": "Harness Loop.md",
       "kind": "note",
-      "relativePath": "index.md",
-      "permalink": "/vault"
+      "relativePath": "Harness Loop.md",
+      "permalink": "harness-loop",
+      "sourceRelativePath": "Harness Loop.md",
+      "slug": "harness-loop",
+      "routePath": "harness-loop",
+      "label": "Harness Loop",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["harness loop"],
+      "published": true,
+      "title": "Harness Loop"
     },
     {
-      "id": "latency-budgeting.md",
+      "id": "Latency Budgeting.md",
       "kind": "note",
-      "relativePath": "latency-budgeting.md",
-      "permalink": "/vault/latency-budgeting"
+      "relativePath": "Latency Budgeting.md",
+      "permalink": "latency-budgeting",
+      "sourceRelativePath": "Latency Budgeting.md",
+      "slug": "latency-budgeting",
+      "routePath": "latency-budgeting",
+      "label": "Latency Budgeting",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["latency budget"],
+      "published": true,
+      "title": "Latency Budgeting"
     },
     {
-      "id": "sandbox-policy-gates.md",
+      "id": "Sandbox Policy Gates.md",
       "kind": "note",
-      "relativePath": "sandbox-policy-gates.md",
-      "permalink": "/vault/sandbox-policy-gates"
+      "relativePath": "Sandbox Policy Gates.md",
+      "permalink": "sandbox-policy-gates",
+      "sourceRelativePath": "Sandbox Policy Gates.md",
+      "slug": "sandbox-policy-gates",
+      "routePath": "sandbox-policy-gates",
+      "label": "Sandbox Policy Gates",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["policy gates"],
+      "published": true,
+      "title": "Sandbox Policy Gates"
     },
     {
-      "id": "tool-adapter-contract.md",
+      "id": "Tool Adapter Contract.md",
       "kind": "note",
-      "relativePath": "tool-adapter-contract.md",
-      "permalink": "/vault/tool-adapter-contract"
+      "relativePath": "Tool Adapter Contract.md",
+      "permalink": "tool-adapter-contract",
+      "sourceRelativePath": "Tool Adapter Contract.md",
+      "slug": "tool-adapter-contract",
+      "routePath": "tool-adapter-contract",
+      "label": "Tool Adapter Contract",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["tool contract"],
+      "published": true,
+      "title": "Tool Adapter Contract"
     },
     {
-      "id": "trace-and-replay.md",
+      "id": "Trace And Replay.md",
       "kind": "note",
-      "relativePath": "trace-and-replay.md",
-      "permalink": "/vault/trace-and-replay"
+      "relativePath": "Trace And Replay.md",
+      "permalink": "trace-and-replay",
+      "sourceRelativePath": "Trace And Replay.md",
+      "slug": "trace-and-replay",
+      "routePath": "trace-and-replay",
+      "label": "Trace And Replay",
+      "created": "2026-02-27",
+      "updated": "2026-02-27",
+      "aliases": ["trace replay"],
+      "published": true,
+      "title": "Trace And Replay"
     }
   ],
   "edges": [
     {
-      "sourceNodeId": "effect-runtime-boundary.md",
-      "targetNodeId": "harness-loop.md",
-      "sourceRelativePath": "effect-runtime-boundary.md",
+      "sourceNodeId": "AI Harness Learning.md",
+      "targetNodeId": "Harness Loop.md",
+      "sourceRelativePath": "AI Harness Learning.md",
       "rawWikilink": "[[harness-loop]]",
       "target": "harness-loop",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "effect-runtime-boundary.md",
-      "targetNodeId": "sandbox-policy-gates.md",
-      "sourceRelativePath": "effect-runtime-boundary.md",
+      "sourceNodeId": "AI Harness Learning.md",
+      "targetNodeId": "Trace And Replay.md",
+      "sourceRelativePath": "AI Harness Learning.md",
+      "rawWikilink": "[[trace-and-replay]]",
+      "target": "trace-and-replay",
+      "resolutionStrategy": "path"
+    },
+    {
+      "sourceNodeId": "Effect Runtime Boundary.md",
+      "targetNodeId": "Harness Loop.md",
+      "sourceRelativePath": "Effect Runtime Boundary.md",
+      "rawWikilink": "[[harness-loop]]",
+      "target": "harness-loop",
+      "resolutionStrategy": "path"
+    },
+    {
+      "sourceNodeId": "Effect Runtime Boundary.md",
+      "targetNodeId": "Sandbox Policy Gates.md",
+      "sourceRelativePath": "Effect Runtime Boundary.md",
       "rawWikilink": "[[sandbox-policy-gates]]",
       "target": "sandbox-policy-gates",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "effect-runtime-boundary.md",
-      "targetNodeId": "trace-and-replay.md",
-      "sourceRelativePath": "effect-runtime-boundary.md",
+      "sourceNodeId": "Effect Runtime Boundary.md",
+      "targetNodeId": "Trace And Replay.md",
+      "sourceRelativePath": "Effect Runtime Boundary.md",
       "rawWikilink": "[[trace-and-replay]]",
       "target": "trace-and-replay",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "evaluation-corpus-design.md",
-      "targetNodeId": "failure-taxonomy.md",
-      "sourceRelativePath": "evaluation-corpus-design.md",
+      "sourceNodeId": "Evaluation Corpus Design.md",
+      "targetNodeId": "Failure Taxonomy.md",
+      "sourceRelativePath": "Evaluation Corpus Design.md",
       "rawWikilink": "[[failure-taxonomy]]",
       "target": "failure-taxonomy",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "evaluation-corpus-design.md",
-      "targetNodeId": "trace-and-replay.md",
-      "sourceRelativePath": "evaluation-corpus-design.md",
+      "sourceNodeId": "Evaluation Corpus Design.md",
+      "targetNodeId": "Trace And Replay.md",
+      "sourceRelativePath": "Evaluation Corpus Design.md",
       "rawWikilink": "[[trace-and-replay]]",
       "target": "trace-and-replay",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "failure-taxonomy.md",
-      "targetNodeId": "evaluation-corpus-design.md",
-      "sourceRelativePath": "failure-taxonomy.md",
+      "sourceNodeId": "Failure Taxonomy.md",
+      "targetNodeId": "Evaluation Corpus Design.md",
+      "sourceRelativePath": "Failure Taxonomy.md",
       "rawWikilink": "[[evaluation-corpus-design]]",
       "target": "evaluation-corpus-design",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "failure-taxonomy.md",
-      "targetNodeId": "trace-and-replay.md",
-      "sourceRelativePath": "failure-taxonomy.md",
+      "sourceNodeId": "Failure Taxonomy.md",
+      "targetNodeId": "Trace And Replay.md",
+      "sourceRelativePath": "Failure Taxonomy.md",
       "rawWikilink": "[[trace-and-replay]]",
       "target": "trace-and-replay",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "harness-loop.md",
-      "targetNodeId": "effect-runtime-boundary.md",
-      "sourceRelativePath": "harness-loop.md",
+      "sourceNodeId": "Harness Loop.md",
+      "targetNodeId": "Effect Runtime Boundary.md",
+      "sourceRelativePath": "Harness Loop.md",
       "rawWikilink": "[[effect-runtime-boundary]]",
       "target": "effect-runtime-boundary",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "harness-loop.md",
-      "targetNodeId": "evaluation-corpus-design.md",
-      "sourceRelativePath": "harness-loop.md",
+      "sourceNodeId": "Harness Loop.md",
+      "targetNodeId": "Evaluation Corpus Design.md",
+      "sourceRelativePath": "Harness Loop.md",
       "rawWikilink": "[[evaluation-corpus-design]]",
       "target": "evaluation-corpus-design",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "harness-loop.md",
-      "targetNodeId": "tool-adapter-contract.md",
-      "sourceRelativePath": "harness-loop.md",
+      "sourceNodeId": "Harness Loop.md",
+      "targetNodeId": "Tool Adapter Contract.md",
+      "sourceRelativePath": "Harness Loop.md",
       "rawWikilink": "[[tool-adapter-contract]]",
       "target": "tool-adapter-contract",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "index.md",
-      "targetNodeId": "harness-loop.md",
-      "sourceRelativePath": "index.md",
-      "rawWikilink": "[[harness-loop]]",
-      "target": "harness-loop",
-      "resolutionStrategy": "path"
-    },
-    {
-      "sourceNodeId": "index.md",
-      "targetNodeId": "trace-and-replay.md",
-      "sourceRelativePath": "index.md",
-      "rawWikilink": "[[trace-and-replay]]",
-      "target": "trace-and-replay",
-      "resolutionStrategy": "path"
-    },
-    {
-      "sourceNodeId": "latency-budgeting.md",
-      "targetNodeId": "evaluation-corpus-design.md",
-      "sourceRelativePath": "latency-budgeting.md",
+      "sourceNodeId": "Latency Budgeting.md",
+      "targetNodeId": "Evaluation Corpus Design.md",
+      "sourceRelativePath": "Latency Budgeting.md",
       "rawWikilink": "[[evaluation-corpus-design]]",
       "target": "evaluation-corpus-design",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "latency-budgeting.md",
-      "targetNodeId": "sandbox-policy-gates.md",
-      "sourceRelativePath": "latency-budgeting.md",
+      "sourceNodeId": "Latency Budgeting.md",
+      "targetNodeId": "Sandbox Policy Gates.md",
+      "sourceRelativePath": "Latency Budgeting.md",
       "rawWikilink": "[[sandbox-policy-gates]]",
       "target": "sandbox-policy-gates",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "sandbox-policy-gates.md",
-      "targetNodeId": "effect-runtime-boundary.md",
-      "sourceRelativePath": "sandbox-policy-gates.md",
+      "sourceNodeId": "Sandbox Policy Gates.md",
+      "targetNodeId": "Effect Runtime Boundary.md",
+      "sourceRelativePath": "Sandbox Policy Gates.md",
       "rawWikilink": "[[effect-runtime-boundary]]",
       "target": "effect-runtime-boundary",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "sandbox-policy-gates.md",
-      "targetNodeId": "failure-taxonomy.md",
-      "sourceRelativePath": "sandbox-policy-gates.md",
+      "sourceNodeId": "Sandbox Policy Gates.md",
+      "targetNodeId": "Failure Taxonomy.md",
+      "sourceRelativePath": "Sandbox Policy Gates.md",
       "rawWikilink": "[[failure-taxonomy]]",
       "target": "failure-taxonomy",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "tool-adapter-contract.md",
-      "targetNodeId": "failure-taxonomy.md",
-      "sourceRelativePath": "tool-adapter-contract.md",
+      "sourceNodeId": "Tool Adapter Contract.md",
+      "targetNodeId": "Failure Taxonomy.md",
+      "sourceRelativePath": "Tool Adapter Contract.md",
       "rawWikilink": "[[failure-taxonomy]]",
       "target": "failure-taxonomy",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "tool-adapter-contract.md",
-      "targetNodeId": "harness-loop.md",
-      "sourceRelativePath": "tool-adapter-contract.md",
+      "sourceNodeId": "Tool Adapter Contract.md",
+      "targetNodeId": "Harness Loop.md",
+      "sourceRelativePath": "Tool Adapter Contract.md",
       "rawWikilink": "[[harness-loop]]",
       "target": "harness-loop",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "tool-adapter-contract.md",
-      "targetNodeId": "trace-and-replay.md",
-      "sourceRelativePath": "tool-adapter-contract.md",
+      "sourceNodeId": "Tool Adapter Contract.md",
+      "targetNodeId": "Trace And Replay.md",
+      "sourceRelativePath": "Tool Adapter Contract.md",
       "rawWikilink": "[[trace-and-replay]]",
       "target": "trace-and-replay",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "trace-and-replay.md",
-      "targetNodeId": "evaluation-corpus-design.md",
-      "sourceRelativePath": "trace-and-replay.md",
+      "sourceNodeId": "Trace And Replay.md",
+      "targetNodeId": "Evaluation Corpus Design.md",
+      "sourceRelativePath": "Trace And Replay.md",
       "rawWikilink": "[[evaluation-corpus-design]]",
       "target": "evaluation-corpus-design",
       "resolutionStrategy": "path"
     },
     {
-      "sourceNodeId": "trace-and-replay.md",
-      "targetNodeId": "tool-adapter-contract.md",
-      "sourceRelativePath": "trace-and-replay.md",
+      "sourceNodeId": "Trace And Replay.md",
+      "targetNodeId": "Tool Adapter Contract.md",
+      "sourceRelativePath": "Trace And Replay.md",
       "rawWikilink": "[[tool-adapter-contract]]",
       "target": "tool-adapter-contract",
       "resolutionStrategy": "path"
@@ -229,243 +310,324 @@
   "diagnostics": [],
   "indexes": {
     "nodesById": {
-      "effect-runtime-boundary.md": {
-        "id": "effect-runtime-boundary.md",
+      "AI Harness Learning.md": {
+        "id": "AI Harness Learning.md",
         "kind": "note",
-        "relativePath": "effect-runtime-boundary.md",
-        "permalink": "/vault/effect-runtime-boundary"
+        "relativePath": "AI Harness Learning.md",
+        "permalink": "ai-harness-learning",
+        "sourceRelativePath": "AI Harness Learning.md",
+        "slug": "ai-harness-learning",
+        "routePath": "ai-harness-learning",
+        "label": "AI Harness Learning",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["vault index"],
+        "published": true,
+        "title": "AI Harness Learning"
       },
-      "evaluation-corpus-design.md": {
-        "id": "evaluation-corpus-design.md",
+      "Effect Runtime Boundary.md": {
+        "id": "Effect Runtime Boundary.md",
         "kind": "note",
-        "relativePath": "evaluation-corpus-design.md",
-        "permalink": "/vault/evaluation-corpus-design"
+        "relativePath": "Effect Runtime Boundary.md",
+        "permalink": "effect-runtime-boundary",
+        "sourceRelativePath": "Effect Runtime Boundary.md",
+        "slug": "effect-runtime-boundary",
+        "routePath": "effect-runtime-boundary",
+        "label": "Effect Runtime Boundary",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["runtime boundary"],
+        "published": true,
+        "title": "Effect Runtime Boundary"
       },
-      "failure-taxonomy.md": {
-        "id": "failure-taxonomy.md",
+      "Evaluation Corpus Design.md": {
+        "id": "Evaluation Corpus Design.md",
         "kind": "note",
-        "relativePath": "failure-taxonomy.md",
-        "permalink": "/vault/failure-taxonomy"
+        "relativePath": "Evaluation Corpus Design.md",
+        "permalink": "evaluation-corpus-design",
+        "sourceRelativePath": "Evaluation Corpus Design.md",
+        "slug": "evaluation-corpus-design",
+        "routePath": "evaluation-corpus-design",
+        "label": "Evaluation Corpus Design",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["eval corpus"],
+        "published": true,
+        "title": "Evaluation Corpus Design"
       },
-      "harness-loop.md": {
-        "id": "harness-loop.md",
+      "Failure Taxonomy.md": {
+        "id": "Failure Taxonomy.md",
         "kind": "note",
-        "relativePath": "harness-loop.md",
-        "permalink": "/vault/harness-loop"
+        "relativePath": "Failure Taxonomy.md",
+        "permalink": "failure-taxonomy",
+        "sourceRelativePath": "Failure Taxonomy.md",
+        "slug": "failure-taxonomy",
+        "routePath": "failure-taxonomy",
+        "label": "Failure Taxonomy",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["failure classes"],
+        "published": true,
+        "title": "Failure Taxonomy"
       },
-      "index.md": {
-        "id": "index.md",
+      "Harness Loop.md": {
+        "id": "Harness Loop.md",
         "kind": "note",
-        "relativePath": "index.md",
-        "permalink": "/vault"
+        "relativePath": "Harness Loop.md",
+        "permalink": "harness-loop",
+        "sourceRelativePath": "Harness Loop.md",
+        "slug": "harness-loop",
+        "routePath": "harness-loop",
+        "label": "Harness Loop",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["harness loop"],
+        "published": true,
+        "title": "Harness Loop"
       },
-      "latency-budgeting.md": {
-        "id": "latency-budgeting.md",
+      "Latency Budgeting.md": {
+        "id": "Latency Budgeting.md",
         "kind": "note",
-        "relativePath": "latency-budgeting.md",
-        "permalink": "/vault/latency-budgeting"
+        "relativePath": "Latency Budgeting.md",
+        "permalink": "latency-budgeting",
+        "sourceRelativePath": "Latency Budgeting.md",
+        "slug": "latency-budgeting",
+        "routePath": "latency-budgeting",
+        "label": "Latency Budgeting",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["latency budget"],
+        "published": true,
+        "title": "Latency Budgeting"
       },
-      "sandbox-policy-gates.md": {
-        "id": "sandbox-policy-gates.md",
+      "Sandbox Policy Gates.md": {
+        "id": "Sandbox Policy Gates.md",
         "kind": "note",
-        "relativePath": "sandbox-policy-gates.md",
-        "permalink": "/vault/sandbox-policy-gates"
+        "relativePath": "Sandbox Policy Gates.md",
+        "permalink": "sandbox-policy-gates",
+        "sourceRelativePath": "Sandbox Policy Gates.md",
+        "slug": "sandbox-policy-gates",
+        "routePath": "sandbox-policy-gates",
+        "label": "Sandbox Policy Gates",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["policy gates"],
+        "published": true,
+        "title": "Sandbox Policy Gates"
       },
-      "tool-adapter-contract.md": {
-        "id": "tool-adapter-contract.md",
+      "Tool Adapter Contract.md": {
+        "id": "Tool Adapter Contract.md",
         "kind": "note",
-        "relativePath": "tool-adapter-contract.md",
-        "permalink": "/vault/tool-adapter-contract"
+        "relativePath": "Tool Adapter Contract.md",
+        "permalink": "tool-adapter-contract",
+        "sourceRelativePath": "Tool Adapter Contract.md",
+        "slug": "tool-adapter-contract",
+        "routePath": "tool-adapter-contract",
+        "label": "Tool Adapter Contract",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["tool contract"],
+        "published": true,
+        "title": "Tool Adapter Contract"
       },
-      "trace-and-replay.md": {
-        "id": "trace-and-replay.md",
+      "Trace And Replay.md": {
+        "id": "Trace And Replay.md",
         "kind": "note",
-        "relativePath": "trace-and-replay.md",
-        "permalink": "/vault/trace-and-replay"
+        "relativePath": "Trace And Replay.md",
+        "permalink": "trace-and-replay",
+        "sourceRelativePath": "Trace And Replay.md",
+        "slug": "trace-and-replay",
+        "routePath": "trace-and-replay",
+        "label": "Trace And Replay",
+        "created": "2026-02-27",
+        "updated": "2026-02-27",
+        "aliases": ["trace replay"],
+        "published": true,
+        "title": "Trace And Replay"
       }
     },
     "edgesBySourceNodeId": {
-      "effect-runtime-boundary.md": [
+      "AI Harness Learning.md": [
         {
-          "sourceNodeId": "effect-runtime-boundary.md",
-          "targetNodeId": "harness-loop.md",
-          "sourceRelativePath": "effect-runtime-boundary.md",
+          "sourceNodeId": "AI Harness Learning.md",
+          "targetNodeId": "Harness Loop.md",
+          "sourceRelativePath": "AI Harness Learning.md",
           "rawWikilink": "[[harness-loop]]",
           "target": "harness-loop",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "effect-runtime-boundary.md",
-          "targetNodeId": "sandbox-policy-gates.md",
-          "sourceRelativePath": "effect-runtime-boundary.md",
+          "sourceNodeId": "AI Harness Learning.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "AI Harness Learning.md",
+          "rawWikilink": "[[trace-and-replay]]",
+          "target": "trace-and-replay",
+          "resolutionStrategy": "path"
+        }
+      ],
+      "Effect Runtime Boundary.md": [
+        {
+          "sourceNodeId": "Effect Runtime Boundary.md",
+          "targetNodeId": "Harness Loop.md",
+          "sourceRelativePath": "Effect Runtime Boundary.md",
+          "rawWikilink": "[[harness-loop]]",
+          "target": "harness-loop",
+          "resolutionStrategy": "path"
+        },
+        {
+          "sourceNodeId": "Effect Runtime Boundary.md",
+          "targetNodeId": "Sandbox Policy Gates.md",
+          "sourceRelativePath": "Effect Runtime Boundary.md",
           "rawWikilink": "[[sandbox-policy-gates]]",
           "target": "sandbox-policy-gates",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "effect-runtime-boundary.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "effect-runtime-boundary.md",
+          "sourceNodeId": "Effect Runtime Boundary.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Effect Runtime Boundary.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         }
       ],
-      "evaluation-corpus-design.md": [
+      "Evaluation Corpus Design.md": [
         {
-          "sourceNodeId": "evaluation-corpus-design.md",
-          "targetNodeId": "failure-taxonomy.md",
-          "sourceRelativePath": "evaluation-corpus-design.md",
+          "sourceNodeId": "Evaluation Corpus Design.md",
+          "targetNodeId": "Failure Taxonomy.md",
+          "sourceRelativePath": "Evaluation Corpus Design.md",
           "rawWikilink": "[[failure-taxonomy]]",
           "target": "failure-taxonomy",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "evaluation-corpus-design.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "evaluation-corpus-design.md",
+          "sourceNodeId": "Evaluation Corpus Design.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Evaluation Corpus Design.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         }
       ],
-      "failure-taxonomy.md": [
+      "Failure Taxonomy.md": [
         {
-          "sourceNodeId": "failure-taxonomy.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "failure-taxonomy.md",
+          "sourceNodeId": "Failure Taxonomy.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Failure Taxonomy.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "failure-taxonomy.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "failure-taxonomy.md",
+          "sourceNodeId": "Failure Taxonomy.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Failure Taxonomy.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         }
       ],
-      "harness-loop.md": [
+      "Harness Loop.md": [
         {
-          "sourceNodeId": "harness-loop.md",
-          "targetNodeId": "effect-runtime-boundary.md",
-          "sourceRelativePath": "harness-loop.md",
+          "sourceNodeId": "Harness Loop.md",
+          "targetNodeId": "Effect Runtime Boundary.md",
+          "sourceRelativePath": "Harness Loop.md",
           "rawWikilink": "[[effect-runtime-boundary]]",
           "target": "effect-runtime-boundary",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "harness-loop.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "harness-loop.md",
+          "sourceNodeId": "Harness Loop.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Harness Loop.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "harness-loop.md",
-          "targetNodeId": "tool-adapter-contract.md",
-          "sourceRelativePath": "harness-loop.md",
+          "sourceNodeId": "Harness Loop.md",
+          "targetNodeId": "Tool Adapter Contract.md",
+          "sourceRelativePath": "Harness Loop.md",
           "rawWikilink": "[[tool-adapter-contract]]",
           "target": "tool-adapter-contract",
           "resolutionStrategy": "path"
         }
       ],
-      "index.md": [
+      "Latency Budgeting.md": [
         {
-          "sourceNodeId": "index.md",
-          "targetNodeId": "harness-loop.md",
-          "sourceRelativePath": "index.md",
-          "rawWikilink": "[[harness-loop]]",
-          "target": "harness-loop",
-          "resolutionStrategy": "path"
-        },
-        {
-          "sourceNodeId": "index.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "index.md",
-          "rawWikilink": "[[trace-and-replay]]",
-          "target": "trace-and-replay",
-          "resolutionStrategy": "path"
-        }
-      ],
-      "latency-budgeting.md": [
-        {
-          "sourceNodeId": "latency-budgeting.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "latency-budgeting.md",
+          "sourceNodeId": "Latency Budgeting.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Latency Budgeting.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "latency-budgeting.md",
-          "targetNodeId": "sandbox-policy-gates.md",
-          "sourceRelativePath": "latency-budgeting.md",
+          "sourceNodeId": "Latency Budgeting.md",
+          "targetNodeId": "Sandbox Policy Gates.md",
+          "sourceRelativePath": "Latency Budgeting.md",
           "rawWikilink": "[[sandbox-policy-gates]]",
           "target": "sandbox-policy-gates",
           "resolutionStrategy": "path"
         }
       ],
-      "sandbox-policy-gates.md": [
+      "Sandbox Policy Gates.md": [
         {
-          "sourceNodeId": "sandbox-policy-gates.md",
-          "targetNodeId": "effect-runtime-boundary.md",
-          "sourceRelativePath": "sandbox-policy-gates.md",
+          "sourceNodeId": "Sandbox Policy Gates.md",
+          "targetNodeId": "Effect Runtime Boundary.md",
+          "sourceRelativePath": "Sandbox Policy Gates.md",
           "rawWikilink": "[[effect-runtime-boundary]]",
           "target": "effect-runtime-boundary",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "sandbox-policy-gates.md",
-          "targetNodeId": "failure-taxonomy.md",
-          "sourceRelativePath": "sandbox-policy-gates.md",
+          "sourceNodeId": "Sandbox Policy Gates.md",
+          "targetNodeId": "Failure Taxonomy.md",
+          "sourceRelativePath": "Sandbox Policy Gates.md",
           "rawWikilink": "[[failure-taxonomy]]",
           "target": "failure-taxonomy",
           "resolutionStrategy": "path"
         }
       ],
-      "tool-adapter-contract.md": [
+      "Tool Adapter Contract.md": [
         {
-          "sourceNodeId": "tool-adapter-contract.md",
-          "targetNodeId": "failure-taxonomy.md",
-          "sourceRelativePath": "tool-adapter-contract.md",
+          "sourceNodeId": "Tool Adapter Contract.md",
+          "targetNodeId": "Failure Taxonomy.md",
+          "sourceRelativePath": "Tool Adapter Contract.md",
           "rawWikilink": "[[failure-taxonomy]]",
           "target": "failure-taxonomy",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "tool-adapter-contract.md",
-          "targetNodeId": "harness-loop.md",
-          "sourceRelativePath": "tool-adapter-contract.md",
+          "sourceNodeId": "Tool Adapter Contract.md",
+          "targetNodeId": "Harness Loop.md",
+          "sourceRelativePath": "Tool Adapter Contract.md",
           "rawWikilink": "[[harness-loop]]",
           "target": "harness-loop",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "tool-adapter-contract.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "tool-adapter-contract.md",
+          "sourceNodeId": "Tool Adapter Contract.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Tool Adapter Contract.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         }
       ],
-      "trace-and-replay.md": [
+      "Trace And Replay.md": [
         {
-          "sourceNodeId": "trace-and-replay.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "trace-and-replay.md",
+          "sourceNodeId": "Trace And Replay.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Trace And Replay.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "trace-and-replay.md",
-          "targetNodeId": "tool-adapter-contract.md",
-          "sourceRelativePath": "trace-and-replay.md",
+          "sourceNodeId": "Trace And Replay.md",
+          "targetNodeId": "Tool Adapter Contract.md",
+          "sourceRelativePath": "Trace And Replay.md",
           "rawWikilink": "[[tool-adapter-contract]]",
           "target": "tool-adapter-contract",
           "resolutionStrategy": "path"
@@ -473,188 +635,210 @@
       ]
     },
     "edgesByTargetNodeId": {
-      "effect-runtime-boundary.md": [
+      "Effect Runtime Boundary.md": [
         {
-          "sourceNodeId": "harness-loop.md",
-          "targetNodeId": "effect-runtime-boundary.md",
-          "sourceRelativePath": "harness-loop.md",
+          "sourceNodeId": "Harness Loop.md",
+          "targetNodeId": "Effect Runtime Boundary.md",
+          "sourceRelativePath": "Harness Loop.md",
           "rawWikilink": "[[effect-runtime-boundary]]",
           "target": "effect-runtime-boundary",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "sandbox-policy-gates.md",
-          "targetNodeId": "effect-runtime-boundary.md",
-          "sourceRelativePath": "sandbox-policy-gates.md",
+          "sourceNodeId": "Sandbox Policy Gates.md",
+          "targetNodeId": "Effect Runtime Boundary.md",
+          "sourceRelativePath": "Sandbox Policy Gates.md",
           "rawWikilink": "[[effect-runtime-boundary]]",
           "target": "effect-runtime-boundary",
           "resolutionStrategy": "path"
         }
       ],
-      "evaluation-corpus-design.md": [
+      "Evaluation Corpus Design.md": [
         {
-          "sourceNodeId": "failure-taxonomy.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "failure-taxonomy.md",
+          "sourceNodeId": "Failure Taxonomy.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Failure Taxonomy.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "harness-loop.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "harness-loop.md",
+          "sourceNodeId": "Harness Loop.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Harness Loop.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "latency-budgeting.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "latency-budgeting.md",
+          "sourceNodeId": "Latency Budgeting.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Latency Budgeting.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "trace-and-replay.md",
-          "targetNodeId": "evaluation-corpus-design.md",
-          "sourceRelativePath": "trace-and-replay.md",
+          "sourceNodeId": "Trace And Replay.md",
+          "targetNodeId": "Evaluation Corpus Design.md",
+          "sourceRelativePath": "Trace And Replay.md",
           "rawWikilink": "[[evaluation-corpus-design]]",
           "target": "evaluation-corpus-design",
           "resolutionStrategy": "path"
         }
       ],
-      "failure-taxonomy.md": [
+      "Failure Taxonomy.md": [
         {
-          "sourceNodeId": "evaluation-corpus-design.md",
-          "targetNodeId": "failure-taxonomy.md",
-          "sourceRelativePath": "evaluation-corpus-design.md",
+          "sourceNodeId": "Evaluation Corpus Design.md",
+          "targetNodeId": "Failure Taxonomy.md",
+          "sourceRelativePath": "Evaluation Corpus Design.md",
           "rawWikilink": "[[failure-taxonomy]]",
           "target": "failure-taxonomy",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "sandbox-policy-gates.md",
-          "targetNodeId": "failure-taxonomy.md",
-          "sourceRelativePath": "sandbox-policy-gates.md",
+          "sourceNodeId": "Sandbox Policy Gates.md",
+          "targetNodeId": "Failure Taxonomy.md",
+          "sourceRelativePath": "Sandbox Policy Gates.md",
           "rawWikilink": "[[failure-taxonomy]]",
           "target": "failure-taxonomy",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "tool-adapter-contract.md",
-          "targetNodeId": "failure-taxonomy.md",
-          "sourceRelativePath": "tool-adapter-contract.md",
+          "sourceNodeId": "Tool Adapter Contract.md",
+          "targetNodeId": "Failure Taxonomy.md",
+          "sourceRelativePath": "Tool Adapter Contract.md",
           "rawWikilink": "[[failure-taxonomy]]",
           "target": "failure-taxonomy",
           "resolutionStrategy": "path"
         }
       ],
-      "harness-loop.md": [
+      "Harness Loop.md": [
         {
-          "sourceNodeId": "effect-runtime-boundary.md",
-          "targetNodeId": "harness-loop.md",
-          "sourceRelativePath": "effect-runtime-boundary.md",
+          "sourceNodeId": "AI Harness Learning.md",
+          "targetNodeId": "Harness Loop.md",
+          "sourceRelativePath": "AI Harness Learning.md",
           "rawWikilink": "[[harness-loop]]",
           "target": "harness-loop",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "index.md",
-          "targetNodeId": "harness-loop.md",
-          "sourceRelativePath": "index.md",
+          "sourceNodeId": "Effect Runtime Boundary.md",
+          "targetNodeId": "Harness Loop.md",
+          "sourceRelativePath": "Effect Runtime Boundary.md",
           "rawWikilink": "[[harness-loop]]",
           "target": "harness-loop",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "tool-adapter-contract.md",
-          "targetNodeId": "harness-loop.md",
-          "sourceRelativePath": "tool-adapter-contract.md",
+          "sourceNodeId": "Tool Adapter Contract.md",
+          "targetNodeId": "Harness Loop.md",
+          "sourceRelativePath": "Tool Adapter Contract.md",
           "rawWikilink": "[[harness-loop]]",
           "target": "harness-loop",
           "resolutionStrategy": "path"
         }
       ],
-      "sandbox-policy-gates.md": [
+      "Sandbox Policy Gates.md": [
         {
-          "sourceNodeId": "effect-runtime-boundary.md",
-          "targetNodeId": "sandbox-policy-gates.md",
-          "sourceRelativePath": "effect-runtime-boundary.md",
+          "sourceNodeId": "Effect Runtime Boundary.md",
+          "targetNodeId": "Sandbox Policy Gates.md",
+          "sourceRelativePath": "Effect Runtime Boundary.md",
           "rawWikilink": "[[sandbox-policy-gates]]",
           "target": "sandbox-policy-gates",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "latency-budgeting.md",
-          "targetNodeId": "sandbox-policy-gates.md",
-          "sourceRelativePath": "latency-budgeting.md",
+          "sourceNodeId": "Latency Budgeting.md",
+          "targetNodeId": "Sandbox Policy Gates.md",
+          "sourceRelativePath": "Latency Budgeting.md",
           "rawWikilink": "[[sandbox-policy-gates]]",
           "target": "sandbox-policy-gates",
           "resolutionStrategy": "path"
         }
       ],
-      "tool-adapter-contract.md": [
+      "Tool Adapter Contract.md": [
         {
-          "sourceNodeId": "harness-loop.md",
-          "targetNodeId": "tool-adapter-contract.md",
-          "sourceRelativePath": "harness-loop.md",
+          "sourceNodeId": "Harness Loop.md",
+          "targetNodeId": "Tool Adapter Contract.md",
+          "sourceRelativePath": "Harness Loop.md",
           "rawWikilink": "[[tool-adapter-contract]]",
           "target": "tool-adapter-contract",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "trace-and-replay.md",
-          "targetNodeId": "tool-adapter-contract.md",
-          "sourceRelativePath": "trace-and-replay.md",
+          "sourceNodeId": "Trace And Replay.md",
+          "targetNodeId": "Tool Adapter Contract.md",
+          "sourceRelativePath": "Trace And Replay.md",
           "rawWikilink": "[[tool-adapter-contract]]",
           "target": "tool-adapter-contract",
           "resolutionStrategy": "path"
         }
       ],
-      "trace-and-replay.md": [
+      "Trace And Replay.md": [
         {
-          "sourceNodeId": "effect-runtime-boundary.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "effect-runtime-boundary.md",
+          "sourceNodeId": "AI Harness Learning.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "AI Harness Learning.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "evaluation-corpus-design.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "evaluation-corpus-design.md",
+          "sourceNodeId": "Effect Runtime Boundary.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Effect Runtime Boundary.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "failure-taxonomy.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "failure-taxonomy.md",
+          "sourceNodeId": "Evaluation Corpus Design.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Evaluation Corpus Design.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "index.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "index.md",
+          "sourceNodeId": "Failure Taxonomy.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Failure Taxonomy.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         },
         {
-          "sourceNodeId": "tool-adapter-contract.md",
-          "targetNodeId": "trace-and-replay.md",
-          "sourceRelativePath": "tool-adapter-contract.md",
+          "sourceNodeId": "Tool Adapter Contract.md",
+          "targetNodeId": "Trace And Replay.md",
+          "sourceRelativePath": "Tool Adapter Contract.md",
           "rawWikilink": "[[trace-and-replay]]",
           "target": "trace-and-replay",
           "resolutionStrategy": "path"
         }
       ]
+    },
+    "noteNodeIdBySlug": {
+      "ai-harness-learning": "AI Harness Learning.md",
+      "effect-runtime-boundary": "Effect Runtime Boundary.md",
+      "evaluation-corpus-design": "Evaluation Corpus Design.md",
+      "failure-taxonomy": "Failure Taxonomy.md",
+      "harness-loop": "Harness Loop.md",
+      "latency-budgeting": "Latency Budgeting.md",
+      "sandbox-policy-gates": "Sandbox Policy Gates.md",
+      "tool-adapter-contract": "Tool Adapter Contract.md",
+      "trace-and-replay": "Trace And Replay.md"
+    },
+    "noteNodeIdByRoutePath": {
+      "ai-harness-learning": "AI Harness Learning.md",
+      "effect-runtime-boundary": "Effect Runtime Boundary.md",
+      "evaluation-corpus-design": "Evaluation Corpus Design.md",
+      "failure-taxonomy": "Failure Taxonomy.md",
+      "harness-loop": "Harness Loop.md",
+      "latency-budgeting": "Latency Budgeting.md",
+      "sandbox-policy-gates": "Sandbox Policy Gates.md",
+      "tool-adapter-contract": "Tool Adapter Contract.md",
+      "trace-and-replay": "Trace And Replay.md"
     }
   }
 }
