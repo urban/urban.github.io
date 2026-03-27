@@ -21,6 +21,14 @@ function toSimulationLink(link: GraphLink): SimulationGraphLink {
   }
 }
 
+function createSeededRandom(seed: number) {
+  let state = seed >>> 0
+  return () => {
+    state = (Math.imul(1664525, state) + 1013904223) >>> 0
+    return state / 0x1_0000_0000
+  }
+}
+
 export const toViewportCenter = ({ width, height }: Size): Point => ({
   x: width / 2,
   y: height / 2,
@@ -81,6 +89,7 @@ export function createSimulation({
 
   const simulation = d3
     .forceSimulation(nodes)
+    .randomSource(createSeededRandom(0xdecafbad))
     .force(
       "link",
       d3

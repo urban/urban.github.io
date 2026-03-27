@@ -27,8 +27,25 @@ export type HtmlGraphSnapshotSource =
   | { type: "snapshot-url"; snapshotUrl: URL }
   | { type: "snapshot-inline"; snapshotPayload: unknown }
 
+export type GraphVisualizerStaticLayoutEntry = {
+  nodeId: NodeId
+  x: number
+  y: number
+}
+
+export type GraphVisualizerHandle = {
+  getNodePosition: (nodeId: NodeId) => { x: number; y: number } | null
+  getCanvasClientRect: () => DOMRect
+  applyStaticLayout: (layout: ReadonlyArray<GraphVisualizerStaticLayoutEntry>) => void
+  hoverNode: (nodeId: NodeId | null) => void
+  selectNode: (nodeId: NodeId) => void
+  settleLayout: (tickCount?: number) => void
+}
+
 export type GraphVisualizerBootstrapOptions = {
   onSelectionChange?: (selection: GraphVisualizerSelectionChange) => void
+  onReady?: (handle: GraphVisualizerHandle) => void
+  disableAnimations?: boolean
   selectedNodeId?: NodeId | null
   documentObject?: Document
 }
@@ -308,6 +325,8 @@ function executeAppCommands({
 
 export async function bootstrapGraphVisualizer({
   onSelectionChange,
+  onReady,
+  disableAnimations = false,
   selectedNodeId,
   documentObject = document,
 }: GraphVisualizerBootstrapOptions = {}) {
@@ -350,6 +369,7 @@ export async function bootstrapGraphVisualizer({
     edgeGraphics,
     ticker: app.ticker,
     getTheme,
+    animationsEnabled: !disableAnimations,
   })
 
   const lifecycle = createLifecycle()
@@ -444,6 +464,49 @@ export async function bootstrapGraphVisualizer({
   )
 
   renderer.render(appState.graph.renderModel)
+
+  onReady?.({
+    getNodePosition: (nodeId) => {
+      const node = graph.nodeById.get(nodeId)
+      return typeof node?.x === "number" && typeof node.y === "number"
+        ? { x: node.x, y: node.y }
+        : null
+    },
+    getCanvasClientRect: () => app.canvas.getBoundingClientRect(),
+    applyStaticLayout: (layout) => {
+      simulation.stop()
+      for (const entry of layout) {
+        const node = graph.nodeById.get(entry.nodeId)
+        if (!node) continue
+        node.x = entry.x
+        node.y = entry.y
+        node.vx = 0
+        node.vy = 0
+        node.fx = entry.x
+        node.fy = entry.y
+      }
+      dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
+    },
+    hoverNode: (nodeId) => {
+      if (nodeId === null) {
+        const hoveredNodeId = appState.graph.hoveredNodeId
+        if (hoveredNodeId !== null) {
+          dispatch({ type: "graph/action", action: { type: "hover/clear", nodeId: hoveredNodeId } })
+        }
+        return
+      }
+
+      dispatch({ type: "graph/action", action: { type: "hover/set", nodeId } })
+    },
+    selectNode: (nodeId) => {
+      dispatch({ type: "graph/action", action: { type: "selection/set", nodeId } })
+    },
+    settleLayout: (tickCount = 300) => {
+      simulation.stop()
+      simulation.tick(tickCount)
+      dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
+    },
+  })
 
   return lifecycle.dispose
 }
