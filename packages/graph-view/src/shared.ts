@@ -150,6 +150,7 @@ export interface NodeSpriteController {
   sprite: PIXI.Graphics
   state: NodeState
   scaleState: NodeState
+  targetScale: number
   setState: (nodeState: NodeState, scaleState: NodeState, theme: GraphTheme) => void
   setPosition: (x: number, y: number) => void
   onPointerDown: (onDown: (event: PIXI.FederatedPointerEvent) => void) => Disposer
@@ -243,6 +244,7 @@ const MAX_NODE_SCALE = Math.max(
 export const GRAPH_CONFIG = {
   node: {
     radius: 6,
+    scaleAnimationSpeed: 10,
     maxScale: MAX_NODE_SCALE,
     maxStrokeWidth: 2,
   },

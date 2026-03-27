@@ -13,26 +13,20 @@ import {
   type NodeState,
 } from "./shared"
 
-function applyNodeVariant(
-  sprite: PIXI.Graphics,
-  nodeState: NodeState,
-  scaleState: NodeState,
-  theme: GraphTheme,
-) {
+function applyNodeVariant(sprite: PIXI.Graphics, nodeState: NodeState, theme: GraphTheme) {
   const variant = theme.node.variants[nodeState]
-  const scale = theme.node.scales[scaleState]
   sprite.clear()
   sprite.circle(0, 0, GRAPH_CONFIG.node.radius).fill(variant.fill)
   sprite
     .circle(0, 0, GRAPH_CONFIG.node.radius)
     .stroke({ width: variant.strokeWidth, color: variant.stroke, alpha: 1 })
-  sprite.scale.set(scale)
   sprite.alpha = variant.alpha
 }
 
 function createNodeSprite(theme: GraphTheme): NodeSpriteController {
   const sprite = new PIXI.Graphics()
-  applyNodeVariant(sprite, "default", "default", theme)
+  applyNodeVariant(sprite, "default", theme)
+  sprite.scale.set(theme.node.scales.default)
   sprite.eventMode = "static"
   sprite.cursor = "pointer"
 
@@ -40,14 +34,12 @@ function createNodeSprite(theme: GraphTheme): NodeSpriteController {
     sprite,
     state: "default",
     scaleState: "default",
+    targetScale: theme.node.scales.default,
     setState: (nodeState, scaleState, nextTheme) => {
-      if (controller.state === nodeState && controller.scaleState === scaleState) {
-        applyNodeVariant(sprite, nodeState, scaleState, nextTheme)
-        return
-      }
       controller.state = nodeState
       controller.scaleState = scaleState
-      applyNodeVariant(sprite, nodeState, scaleState, nextTheme)
+      controller.targetScale = nextTheme.node.scales[scaleState]
+      applyNodeVariant(sprite, nodeState, nextTheme)
     },
     setPosition: (x, y) => sprite.position.set(x, y),
     onPointerDown: (onDown) => {
@@ -136,7 +128,7 @@ export function createWorld(app: PIXI.Application) {
 
 type LabelAnimationState = {
   baseX: number
-  baseY: number
+  nodeY: number
   currentOffset: number
   targetOffset: number
   baseAlpha: number
@@ -175,7 +167,7 @@ export function createGraphRenderer({
     nodeLabels.set(node.id, nodeLabel)
     labelAnimationByNodeId.set(node.id, {
       baseX: 0,
-      baseY: 0,
+      nodeY: 0,
       currentOffset: 0,
       targetOffset: 0,
       baseAlpha: 0,
@@ -184,9 +176,23 @@ export function createGraphRenderer({
     })
   }
 
-  const animateLabels = () => {
+  const animateVisuals = () => {
     const deltaSeconds = ticker.deltaMS / 1000
-    const interpolation = 1 - Math.exp(-GRAPH_CONFIG.label.hoverAnimationSpeed * deltaSeconds)
+    const scaleInterpolation = 1 - Math.exp(-GRAPH_CONFIG.node.scaleAnimationSpeed * deltaSeconds)
+    const labelInterpolation = 1 - Math.exp(-GRAPH_CONFIG.label.hoverAnimationSpeed * deltaSeconds)
+
+    for (const nodeSprite of nodeSprites.values()) {
+      if (!nodeSprite.sprite.visible) continue
+      const currentScale = nodeSprite.sprite.scale.x
+      const scaleDelta = nodeSprite.targetScale - currentScale
+      if (Math.abs(scaleDelta) <= 0.001) {
+        nodeSprite.sprite.scale.set(nodeSprite.targetScale)
+      } else {
+        const nextScale = currentScale + scaleDelta * scaleInterpolation
+        nodeSprite.sprite.scale.set(nextScale)
+      }
+    }
+
     for (const [nodeId, animation] of labelAnimationByNodeId) {
       const labelSprite = nodeLabels.get(nodeId)
       if (!labelSprite || !labelSprite.visible) continue
@@ -194,20 +200,24 @@ export function createGraphRenderer({
       if (Math.abs(offsetDelta) <= 0.01) {
         animation.currentOffset = animation.targetOffset
       } else {
-        animation.currentOffset += offsetDelta * interpolation
+        animation.currentOffset += offsetDelta * labelInterpolation
       }
       const visibilityDelta = animation.targetVisibility - animation.currentVisibility
       if (Math.abs(visibilityDelta) <= 0.01) {
         animation.currentVisibility = animation.targetVisibility
       } else {
-        animation.currentVisibility += visibilityDelta * interpolation
+        animation.currentVisibility += visibilityDelta * labelInterpolation
       }
-      labelSprite.position.set(animation.baseX, animation.baseY + animation.currentOffset)
+      const nodeSprite = nodeSprites.get(nodeId)
+      const nodeScale = nodeSprite?.sprite.scale.x ?? 1
+      const labelY =
+        animation.nodeY + GRAPH_CONFIG.node.radius * nodeScale + GRAPH_CONFIG.label.offset
+      labelSprite.position.set(animation.baseX, labelY + animation.currentOffset)
       labelSprite.alpha = animation.baseAlpha * animation.currentVisibility
     }
   }
 
-  ticker.add(animateLabels)
+  ticker.add(animateVisuals)
 
   const render = ({
     nodes: renderNodes,
@@ -268,11 +278,11 @@ export function createGraphRenderer({
         GRAPH_CONFIG.label.offset
       if (animation) {
         animation.baseX = label.x
-        animation.baseY = labelY
+        animation.nodeY = label.y
         animation.targetOffset = label.isHovered ? GRAPH_CONFIG.label.hoverOffset : 0
         animation.baseAlpha = baseAlpha
         animation.targetVisibility = targetVisibility
-        labelSprite.position.set(animation.baseX, animation.baseY + animation.currentOffset)
+        labelSprite.position.set(animation.baseX, labelY + animation.currentOffset)
         labelSprite.alpha = animation.baseAlpha * animation.currentVisibility
       } else {
         labelSprite.position.set(label.x, labelY)
@@ -295,7 +305,7 @@ export function createGraphRenderer({
     nodeSprites,
     render,
     dispose: () => {
-      ticker.remove(animateLabels)
+      ticker.remove(animateVisuals)
       for (const nodeSprite of nodeSprites.values()) {
         nodeSprite.sprite.removeAllListeners()
       }
