@@ -52,6 +52,7 @@ export type GraphVisualizerBootstrapOptions = {
   onReady?: (handle: GraphVisualizerHandle) => void
   disableAnimations?: boolean
   selectedNodeId?: NodeId | null
+  themeSet?: GraphThemeSet
   documentObject?: Document
 }
 
@@ -641,13 +642,14 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
     onReady,
     disableAnimations = false,
     selectedNodeId,
+    themeSet,
     documentObject = document,
   }: GraphVisualizerBootstrapOptions = {}): Effect.fn.Return<
     () => void,
     GraphVisualizerBootstrapFailure
   > {
     const graphSource = yield* readGraphSnapshotSourceFromDocumentEffect(documentObject)
-    const graphThemes = yield* readGraphThemeSetFromDocumentEffect(documentObject)
+    const graphThemes = themeSet ?? (yield* readGraphThemeSetFromDocumentEffect(documentObject))
     const graph = yield* loadGraphDataEffect(graphSource)
     const getTheme = () => resolveGraphTheme(documentObject, graphThemes)
     const app = yield* createPixiAppEffect({ containerSelector: "#app", theme: getTheme() })

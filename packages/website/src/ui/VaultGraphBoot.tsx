@@ -3,6 +3,7 @@
 import { Effect } from "effect"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
+import type { GraphThemeSet } from "@urban/graph-view"
 import type { GraphVisualizerSelectionChange } from "@urban/graph-view/bootstrap"
 
 const normalizePathname = (pathname: string): string => {
@@ -35,7 +36,11 @@ export const resolveVaultGraphSelectionNavigationHref = ({
   return normalizePathname(nextHref) === normalizePathname(pathname) ? null : nextHref
 }
 
-export const VaultGraphBoot = () => {
+type VaultGraphBootProps = {
+  readonly themeSet?: GraphThemeSet
+}
+
+export const VaultGraphBoot = ({ themeSet }: VaultGraphBootProps) => {
   const router = useRouter()
   const pathname = usePathname()
 
@@ -58,6 +63,7 @@ export const VaultGraphBoot = () => {
         try {
           dispose = await Effect.runPromise(
             bootstrapGraphVisualizerEffect({
+              themeSet,
               onSelectionChange: (selection) => {
                 const nextHref = resolveVaultGraphSelectionNavigationHref({
                   selection,
@@ -91,7 +97,7 @@ export const VaultGraphBoot = () => {
       disposed = true
       dispose?.()
     }
-  }, [pathname, router])
+  }, [pathname, router, themeSet])
 
   return null
 }
