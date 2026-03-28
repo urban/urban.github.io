@@ -12,6 +12,7 @@ import {
   type GraphNode,
   type NodeId,
   type NodeSpriteController,
+  type Point,
 } from "./shared"
 
 function addStagePointerHandlers({
@@ -86,6 +87,38 @@ function addNodePointerHandlers({
   }
 }
 
+export function getCanvasViewportCenter(canvas: HTMLCanvasElement): Point {
+  const rect = canvas.getBoundingClientRect()
+  return {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  }
+}
+
+export function scaleWorldAroundAnchor({
+  worldX,
+  worldY,
+  currentScale,
+  nextScale,
+  anchor,
+}: {
+  worldX: number
+  worldY: number
+  currentScale: number
+  nextScale: number
+  anchor: Point
+}): Point {
+  if (currentScale === nextScale) {
+    return { x: worldX, y: worldY }
+  }
+
+  const scaleRatio = nextScale / currentScale
+  return {
+    x: anchor.x - (anchor.x - worldX) * scaleRatio,
+    y: anchor.y - (anchor.y - worldY) * scaleRatio,
+  }
+}
+
 function addWheelZoomHandler({
   canvas,
   world,
@@ -98,13 +131,19 @@ function addWheelZoomHandler({
   const onWheel = (event: WheelEvent) => {
     event.preventDefault()
     const zoomFactor = event.deltaY < 0 ? 1.1 : 0.9
-    const newScale = clamp(world.scale.x * zoomFactor, GRAPH_CONFIG.zoom.min, GRAPH_CONFIG.zoom.max)
-    const mouse = new PIXI.Point(event.clientX, event.clientY)
-    const mouseLocalBeforeScale = world.toLocal(mouse)
+    const currentScale = world.scale.x
+    const newScale = clamp(currentScale * zoomFactor, GRAPH_CONFIG.zoom.min, GRAPH_CONFIG.zoom.max)
+    const anchor = getCanvasViewportCenter(canvas)
+    const nextWorldPosition = scaleWorldAroundAnchor({
+      worldX: world.x,
+      worldY: world.y,
+      currentScale,
+      nextScale: newScale,
+      anchor,
+    })
+
     world.scale.set(newScale)
-    const mouseLocalAfterScale = world.toLocal(mouse)
-    world.x += (mouseLocalAfterScale.x - mouseLocalBeforeScale.x) * world.scale.x
-    world.y += (mouseLocalAfterScale.y - mouseLocalBeforeScale.y) * world.scale.y
+    world.position.set(nextWorldPosition.x, nextWorldPosition.y)
     onZoom()
   }
 

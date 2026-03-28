@@ -19,6 +19,7 @@ import {
   type GraphState,
   type SelectionSnapshot,
 } from "./main"
+import { scaleWorldAroundAnchor } from "./interaction"
 import { createSimulation, toViewportCenter } from "./simulation"
 
 function makeSnapshotPayload(): GraphSnapshot {
@@ -896,6 +897,32 @@ describe("centerReleasedSelectedNode", () => {
     expect(nearbyTwo.vy).toBeUndefined()
     expect(farAway.vx).toBeUndefined()
     expect(farAway.vy).toBeUndefined()
+  })
+})
+
+describe("scaleWorldAroundAnchor", () => {
+  test("preserves the viewport center while zooming", () => {
+    expect(
+      scaleWorldAroundAnchor({
+        worldX: 0,
+        worldY: 0,
+        currentScale: 1,
+        nextScale: 2,
+        anchor: { x: 450, y: 350 },
+      }),
+    ).toEqual({ x: -450, y: -350 })
+  })
+
+  test("returns the original position when the scale does not change", () => {
+    expect(
+      scaleWorldAroundAnchor({
+        worldX: 120,
+        worldY: -40,
+        currentScale: 1.5,
+        nextScale: 1.5,
+        anchor: { x: 450, y: 350 },
+      }),
+    ).toEqual({ x: 120, y: -40 })
   })
 })
 
