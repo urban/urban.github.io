@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Trace And Replay
-
 Capture structured events for each loop step:
 
 - inputs

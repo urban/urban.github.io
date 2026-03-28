@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# AI Harness Learning
-
 I am interested in building AI harnesses that are reliable under real tool and
 permission constraints, not just ideal demos.
 

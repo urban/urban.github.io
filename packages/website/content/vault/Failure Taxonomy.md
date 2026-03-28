@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Failure Taxonomy
-
 Classify harness failures into stable buckets:
 
 - planning error

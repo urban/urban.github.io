@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Tool Adapter Contract
-
 Every tool adapter should expose:
 
 - typed input schema

@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Latency Budgeting
-
 Set a per-task latency budget before optimization work.
 Split budget across:
 
