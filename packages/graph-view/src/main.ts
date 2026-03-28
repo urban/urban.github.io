@@ -1,10 +1,17 @@
+import { Effect } from "effect"
+
 export {
   bootstrapGraphVisualizer,
+  bootstrapGraphVisualizerEffect,
   createGraphVisualizerSelectionChange,
+  renderGraphVisualizerBootstrapError,
   resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
   resolveGraphThemeSetFromHtmlConfig,
+  resolveGraphThemeSetFromHtmlConfigEffect,
+  toGraphVisualizerBootstrapUserMessage,
   type GraphVisualizerBootstrapOptions,
+  type GraphVisualizerBootstrapFailure,
   type GraphVisualizerHandle,
   type GraphVisualizerNoSelectionChange,
   type GraphVisualizerStaticLayoutEntry,
@@ -26,6 +33,11 @@ export {
   reduceGraphStateWithCommands,
   reduceGraphStateWithTransition,
 } from "./state"
+export {
+  GraphThemeDecodeError,
+  GraphThemeJsonParseError,
+  GraphVisualizerBootstrapError,
+} from "./bootstrap"
 export { DARK_GRAPH_THEME, LIGHT_GRAPH_THEME, resolveGraphTheme } from "./shared"
 export type {
   AppAction,
@@ -46,18 +58,44 @@ const isBrowserRuntime = typeof window !== "undefined" && typeof document !== "u
 
 if (isBrowserRuntime) {
   import("./bootstrap")
-    .then(async ({ bootstrapGraphVisualizer }) => {
-      const dispose = await bootstrapGraphVisualizer()
-      if (typeof dispose === "function") {
-        window.addEventListener(
-          "beforeunload",
-          () => {
-            dispose()
-          },
-          { once: true },
-        )
-      }
-    })
+    .then(
+      async ({
+        GraphThemeDecodeError,
+        GraphThemeJsonParseError,
+        GraphVisualizerBootstrapError,
+        bootstrapGraphVisualizerEffect,
+        renderGraphVisualizerBootstrapError,
+        toGraphVisualizerBootstrapUserMessage,
+      }) => {
+        try {
+          const dispose = await Effect.runPromise(bootstrapGraphVisualizerEffect())
+          if (typeof dispose === "function") {
+            window.addEventListener(
+              "beforeunload",
+              () => {
+                dispose()
+              },
+              { once: true },
+            )
+          }
+        } catch (error: unknown) {
+          if (
+            error instanceof GraphThemeJsonParseError ||
+            error instanceof GraphThemeDecodeError ||
+            error instanceof GraphVisualizerBootstrapError
+          ) {
+            renderGraphVisualizerBootstrapError({
+              documentObject: document,
+              error,
+            })
+            console.error(toGraphVisualizerBootstrapUserMessage(error))
+            return
+          }
+
+          console.error(error)
+        }
+      },
+    )
     .catch((error: unknown) => {
       console.error(error)
     })

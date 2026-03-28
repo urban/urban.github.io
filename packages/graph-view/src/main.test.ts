@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test"
+import { Effect } from "effect"
 import type { GraphSnapshot } from "@urban/build-graph/schema"
 import { createGraphVisualizerSelectionChange } from "./bootstrap"
 import {
@@ -10,7 +11,9 @@ import {
   reduceGraphState,
   reduceGraphStateWithCommands,
   reduceGraphStateWithTransition,
+  GraphThemeDecodeError,
   resolveGraphThemeSetFromHtmlConfig,
+  resolveGraphThemeSetFromHtmlConfigEffect,
   resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
   DARK_GRAPH_THEME,
@@ -437,6 +440,24 @@ describe("resolveGraphThemeSetFromHtmlConfig", () => {
         darkThemeJson: null,
       }),
     ).toThrow("Invalid light graph theme JSON")
+  })
+
+  test("effect returns a typed decode error for invalid theme shape", async () => {
+    try {
+      await Effect.runPromise(
+        resolveGraphThemeSetFromHtmlConfigEffect({
+          lightThemeJson: JSON.stringify({ view: { backgroundColor: "nope" } }),
+          darkThemeJson: null,
+        }),
+      )
+      throw new Error("expected theme decode to fail")
+    } catch (error: unknown) {
+      expect(error).toBeInstanceOf(GraphThemeDecodeError)
+      if (!(error instanceof GraphThemeDecodeError)) {
+        throw new Error("expected GraphThemeDecodeError")
+      }
+      expect(error.themeName).toBe("light")
+    }
   })
 })
 
