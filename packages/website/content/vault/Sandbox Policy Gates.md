@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Sandbox Policy Gates
-
 A harness should model permissions as explicit gates:
 
 - read-only

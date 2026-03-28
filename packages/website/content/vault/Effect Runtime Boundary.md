@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Effect Runtime Boundary
-
 Define where pure planning ends and side effects begin.
 
 Use `Effect` values for planning, validation, and transformations.

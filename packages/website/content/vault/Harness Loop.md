@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Harness Loop
-
 An AI harness loop is a repeatable cycle:
 
 1. ingest task context

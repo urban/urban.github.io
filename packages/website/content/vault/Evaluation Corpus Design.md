@@ -8,8 +8,6 @@ aliases:
 published: true
 ---
 
-# Evaluation Corpus Design
-
 Build a corpus of realistic tasks with expected outcomes.
 Each case should include:
 
