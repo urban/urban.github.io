@@ -10,8 +10,11 @@ import {
   reduceGraphState,
   reduceGraphStateWithCommands,
   reduceGraphStateWithTransition,
+  resolveGraphThemeSetFromHtmlConfig,
   resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
+  DARK_GRAPH_THEME,
+  LIGHT_GRAPH_THEME,
   type AppCommand,
   type GraphLink,
   type GraphNode,
@@ -303,6 +306,137 @@ describe("resolveInitialSelectedNodeIdFromHtmlConfig", () => {
     expect(resolveInitialSelectedNodeIdFromHtmlConfig(null)).toBeNull()
     expect(resolveInitialSelectedNodeIdFromHtmlConfig(undefined)).toBeNull()
     expect(resolveInitialSelectedNodeIdFromHtmlConfig("   ")).toBeNull()
+  })
+})
+
+describe("resolveGraphThemeSetFromHtmlConfig", () => {
+  test("falls back to the default light and dark themes", () => {
+    expect(
+      resolveGraphThemeSetFromHtmlConfig({
+        lightThemeJson: null,
+        darkThemeJson: undefined,
+      }),
+    ).toEqual({
+      light: LIGHT_GRAPH_THEME,
+      dark: DARK_GRAPH_THEME,
+    })
+  })
+
+  test("parses custom light and dark themes from HTML data attributes", () => {
+    const themeSet = resolveGraphThemeSetFromHtmlConfig({
+      lightThemeJson: JSON.stringify({
+        view: { backgroundColor: 1 },
+        node: {
+          variants: {
+            default: { fill: 2, stroke: 3, strokeWidth: 4, alpha: 0.5 },
+            selected: { fill: 5, stroke: 6, strokeWidth: 7, alpha: 0.6 },
+            muted: { fill: 8, stroke: 9, strokeWidth: 10, alpha: 0.7 },
+          },
+          scales: { default: 1, selected: 2, muted: 0.5 },
+        },
+        edge: {
+          variants: {
+            default: { width: 11, color: 12, alpha: 0.8 },
+            muted: { width: 13, color: 14, alpha: 0.9 },
+          },
+        },
+        label: {
+          variants: {
+            default: { fill: 15, alpha: 1 },
+            selected: { fill: 16, alpha: 0.95 },
+            muted: { fill: 17, alpha: 0.4 },
+          },
+          style: { fontFamily: "Inter", fontSize: 18, fontWeight: "500" },
+        },
+      }),
+      darkThemeJson: JSON.stringify({
+        view: { backgroundColor: 21 },
+        node: {
+          variants: {
+            default: { fill: 22, stroke: 23, strokeWidth: 24, alpha: 0.55 },
+            selected: { fill: 25, stroke: 26, strokeWidth: 27, alpha: 0.65 },
+            muted: { fill: 28, stroke: 29, strokeWidth: 30, alpha: 0.75 },
+          },
+          scales: { default: 1.25, selected: 2.25, muted: 0.75 },
+        },
+        edge: {
+          variants: {
+            default: { width: 31, color: 32, alpha: 0.85 },
+            muted: { width: 33, color: 34, alpha: 0.95 },
+          },
+        },
+        label: {
+          variants: {
+            default: { fill: 35, alpha: 0.98 },
+            selected: { fill: 36, alpha: 0.88 },
+            muted: { fill: 37, alpha: 0.48 },
+          },
+          style: { fontFamily: "Arial", fontSize: 20, fontWeight: "600" },
+        },
+      }),
+    })
+
+    expect(themeSet).toEqual({
+      light: {
+        view: { backgroundColor: 1 },
+        node: {
+          variants: {
+            default: { fill: 2, stroke: 3, strokeWidth: 4, alpha: 0.5 },
+            selected: { fill: 5, stroke: 6, strokeWidth: 7, alpha: 0.6 },
+            muted: { fill: 8, stroke: 9, strokeWidth: 10, alpha: 0.7 },
+          },
+          scales: { default: 1, selected: 2, muted: 0.5 },
+        },
+        edge: {
+          variants: {
+            default: { width: 11, color: 12, alpha: 0.8 },
+            muted: { width: 13, color: 14, alpha: 0.9 },
+          },
+        },
+        label: {
+          variants: {
+            default: { fill: 15, alpha: 1 },
+            selected: { fill: 16, alpha: 0.95 },
+            muted: { fill: 17, alpha: 0.4 },
+          },
+          style: { fontFamily: "Inter", fontSize: 18, fontWeight: "500" },
+        },
+      },
+      dark: {
+        view: { backgroundColor: 21 },
+        node: {
+          variants: {
+            default: { fill: 22, stroke: 23, strokeWidth: 24, alpha: 0.55 },
+            selected: { fill: 25, stroke: 26, strokeWidth: 27, alpha: 0.65 },
+            muted: { fill: 28, stroke: 29, strokeWidth: 30, alpha: 0.75 },
+          },
+          scales: { default: 1.25, selected: 2.25, muted: 0.75 },
+        },
+        edge: {
+          variants: {
+            default: { width: 31, color: 32, alpha: 0.85 },
+            muted: { width: 33, color: 34, alpha: 0.95 },
+          },
+        },
+        label: {
+          variants: {
+            default: { fill: 35, alpha: 0.98 },
+            selected: { fill: 36, alpha: 0.88 },
+            muted: { fill: 37, alpha: 0.48 },
+          },
+          style: { fontFamily: "Arial", fontSize: 20, fontWeight: "600" },
+        },
+      },
+    })
+  })
+
+  test("throws when a configured theme is invalid", () => {
+    expect(() =>
+      resolveGraphThemeSetFromHtmlConfig({
+        lightThemeJson: JSON.stringify({ view: { backgroundColor: "nope" } }),
+        darkThemeJson: null,
+      }),
+    ).toThrow("Invalid light graph theme JSON")
   })
 })
 

@@ -3,6 +3,7 @@ export {
   createGraphVisualizerSelectionChange,
   resolveInitialSelectedNodeIdFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
+  resolveGraphThemeSetFromHtmlConfig,
   type GraphVisualizerBootstrapOptions,
   type GraphVisualizerHandle,
   type GraphVisualizerNoSelectionChange,
@@ -25,6 +26,7 @@ export {
   reduceGraphStateWithCommands,
   reduceGraphStateWithTransition,
 } from "./state"
+export { DARK_GRAPH_THEME, LIGHT_GRAPH_THEME, resolveGraphTheme } from "./shared"
 export type {
   AppAction,
   AppState,
@@ -34,6 +36,8 @@ export type {
   GraphNode,
   GraphReducerContext,
   GraphState,
+  GraphTheme,
+  GraphThemeSet,
   SelectionSnapshot,
   PointerGestureState,
 } from "./shared"

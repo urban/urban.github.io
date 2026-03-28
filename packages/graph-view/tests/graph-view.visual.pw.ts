@@ -24,8 +24,8 @@ type GraphHarness = {
   getSelectionChanges: () => ReadonlyArray<SelectionChange>
 }
 
-async function gotoHarness(page: Page) {
-  await page.goto("/playwright-harness.html")
+async function gotoHarness(page: Page, harnessPath = "/playwright-harness.html") {
+  await page.goto(harnessPath)
   await page.waitForFunction(() => "__graphViewHarness" in window)
   await settleLayout(page)
 }
@@ -84,6 +84,21 @@ test.describe("graph view visual regression", () => {
     await setTheme(page, "dark")
 
     await expect(page).toHaveScreenshot("graph-dark.png", { maxDiffPixels: 3_000 })
+  })
+})
+
+test.describe("graph view custom theme overrides", () => {
+  test("renders a custom light theme from HTML data attributes", async ({ page }) => {
+    await gotoHarness(page, "/playwright-custom-theme-harness.html")
+
+    await expect(page).toHaveScreenshot("graph-custom-light.png", { maxDiffPixels: 3_000 })
+  })
+
+  test("renders a custom dark theme from HTML data attributes", async ({ page }) => {
+    await gotoHarness(page, "/playwright-custom-theme-harness.html")
+    await setTheme(page, "dark")
+
+    await expect(page).toHaveScreenshot("graph-custom-dark.png", { maxDiffPixels: 3_000 })
   })
 })
 
