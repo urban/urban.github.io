@@ -1,4 +1,4 @@
-import type { GraphTheme } from "@urban/graph-view"
+import type { GraphTheme, GraphThemeSet } from "@urban/graph-view"
 
 export const LIGHT_VAULT_GRAPH_THEME: GraphTheme = {
   view: { backgroundColor: 0xfafaf9 },
@@ -68,5 +68,7 @@ export const DARK_VAULT_GRAPH_THEME: GraphTheme = {
   },
 }
 
-export const serializeGraphTheme = (theme: GraphTheme): string =>
-  JSON.stringify(theme).replaceAll("<", "\\u003c")
+export const VAULT_GRAPH_THEME_SET: GraphThemeSet = {
+  light: LIGHT_VAULT_GRAPH_THEME,
+  dark: DARK_VAULT_GRAPH_THEME,
+}
