@@ -1,5 +1,10 @@
 import type { GraphSnapshot } from "@urban/build-graph/schema"
 import { VaultGraphBoot } from "./VaultGraphBoot"
+import {
+  DARK_VAULT_GRAPH_THEME,
+  LIGHT_VAULT_GRAPH_THEME,
+  serializeGraphTheme,
+} from "./vaultGraphTheme"
 
 const GRAPH_SNAPSHOT_SCRIPT_ID = "graph-snapshot"
 
@@ -21,7 +26,9 @@ export const VaultGraphHost = ({ snapshot, selectedNodeId }: Props) => (
       id="app"
       data-graph-snapshot-script-id={GRAPH_SNAPSHOT_SCRIPT_ID}
       data-selected-node-id={selectedNodeId}
-      className="min-h-[420px] overflow-hidden rounded-md border border-black/10 dark:border-white/10 bg-black/[0.04] dark:bg-white/[0.04]"
+      data-light-graph-theme={serializeGraphTheme(LIGHT_VAULT_GRAPH_THEME)}
+      data-dark-graph-theme={serializeGraphTheme(DARK_VAULT_GRAPH_THEME)}
+      className="min-h-[420px] overflow-hidden rounded-md border border-black/10 bg-stone-50 dark:border-white/10 dark:bg-stone-950"
     />
     <script
       id={GRAPH_SNAPSHOT_SCRIPT_ID}

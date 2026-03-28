@@ -1,6 +1,11 @@
 import { expect, mock, test } from "bun:test"
 import { renderToStaticMarkup } from "react-dom/server"
 import type { GraphSnapshot } from "@urban/build-graph/schema"
+import {
+  DARK_VAULT_GRAPH_THEME,
+  LIGHT_VAULT_GRAPH_THEME,
+  serializeGraphTheme,
+} from "./vaultGraphTheme"
 
 mock.module("next/navigation", () => ({
   usePathname: () => "/vault/alpha",
@@ -54,6 +59,12 @@ test("renders inline snapshot payload and selected node config", () => {
 
   expect(markup).toContain('id="app"')
   expect(markup).toContain('data-selected-node-id="/vault/alpha"')
+  expect(markup).toContain(
+    `data-light-graph-theme="${serializeGraphTheme(LIGHT_VAULT_GRAPH_THEME).replaceAll('"', "&quot;")}"`,
+  )
+  expect(markup).toContain(
+    `data-dark-graph-theme="${serializeGraphTheme(DARK_VAULT_GRAPH_THEME).replaceAll('"', "&quot;")}"`,
+  )
   expect(markup).toContain('type="application/json"')
   expect(markup).toContain('"/vault/alpha"')
 })
