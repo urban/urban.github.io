@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter, Lora } from "next/font/google"
 import Script from "next/script"
+import pkg from "../../package.json"
 import { cn } from "../lib/utils"
 import "../styles/globals.css"
 import { Footer } from "../ui/Footer"
@@ -23,6 +24,16 @@ export const metadata: Metadata = {
   description: "Urban Faubion's personal website",
 }
 
+const CONSOLE_SIGNATURE = `
+
+░█░█░█▀▄░█▀▄░█▀█░█▀█░░░█▀▀░█▀█░█░█░█▀▄░▀█▀░█▀█░█▀█
+░█░█░█▀▄░█▀▄░█▀█░█░█░░░█▀▀░█▀█░█░█░█▀▄░░█░░█░█░█░█
+░▀▀▀░▀░▀░▀▀░░▀░▀░▀░▀░░░▀░░░▀░▀░▀▀▀░▀▀░░▀▀▀░▀▀▀░▀░▀
+
+VERSION: ${pkg.version}
+LINKEDIN: https://www.linkedin.com/in/urbanfaubion/
+`
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,6 +46,13 @@ export default function RootLayout({
       className={cn(`antialiased optimize-legibility`, inter.className, lora.className)}
     >
       <head>
+        <Script
+          id="console-signature"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `console.log(${JSON.stringify(CONSOLE_SIGNATURE)})`,
+          }}
+        />
         <Script src="/preload-color-scheme.js" />
       </head>
       <body>
