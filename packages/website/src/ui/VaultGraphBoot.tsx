@@ -1,5 +1,6 @@
 "use client"
 
+import { Effect } from "effect"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import type { GraphVisualizerSelectionChange } from "@urban/graph-view/bootstrap"
@@ -42,23 +43,49 @@ export const VaultGraphBoot = () => {
     let disposed = false
     let dispose: (() => void) | undefined
 
-    void import("@urban/graph-view/bootstrap").then(async ({ bootstrapGraphVisualizer }) => {
-      if (disposed) {
-        return
-      }
+    void import("@urban/graph-view/bootstrap").then(
+      async ({
+        GraphThemeDecodeError,
+        GraphThemeJsonParseError,
+        GraphVisualizerBootstrapError,
+        bootstrapGraphVisualizerEffect,
+        renderGraphVisualizerBootstrapError,
+      }) => {
+        if (disposed) {
+          return
+        }
 
-      dispose = await bootstrapGraphVisualizer({
-        onSelectionChange: (selection) => {
-          const nextHref = resolveVaultGraphSelectionNavigationHref({
-            selection,
-            pathname,
-          })
-          if (nextHref !== null) {
-            router.push(nextHref)
+        try {
+          dispose = await Effect.runPromise(
+            bootstrapGraphVisualizerEffect({
+              onSelectionChange: (selection) => {
+                const nextHref = resolveVaultGraphSelectionNavigationHref({
+                  selection,
+                  pathname,
+                })
+                if (nextHref !== null) {
+                  router.push(nextHref)
+                }
+              },
+            }),
+          )
+        } catch (error: unknown) {
+          if (
+            error instanceof GraphThemeJsonParseError ||
+            error instanceof GraphThemeDecodeError ||
+            error instanceof GraphVisualizerBootstrapError
+          ) {
+            renderGraphVisualizerBootstrapError({
+              documentObject: document,
+              error,
+            })
+            return
           }
-        },
-      })
-    })
+
+          console.error(error)
+        }
+      },
+    )
 
     return () => {
       disposed = true
