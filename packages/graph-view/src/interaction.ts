@@ -87,11 +87,19 @@ function addNodePointerHandlers({
   }
 }
 
-export function getCanvasViewportCenter(canvas: HTMLCanvasElement): Point {
+export function getCanvasPointerPosition({
+  canvas,
+  clientX,
+  clientY,
+}: {
+  canvas: HTMLCanvasElement
+  clientX: number
+  clientY: number
+}): Point {
   const rect = canvas.getBoundingClientRect()
   return {
-    x: rect.left + rect.width / 2,
-    y: rect.top + rect.height / 2,
+    x: clientX - rect.left,
+    y: clientY - rect.top,
   }
 }
 
@@ -133,7 +141,11 @@ function addWheelZoomHandler({
     const zoomFactor = event.deltaY < 0 ? 1.1 : 0.9
     const currentScale = world.scale.x
     const newScale = clamp(currentScale * zoomFactor, GRAPH_CONFIG.zoom.min, GRAPH_CONFIG.zoom.max)
-    const anchor = getCanvasViewportCenter(canvas)
+    const anchor = getCanvasPointerPosition({
+      canvas,
+      clientX: event.clientX,
+      clientY: event.clientY,
+    })
     const nextWorldPosition = scaleWorldAroundAnchor({
       worldX: world.x,
       worldY: world.y,
