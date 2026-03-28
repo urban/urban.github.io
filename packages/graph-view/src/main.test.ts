@@ -901,16 +901,16 @@ describe("centerReleasedSelectedNode", () => {
 })
 
 describe("scaleWorldAroundAnchor", () => {
-  test("preserves the viewport center while zooming", () => {
+  test("preserves the pointer position while zooming", () => {
     expect(
       scaleWorldAroundAnchor({
         worldX: 0,
         worldY: 0,
         currentScale: 1,
         nextScale: 2,
-        anchor: { x: 450, y: 350 },
+        anchor: { x: 300, y: 250 },
       }),
-    ).toEqual({ x: -450, y: -350 })
+    ).toEqual({ x: -300, y: -250 })
   })
 
   test("returns the original position when the scale does not change", () => {
