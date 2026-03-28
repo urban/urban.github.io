@@ -1,5 +1,5 @@
 import type { Simulation } from "d3-force"
-import { Schema } from "effect"
+import { Effect, Schema } from "effect"
 import type { GraphSnapshotNode } from "@urban/build-graph/schema"
 import { createAppState, reduceAppStateWithCommands } from "./app-state"
 import { bindPointerInteractions } from "./interaction"
@@ -85,6 +85,39 @@ export type GraphVisualizerSelectionChange =
   | GraphVisualizerNoSelectionChange
   | GraphVisualizerNoteSelectionChange
   | GraphVisualizerPlaceholderSelectionChange
+
+const GraphThemeNameSchema = Schema.Union([Schema.Literal("light"), Schema.Literal("dark")])
+
+type GraphThemeName = Schema.Schema.Type<typeof GraphThemeNameSchema>
+
+export class GraphThemeJsonParseError extends Schema.TaggedErrorClass<GraphThemeJsonParseError>()(
+  "GraphThemeJsonParseError",
+  {
+    themeName: GraphThemeNameSchema,
+    input: Schema.String,
+    message: Schema.String,
+  },
+) {}
+
+export class GraphThemeDecodeError extends Schema.TaggedErrorClass<GraphThemeDecodeError>()(
+  "GraphThemeDecodeError",
+  {
+    themeName: GraphThemeNameSchema,
+    message: Schema.String,
+  },
+) {}
+
+export class GraphVisualizerBootstrapError extends Schema.TaggedErrorClass<GraphVisualizerBootstrapError>()(
+  "GraphVisualizerBootstrapError",
+  {
+    message: Schema.String,
+  },
+) {}
+
+export type GraphVisualizerBootstrapFailure =
+  | GraphThemeJsonParseError
+  | GraphThemeDecodeError
+  | GraphVisualizerBootstrapError
 
 export function createGraphVisualizerSelectionChange({
   selectedNodeId,
@@ -253,8 +286,6 @@ const GraphThemeSchema = Schema.Struct({
 
 type GraphThemePayload = Schema.Schema.Type<typeof GraphThemeSchema>
 
-const decodeGraphThemeUnknown = Schema.decodeUnknownSync(GraphThemeSchema)
-
 function toGraphTheme(payload: GraphThemePayload): GraphTheme {
   return {
     ...payload,
@@ -275,44 +306,65 @@ function toGraphTheme(payload: GraphThemePayload): GraphTheme {
   }
 }
 
-function decodeGraphTheme(value: unknown, themeName: string): GraphTheme {
-  try {
-    return toGraphTheme(decodeGraphThemeUnknown(value))
-  } catch (error: unknown) {
-    throw new Error(
-      `Invalid ${themeName} graph theme JSON: ${
-        error instanceof Error ? error.message : "unknown decode error"
-      }`,
-    )
-  }
-}
+const parseGraphThemeJson = Effect.fn("parseGraphThemeJson")(function* (
+  themeJson: string,
+  themeName: GraphThemeName,
+): Effect.fn.Return<unknown, GraphThemeJsonParseError> {
+  return yield* Effect.try({
+    try: () => JSON.parse(themeJson) as unknown,
+    catch: (error: unknown) =>
+      new GraphThemeJsonParseError({
+        themeName,
+        input: themeJson,
+        message: error instanceof Error ? error.message : "unknown parse error",
+      }),
+  })
+})
 
-function parseOptionalGraphThemeJson(
+const decodeGraphTheme = Effect.fn("decodeGraphTheme")(function* (
+  value: unknown,
+  themeName: GraphThemeName,
+): Effect.fn.Return<GraphTheme, GraphThemeDecodeError> {
+  const payload = yield* Schema.decodeUnknownEffect(GraphThemeSchema)(value).pipe(
+    Effect.mapError(
+      (error) =>
+        new GraphThemeDecodeError({
+          themeName,
+          message: error.message,
+        }),
+    ),
+  )
+
+  return toGraphTheme(payload)
+})
+
+const parseOptionalGraphThemeJson = Effect.fn("parseOptionalGraphThemeJson")(function* (
   themeJson: string | null | undefined,
-  themeName: string,
-): GraphTheme | null {
+  themeName: GraphThemeName,
+): Effect.fn.Return<GraphTheme | null, GraphThemeJsonParseError | GraphThemeDecodeError> {
   const normalizedThemeJson = themeJson?.trim() ?? ""
   if (normalizedThemeJson === "") {
     return null
   }
 
-  try {
-    return decodeGraphTheme(JSON.parse(normalizedThemeJson), themeName)
-  } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      error.message.startsWith(`Invalid ${themeName} graph theme JSON:`)
-    ) {
-      throw error
-    }
+  const payload = yield* parseGraphThemeJson(normalizedThemeJson, themeName)
+  return yield* decodeGraphTheme(payload, themeName)
+})
 
-    throw new Error(
-      `Invalid ${themeName} graph theme JSON: ${
-        error instanceof Error ? error.message : "unknown parse error"
-      }`,
-    )
+export const resolveGraphThemeSetFromHtmlConfigEffect = Effect.fn(
+  "resolveGraphThemeSetFromHtmlConfigEffect",
+)(function* ({
+  lightThemeJson,
+  darkThemeJson,
+}: {
+  lightThemeJson: string | null | undefined
+  darkThemeJson: string | null | undefined
+}): Effect.fn.Return<GraphThemeSet, GraphThemeJsonParseError | GraphThemeDecodeError> {
+  return {
+    light: (yield* parseOptionalGraphThemeJson(lightThemeJson, "light")) ?? LIGHT_GRAPH_THEME,
+    dark: (yield* parseOptionalGraphThemeJson(darkThemeJson, "dark")) ?? DARK_GRAPH_THEME,
   }
-}
+})
 
 export function resolveGraphThemeSetFromHtmlConfig({
   lightThemeJson,
@@ -321,23 +373,42 @@ export function resolveGraphThemeSetFromHtmlConfig({
   lightThemeJson: string | null | undefined
   darkThemeJson: string | null | undefined
 }): GraphThemeSet {
-  return {
-    light: parseOptionalGraphThemeJson(lightThemeJson, "light") ?? LIGHT_GRAPH_THEME,
-    dark: parseOptionalGraphThemeJson(darkThemeJson, "dark") ?? DARK_GRAPH_THEME,
+  try {
+    return Effect.runSync(
+      resolveGraphThemeSetFromHtmlConfigEffect({
+        lightThemeJson,
+        darkThemeJson,
+      }),
+    )
+  } catch (error: unknown) {
+    if (error instanceof GraphThemeJsonParseError || error instanceof GraphThemeDecodeError) {
+      throw new Error(`Invalid ${error.themeName} graph theme JSON: ${error.message}`)
+    }
+
+    throw error
   }
 }
 
-function readGraphThemeSetFromDocument(documentObject: Document): GraphThemeSet {
-  const appElement = documentObject.getElementById("app")
-  if (appElement === null) {
-    throw new Error("Missing #app container element for graph visualizer bootstrap.")
-  }
+const readGraphThemeSetFromDocumentEffect = Effect.fn("readGraphThemeSetFromDocumentEffect")(
+  function* (
+    documentObject: Document,
+  ): Effect.fn.Return<
+    GraphThemeSet,
+    GraphThemeJsonParseError | GraphThemeDecodeError | GraphVisualizerBootstrapError
+  > {
+    const appElement = documentObject.getElementById("app")
+    if (appElement === null) {
+      return yield* new GraphVisualizerBootstrapError({
+        message: "Missing #app container element for graph visualizer bootstrap.",
+      })
+    }
 
-  return resolveGraphThemeSetFromHtmlConfig({
-    lightThemeJson: appElement.dataset.lightGraphTheme,
-    darkThemeJson: appElement.dataset.darkGraphTheme,
-  })
-}
+    return yield* resolveGraphThemeSetFromHtmlConfigEffect({
+      lightThemeJson: appElement.dataset.lightGraphTheme,
+      darkThemeJson: appElement.dataset.darkGraphTheme,
+    })
+  },
+)
 
 function readGraphSnapshotSourceFromDocument(documentObject: Document): HtmlGraphSnapshotSource {
   const appElement = documentObject.getElementById("app")
@@ -488,191 +559,333 @@ function executeAppCommands({
   }
 }
 
-export async function bootstrapGraphVisualizer({
-  onSelectionChange,
-  onReady,
-  disableAnimations = false,
-  selectedNodeId,
-  documentObject = document,
-}: GraphVisualizerBootstrapOptions = {}) {
-  const graphSource = readGraphSnapshotSourceFromDocument(documentObject)
-  const graphThemes = readGraphThemeSetFromDocument(documentObject)
-  const graph =
-    graphSource.type === "snapshot-url"
-      ? await loadGraphDataFromSnapshot(graphSource.snapshotUrl)
-      : createGraphDataFromSnapshotPayload(graphSource.snapshotPayload)
-  const getTheme = () => resolveGraphTheme(documentObject, graphThemes)
-  const app = await createPixiApp({ containerSelector: "#app", theme: getTheme() })
-  const graphRootElement = app.canvas.parentElement
-  if (!(graphRootElement instanceof HTMLElement)) {
-    throw new Error("Missing graph root element for graph visualizer bootstrap.")
-  }
-  const { world, edgeGraphics, nodeLayer, labelLayer } = createWorld(app)
-
-  const context = {
-    nodes: graph.nodes,
-    links: graph.links,
-    nodeById: graph.nodeById,
-    adjacency: graph.adjacency,
-  }
-
-  const simulationController = createSimulation({
-    nodes: graph.nodes,
-    links: graph.links,
-    nodeById: graph.nodeById,
-    adjacency: graph.adjacency,
-    initialViewportSize: {
-      width: app.screen.width,
-      height: app.screen.height,
-    },
+const readGraphSnapshotSourceFromDocumentEffect = Effect.fn(
+  "readGraphSnapshotSourceFromDocumentEffect",
+)(function* (
+  documentObject: Document,
+): Effect.fn.Return<HtmlGraphSnapshotSource, GraphVisualizerBootstrapError> {
+  return yield* Effect.try({
+    try: () => readGraphSnapshotSourceFromDocument(documentObject),
+    catch: (error: unknown) =>
+      new GraphVisualizerBootstrapError({
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to read the graph snapshot source from HTML.",
+      }),
   })
-  const { simulation } = simulationController
+})
 
-  const renderer = createGraphRenderer({
-    nodes: graph.nodes,
-    nodeLayer,
-    labelLayer,
-    edgeGraphics,
-    ticker: app.ticker,
-    getTheme,
-    animationsEnabled: !disableAnimations,
+const readInitialSelectedNodeIdFromDocumentEffect = Effect.fn(
+  "readInitialSelectedNodeIdFromDocumentEffect",
+)(function* (
+  documentObject: Document,
+): Effect.fn.Return<NodeId | null, GraphVisualizerBootstrapError> {
+  return yield* Effect.try({
+    try: () => readInitialSelectedNodeIdFromDocument(documentObject),
+    catch: (error: unknown) =>
+      new GraphVisualizerBootstrapError({
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to read the initial selected node id from HTML.",
+      }),
   })
+})
 
-  const lifecycle = createLifecycle()
-  lifecycle.add(simulationController.dispose)
-  lifecycle.add(renderer.dispose)
-
-  const initialSelectedNodeId =
-    selectedNodeId === undefined
-      ? readInitialSelectedNodeIdFromDocument(documentObject)
-      : selectedNodeId
-  let appState = createAppState(context, initialSelectedNodeId)
-  simulationController.setSelectedNodeId(selectedNodeIdFromSelection(appState.graph.selection))
-
-  const dispatch = (action: AppAction) => {
-    const reduced = reduceAppStateWithCommands(appState, action, context)
-    if (reduced.state === appState && reduced.commands.length === 0) {
-      return
-    }
-
-    const previousState = appState
-    appState = reduced.state
-
-    executeAppCommands({
-      commands: reduced.commands,
-      simulation,
-      simulationController,
-      nodeById: graph.nodeById,
-      snapshotNodeById: graph.snapshotNodeById,
-      onSelectionChange,
-      world,
-      getCanvasCenterGlobal: () => ({ x: app.screen.width / 2, y: app.screen.height / 2 }),
+const loadGraphDataEffect = Effect.fn("loadGraphDataEffect")(function* (
+  graphSource: HtmlGraphSnapshotSource,
+): Effect.fn.Return<
+  ReturnType<typeof createGraphDataFromSnapshotPayload>,
+  GraphVisualizerBootstrapError
+> {
+  if (graphSource.type === "snapshot-inline") {
+    return yield* Effect.try({
+      try: () => createGraphDataFromSnapshotPayload(graphSource.snapshotPayload),
+      catch: (error: unknown) =>
+        new GraphVisualizerBootstrapError({
+          message:
+            error instanceof Error ? error.message : "Failed to decode the inline graph snapshot.",
+        }),
     })
+  }
 
-    if (previousState.graph !== appState.graph) {
-      renderer.render(appState.graph.renderModel)
+  return yield* Effect.tryPromise({
+    try: () => loadGraphDataFromSnapshot(graphSource.snapshotUrl),
+    catch: (error: unknown) =>
+      new GraphVisualizerBootstrapError({
+        message: error instanceof Error ? error.message : "Failed to load the graph snapshot.",
+      }),
+  })
+})
+
+const createPixiAppEffect = Effect.fn("createPixiAppEffect")(function* ({
+  containerSelector,
+  theme,
+}: {
+  containerSelector: string
+  theme: GraphTheme
+}): Effect.fn.Return<Awaited<ReturnType<typeof createPixiApp>>, GraphVisualizerBootstrapError> {
+  return yield* Effect.tryPromise({
+    try: () => createPixiApp({ containerSelector, theme }),
+    catch: (error: unknown) =>
+      new GraphVisualizerBootstrapError({
+        message: error instanceof Error ? error.message : "Failed to create the graph canvas.",
+      }),
+  })
+})
+
+export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualizerEffect")(
+  function* ({
+    onSelectionChange,
+    onReady,
+    disableAnimations = false,
+    selectedNodeId,
+    documentObject = document,
+  }: GraphVisualizerBootstrapOptions = {}): Effect.fn.Return<
+    () => void,
+    GraphVisualizerBootstrapFailure
+  > {
+    const graphSource = yield* readGraphSnapshotSourceFromDocumentEffect(documentObject)
+    const graphThemes = yield* readGraphThemeSetFromDocumentEffect(documentObject)
+    const graph = yield* loadGraphDataEffect(graphSource)
+    const getTheme = () => resolveGraphTheme(documentObject, graphThemes)
+    const app = yield* createPixiAppEffect({ containerSelector: "#app", theme: getTheme() })
+    const graphRootElement = app.canvas.parentElement
+    if (!(graphRootElement instanceof HTMLElement)) {
+      return yield* new GraphVisualizerBootstrapError({
+        message: "Missing graph root element for graph visualizer bootstrap.",
+      })
     }
-  }
+    const { world, edgeGraphics, nodeLayer, labelLayer } = createWorld(app)
 
-  const onSimulationTick = () => {
-    dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
-  }
-  simulation.on("tick", onSimulationTick)
+    const context = {
+      nodes: graph.nodes,
+      links: graph.links,
+      nodeById: graph.nodeById,
+      adjacency: graph.adjacency,
+    }
 
-  const syncSimulationCenterToViewport = () => {
-    simulationController.setLayoutCenter(
-      toViewportCenter({
+    const simulationController = createSimulation({
+      nodes: graph.nodes,
+      links: graph.links,
+      nodeById: graph.nodeById,
+      adjacency: graph.adjacency,
+      initialViewportSize: {
         width: app.screen.width,
         height: app.screen.height,
-      }),
-    )
-    simulation.alpha(0.3).restart()
-  }
+      },
+    })
+    const { simulation } = simulationController
 
-  if (typeof ResizeObserver === "function") {
-    const resizeObserver = new ResizeObserver(() => {
-      window.requestAnimationFrame(syncSimulationCenterToViewport)
-    })
-    resizeObserver.observe(graphRootElement)
-    lifecycle.add(() => {
-      resizeObserver.disconnect()
-    })
-  } else {
-    window.addEventListener("resize", syncSimulationCenterToViewport)
-    lifecycle.add(() => {
-      window.removeEventListener("resize", syncSimulationCenterToViewport)
-    })
-  }
-
-  if (typeof MutationObserver === "function") {
-    const themeObserver = new MutationObserver(() => {
-      applyAppTheme(app, getTheme())
-      renderer.render(appState.graph.renderModel)
-    })
-    themeObserver.observe(documentObject.documentElement, {
-      attributes: true,
-      attributeFilter: ["class", "data-color-scheme"],
-    })
-    lifecycle.add(() => {
-      themeObserver.disconnect()
-    })
-  }
-
-  lifecycle.add(
-    bindPointerInteractions({
-      app,
-      world,
+    const renderer = createGraphRenderer({
       nodes: graph.nodes,
-      nodeSprites: renderer.nodeSprites,
-      dispatch,
-      onZoom: () => renderer.render(appState.graph.renderModel),
-    }),
-  )
+      nodeLayer,
+      labelLayer,
+      edgeGraphics,
+      ticker: app.ticker,
+      getTheme,
+      animationsEnabled: !disableAnimations,
+    })
 
-  renderer.render(appState.graph.renderModel)
+    const lifecycle = createLifecycle()
+    lifecycle.add(simulationController.dispose)
+    lifecycle.add(renderer.dispose)
 
-  onReady?.({
-    getNodePosition: (nodeId) => {
-      const node = graph.nodeById.get(nodeId)
-      return typeof node?.x === "number" && typeof node.y === "number"
-        ? { x: node.x, y: node.y }
-        : null
-    },
-    getCanvasClientRect: () => app.canvas.getBoundingClientRect(),
-    applyStaticLayout: (layout) => {
-      simulation.stop()
-      for (const entry of layout) {
-        const node = graph.nodeById.get(entry.nodeId)
-        if (!node) continue
-        node.x = entry.x
-        node.y = entry.y
-        node.vx = 0
-        node.vy = 0
-        node.fx = entry.x
-        node.fy = entry.y
-      }
-      dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
-    },
-    hoverNode: (nodeId) => {
-      if (nodeId === null) {
-        const hoveredNodeId = appState.graph.hoveredNodeId
-        if (hoveredNodeId !== null) {
-          dispatch({ type: "graph/action", action: { type: "hover/clear", nodeId: hoveredNodeId } })
-        }
+    const initialSelectedNodeId =
+      selectedNodeId === undefined
+        ? yield* readInitialSelectedNodeIdFromDocumentEffect(documentObject)
+        : selectedNodeId
+    let appState = createAppState(context, initialSelectedNodeId)
+    simulationController.setSelectedNodeId(selectedNodeIdFromSelection(appState.graph.selection))
+
+    const dispatch = (action: AppAction) => {
+      const reduced = reduceAppStateWithCommands(appState, action, context)
+      if (reduced.state === appState && reduced.commands.length === 0) {
         return
       }
 
-      dispatch({ type: "graph/action", action: { type: "hover/set", nodeId } })
-    },
-    selectNode: (nodeId) => {
-      dispatch({ type: "graph/action", action: { type: "selection/set", nodeId } })
-    },
-    settleLayout: (tickCount = 300) => {
-      simulation.stop()
-      simulation.tick(tickCount)
-      dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
-    },
-  })
+      const previousState = appState
+      appState = reduced.state
 
-  return lifecycle.dispose
+      executeAppCommands({
+        commands: reduced.commands,
+        simulation,
+        simulationController,
+        nodeById: graph.nodeById,
+        snapshotNodeById: graph.snapshotNodeById,
+        onSelectionChange,
+        world,
+        getCanvasCenterGlobal: () => ({ x: app.screen.width / 2, y: app.screen.height / 2 }),
+      })
+
+      if (previousState.graph !== appState.graph) {
+        renderer.render(appState.graph.renderModel)
+      }
+    }
+
+    const onSimulationTick = () => {
+      dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
+    }
+    simulation.on("tick", onSimulationTick)
+
+    const syncSimulationCenterToViewport = () => {
+      simulationController.setLayoutCenter(
+        toViewportCenter({
+          width: app.screen.width,
+          height: app.screen.height,
+        }),
+      )
+      simulation.alpha(0.3).restart()
+    }
+
+    if (typeof ResizeObserver === "function") {
+      const resizeObserver = new ResizeObserver(() => {
+        window.requestAnimationFrame(syncSimulationCenterToViewport)
+      })
+      resizeObserver.observe(graphRootElement)
+      lifecycle.add(() => {
+        resizeObserver.disconnect()
+      })
+    } else {
+      window.addEventListener("resize", syncSimulationCenterToViewport)
+      lifecycle.add(() => {
+        window.removeEventListener("resize", syncSimulationCenterToViewport)
+      })
+    }
+
+    if (typeof MutationObserver === "function") {
+      const themeObserver = new MutationObserver(() => {
+        applyAppTheme(app, getTheme())
+        renderer.render(appState.graph.renderModel)
+      })
+      themeObserver.observe(documentObject.documentElement, {
+        attributes: true,
+        attributeFilter: ["class", "data-color-scheme"],
+      })
+      lifecycle.add(() => {
+        themeObserver.disconnect()
+      })
+    }
+
+    lifecycle.add(
+      bindPointerInteractions({
+        app,
+        world,
+        nodes: graph.nodes,
+        nodeSprites: renderer.nodeSprites,
+        dispatch,
+        onZoom: () => renderer.render(appState.graph.renderModel),
+      }),
+    )
+
+    renderer.render(appState.graph.renderModel)
+
+    onReady?.({
+      getNodePosition: (nodeId) => {
+        const node = graph.nodeById.get(nodeId)
+        return typeof node?.x === "number" && typeof node.y === "number"
+          ? { x: node.x, y: node.y }
+          : null
+      },
+      getCanvasClientRect: () => app.canvas.getBoundingClientRect(),
+      applyStaticLayout: (layout) => {
+        simulation.stop()
+        for (const entry of layout) {
+          const node = graph.nodeById.get(entry.nodeId)
+          if (!node) continue
+          node.x = entry.x
+          node.y = entry.y
+          node.vx = 0
+          node.vy = 0
+          node.fx = entry.x
+          node.fy = entry.y
+        }
+        dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
+      },
+      hoverNode: (nodeId) => {
+        if (nodeId === null) {
+          const hoveredNodeId = appState.graph.hoveredNodeId
+          if (hoveredNodeId !== null) {
+            dispatch({
+              type: "graph/action",
+              action: { type: "hover/clear", nodeId: hoveredNodeId },
+            })
+          }
+          return
+        }
+
+        dispatch({ type: "graph/action", action: { type: "hover/set", nodeId } })
+      },
+      selectNode: (nodeId) => {
+        dispatch({ type: "graph/action", action: { type: "selection/set", nodeId } })
+      },
+      settleLayout: (tickCount = 300) => {
+        simulation.stop()
+        simulation.tick(tickCount)
+        dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
+      },
+    })
+
+    return lifecycle.dispose
+  },
+)
+
+export async function bootstrapGraphVisualizer(options: GraphVisualizerBootstrapOptions = {}) {
+  return await Effect.runPromise(bootstrapGraphVisualizerEffect(options))
+}
+
+export function toGraphVisualizerBootstrapUserMessage(
+  error: GraphVisualizerBootstrapFailure,
+): string {
+  switch (error._tag) {
+    case "GraphThemeJsonParseError":
+      return `The ${error.themeName} graph theme could not be loaded because its JSON is invalid.`
+    case "GraphThemeDecodeError":
+      return `The ${error.themeName} graph theme could not be loaded because it does not match the expected shape.`
+    case "GraphVisualizerBootstrapError":
+      return `The graph could not be loaded. ${error.message}`
+  }
+}
+
+export function renderGraphVisualizerBootstrapError({
+  documentObject,
+  error,
+}: {
+  documentObject: Document
+  error: GraphVisualizerBootstrapFailure
+}) {
+  const hostElement = documentObject.getElementById("app") ?? documentObject.body
+  if (!(hostElement instanceof HTMLElement)) {
+    return
+  }
+
+  hostElement.replaceChildren()
+  hostElement.setAttribute("data-graph-bootstrap-state", "error")
+  hostElement.style.display = "grid"
+  hostElement.style.placeItems = "center"
+  hostElement.style.padding = "24px"
+
+  const panelElement = documentObject.createElement("div")
+  panelElement.setAttribute("role", "alert")
+  panelElement.style.maxWidth = "40rem"
+  panelElement.style.padding = "16px 20px"
+  panelElement.style.borderRadius = "12px"
+  panelElement.style.border = "1px solid rgba(127, 29, 29, 0.18)"
+  panelElement.style.background = "rgba(254, 242, 242, 0.92)"
+  panelElement.style.color = "#7f1d1d"
+  panelElement.style.fontFamily = "Inter, system-ui, sans-serif"
+  panelElement.style.lineHeight = "1.5"
+
+  const titleElement = documentObject.createElement("strong")
+  titleElement.textContent = "Graph unavailable"
+  titleElement.style.display = "block"
+  titleElement.style.marginBottom = "8px"
+
+  const messageElement = documentObject.createElement("p")
+  messageElement.textContent = toGraphVisualizerBootstrapUserMessage(error)
+  messageElement.style.margin = "0"
+
+  panelElement.append(titleElement, messageElement)
+  hostElement.append(panelElement)
 }
