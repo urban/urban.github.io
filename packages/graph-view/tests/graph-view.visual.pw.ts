@@ -102,6 +102,18 @@ test.describe("graph view custom theme overrides", () => {
   })
 })
 
+test.describe("graph view bootstrap errors", () => {
+  test("renders a user-facing error for an invalid theme", async ({ page }) => {
+    await page.goto("/playwright-invalid-theme-harness.html")
+
+    const alert = page.getByRole("alert")
+    await expect(alert).toContainText(
+      "The light graph theme could not be loaded because it does not match the expected shape.",
+    )
+    await expect(page).toHaveScreenshot("graph-invalid-theme-error.png", { maxDiffPixels: 3_000 })
+  })
+})
+
 test.describe("graph view interactions", () => {
   test("shows hover state for the selected node", async ({ page }) => {
     await gotoHarness(page)
