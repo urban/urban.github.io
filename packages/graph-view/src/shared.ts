@@ -28,6 +28,11 @@ export type GraphTheme = {
   }
 }
 
+export type GraphThemeSet = {
+  light: GraphTheme
+  dark: GraphTheme
+}
+
 export interface GraphNode extends d3.SimulationNodeDatum {
   id: NodeId
   label: string
@@ -166,7 +171,7 @@ const GRAPH_LABEL_STYLE: PIXI.TextStyleOptions = {
   fontWeight: "400",
 }
 
-const LIGHT_GRAPH_THEME: GraphTheme = {
+export const LIGHT_GRAPH_THEME: GraphTheme = {
   view: { backgroundColor: 0xf5f5f5 },
   node: {
     variants: {
@@ -198,7 +203,7 @@ const LIGHT_GRAPH_THEME: GraphTheme = {
   },
 }
 
-const DARK_GRAPH_THEME: GraphTheme = {
+export const DARK_GRAPH_THEME: GraphTheme = {
   view: { backgroundColor: 0x1b1917 },
   node: {
     variants: {
@@ -230,10 +235,14 @@ const DARK_GRAPH_THEME: GraphTheme = {
   },
 }
 
-export function resolveGraphTheme(documentObject: Document): GraphTheme {
-  return documentObject.documentElement.classList.contains("dark")
-    ? DARK_GRAPH_THEME
-    : LIGHT_GRAPH_THEME
+export function resolveGraphTheme(
+  documentObject: Document,
+  themeSet: GraphThemeSet = {
+    light: LIGHT_GRAPH_THEME,
+    dark: DARK_GRAPH_THEME,
+  },
+): GraphTheme {
+  return documentObject.documentElement.classList.contains("dark") ? themeSet.dark : themeSet.light
 }
 
 const MAX_NODE_SCALE = Math.max(

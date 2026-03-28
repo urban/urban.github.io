@@ -11,12 +11,16 @@ import {
   toSnapshotNodeLabel,
 } from "./state"
 import {
+  DARK_GRAPH_THEME,
   GRAPH_CONFIG,
+  LIGHT_GRAPH_THEME,
   resolveGraphTheme,
   selectedNodeIdFromSelection,
   type AppAction,
   type AppCommand,
   type GraphNode,
+  type GraphTheme,
+  type GraphThemeSet,
   type NodeId,
   type SimulationGraphLink,
 } from "./shared"
@@ -172,6 +176,359 @@ export function resolveInitialSelectedNodeIdFromHtmlConfig(
 
   const normalizedSelectedNodeId = selectedNodeId.trim()
   return normalizedSelectedNodeId === "" ? null : normalizedSelectedNodeId
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null
+}
+
+function readNumberProperty(
+  record: Record<string, unknown>,
+  propertyName: string,
+  themeName: string,
+) {
+  const value = record[propertyName]
+  if (typeof value !== "number") {
+    throw new Error(`Invalid ${themeName} graph theme JSON: ${propertyName} must be a number.`)
+  }
+  return value
+}
+
+function readNodeStateVariantMap(
+  value: unknown,
+  themeName: string,
+): GraphTheme["node"]["variants"] {
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: node.variants must be an object.`)
+  }
+
+  return {
+    default: {
+      fill: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "fill",
+        themeName,
+      ),
+      stroke: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "stroke",
+        themeName,
+      ),
+      strokeWidth: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "strokeWidth",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "alpha",
+        themeName,
+      ),
+    },
+    selected: {
+      fill: readNumberProperty(
+        value.selected && isRecord(value.selected) ? value.selected : {},
+        "fill",
+        themeName,
+      ),
+      stroke: readNumberProperty(
+        value.selected && isRecord(value.selected) ? value.selected : {},
+        "stroke",
+        themeName,
+      ),
+      strokeWidth: readNumberProperty(
+        value.selected && isRecord(value.selected) ? value.selected : {},
+        "strokeWidth",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.selected && isRecord(value.selected) ? value.selected : {},
+        "alpha",
+        themeName,
+      ),
+    },
+    muted: {
+      fill: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "fill",
+        themeName,
+      ),
+      stroke: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "stroke",
+        themeName,
+      ),
+      strokeWidth: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "strokeWidth",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "alpha",
+        themeName,
+      ),
+    },
+  }
+}
+
+function readNodeStateScaleMap(value: unknown, themeName: string): GraphTheme["node"]["scales"] {
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: node.scales must be an object.`)
+  }
+
+  return {
+    default: readNumberProperty(value, "default", themeName),
+    selected: readNumberProperty(value, "selected", themeName),
+    muted: readNumberProperty(value, "muted", themeName),
+  }
+}
+
+function readEdgeStateVariantMap(
+  value: unknown,
+  themeName: string,
+): GraphTheme["edge"]["variants"] {
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: edge.variants must be an object.`)
+  }
+
+  return {
+    default: {
+      width: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "width",
+        themeName,
+      ),
+      color: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "color",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "alpha",
+        themeName,
+      ),
+    },
+    muted: {
+      width: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "width",
+        themeName,
+      ),
+      color: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "color",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "alpha",
+        themeName,
+      ),
+    },
+  }
+}
+
+function readLabelStateVariantMap(
+  value: unknown,
+  themeName: string,
+): GraphTheme["label"]["variants"] {
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: label.variants must be an object.`)
+  }
+
+  return {
+    default: {
+      fill: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "fill",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.default && isRecord(value.default) ? value.default : {},
+        "alpha",
+        themeName,
+      ),
+    },
+    selected: {
+      fill: readNumberProperty(
+        value.selected && isRecord(value.selected) ? value.selected : {},
+        "fill",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.selected && isRecord(value.selected) ? value.selected : {},
+        "alpha",
+        themeName,
+      ),
+    },
+    muted: {
+      fill: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "fill",
+        themeName,
+      ),
+      alpha: readNumberProperty(
+        value.muted && isRecord(value.muted) ? value.muted : {},
+        "alpha",
+        themeName,
+      ),
+    },
+  }
+}
+
+const SUPPORTED_FONT_WEIGHTS = [
+  "normal",
+  "bold",
+  "bolder",
+  "lighter",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+] as const
+
+function isSupportedFontWeight(
+  value: string,
+): value is NonNullable<GraphTheme["label"]["style"]["fontWeight"]> {
+  return SUPPORTED_FONT_WEIGHTS.some((supportedFontWeight) => supportedFontWeight === value)
+}
+
+function readLabelStyle(value: unknown, themeName: string): GraphTheme["label"]["style"] {
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: label.style must be an object.`)
+  }
+
+  const style: GraphTheme["label"]["style"] = {}
+  const fontFamily = value.fontFamily
+  const fontSize = value.fontSize
+  const fontWeight = value.fontWeight
+
+  if (fontFamily !== undefined) {
+    if (typeof fontFamily !== "string") {
+      throw new Error(
+        `Invalid ${themeName} graph theme JSON: label.style.fontFamily must be a string.`,
+      )
+    }
+    style.fontFamily = fontFamily
+  }
+
+  if (fontSize !== undefined) {
+    if (typeof fontSize !== "number") {
+      throw new Error(
+        `Invalid ${themeName} graph theme JSON: label.style.fontSize must be a number.`,
+      )
+    }
+    style.fontSize = fontSize
+  }
+
+  if (fontWeight !== undefined) {
+    if (typeof fontWeight !== "string" || !isSupportedFontWeight(fontWeight)) {
+      throw new Error(
+        `Invalid ${themeName} graph theme JSON: label.style.fontWeight must be a supported font-weight string.`,
+      )
+    }
+    style.fontWeight = fontWeight
+  }
+
+  return style
+}
+
+function decodeGraphTheme(value: unknown, themeName: string): GraphTheme {
+  if (!isRecord(value)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: theme must be an object.`)
+  }
+
+  const view = value.view
+  const node = value.node
+  const edge = value.edge
+  const label = value.label
+
+  if (!isRecord(view)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: view must be an object.`)
+  }
+  if (!isRecord(node)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: node must be an object.`)
+  }
+  if (!isRecord(edge)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: edge must be an object.`)
+  }
+  if (!isRecord(label)) {
+    throw new Error(`Invalid ${themeName} graph theme JSON: label must be an object.`)
+  }
+
+  return {
+    view: { backgroundColor: readNumberProperty(view, "backgroundColor", themeName) },
+    node: {
+      variants: readNodeStateVariantMap(node.variants, themeName),
+      scales: readNodeStateScaleMap(node.scales, themeName),
+    },
+    edge: {
+      variants: readEdgeStateVariantMap(edge.variants, themeName),
+    },
+    label: {
+      variants: readLabelStateVariantMap(label.variants, themeName),
+      style: readLabelStyle(label.style, themeName),
+    },
+  }
+}
+
+function parseOptionalGraphThemeJson(
+  themeJson: string | null | undefined,
+  themeName: string,
+): GraphTheme | null {
+  const normalizedThemeJson = themeJson?.trim() ?? ""
+  if (normalizedThemeJson === "") {
+    return null
+  }
+
+  try {
+    return decodeGraphTheme(JSON.parse(normalizedThemeJson), themeName)
+  } catch (error: unknown) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith(`Invalid ${themeName} graph theme JSON:`)
+    ) {
+      throw error
+    }
+
+    throw new Error(
+      `Invalid ${themeName} graph theme JSON: ${
+        error instanceof Error ? error.message : "unknown parse error"
+      }`,
+    )
+  }
+}
+
+export function resolveGraphThemeSetFromHtmlConfig({
+  lightThemeJson,
+  darkThemeJson,
+}: {
+  lightThemeJson: string | null | undefined
+  darkThemeJson: string | null | undefined
+}): GraphThemeSet {
+  return {
+    light: parseOptionalGraphThemeJson(lightThemeJson, "light") ?? LIGHT_GRAPH_THEME,
+    dark: parseOptionalGraphThemeJson(darkThemeJson, "dark") ?? DARK_GRAPH_THEME,
+  }
+}
+
+function readGraphThemeSetFromDocument(documentObject: Document): GraphThemeSet {
+  const appElement = documentObject.getElementById("app")
+  if (appElement === null) {
+    throw new Error("Missing #app container element for graph visualizer bootstrap.")
+  }
+
+  return resolveGraphThemeSetFromHtmlConfig({
+    lightThemeJson: appElement.dataset.lightGraphTheme,
+    darkThemeJson: appElement.dataset.darkGraphTheme,
+  })
 }
 
 function readGraphSnapshotSourceFromDocument(documentObject: Document): HtmlGraphSnapshotSource {
@@ -331,11 +688,12 @@ export async function bootstrapGraphVisualizer({
   documentObject = document,
 }: GraphVisualizerBootstrapOptions = {}) {
   const graphSource = readGraphSnapshotSourceFromDocument(documentObject)
+  const graphThemes = readGraphThemeSetFromDocument(documentObject)
   const graph =
     graphSource.type === "snapshot-url"
       ? await loadGraphDataFromSnapshot(graphSource.snapshotUrl)
       : createGraphDataFromSnapshotPayload(graphSource.snapshotPayload)
-  const getTheme = () => resolveGraphTheme(documentObject)
+  const getTheme = () => resolveGraphTheme(documentObject, graphThemes)
   const app = await createPixiApp({ containerSelector: "#app", theme: getTheme() })
   const graphRootElement = app.canvas.parentElement
   if (!(graphRootElement instanceof HTMLElement)) {
