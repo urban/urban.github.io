@@ -16,7 +16,8 @@ const BackToPrev = ({ children, href }: Props) => {
   return (
     <NextLink
       href={href}
-      className="relative group w-fit flex pl-7 pr-3 py-1.5 flex-nowrap rounded border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+      // className="relative group w-fit flex pl-7 pr-3 py-1.5 flex-nowrap rounded border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
+      className="relative group w-fit flex pl-7 flex-nowrap hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
       onClick={handleClick}
     >
       <svg

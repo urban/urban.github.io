@@ -7,14 +7,10 @@ import remarkGfm from "remark-gfm"
 import { DescriptionExcerptPlugin } from "./DescriptionExcerptPlugin"
 import { HeadingsPlugin } from "./HeadingsPlugin"
 import { LocalImagePlugin } from "./LocalImagePlugin"
-import type { MDXComponents, MDXModule } from "mdx/types"
+import type { MDXModule } from "mdx/types"
 import type { VFile } from "vfile"
 import rehypeShiki from "@shikijs/rehype"
-import { MdxLink } from "../../ui/MdxLink"
-
-const MDX_COMPONENTS = {
-  a: MdxLink,
-} satisfies MDXComponents
+import { MdxComponents } from "../../ui/MdxComponents"
 
 export class MdxError extends Schema.TaggedErrorClass<MdxError>()("MdxError", {
   error: Schema.Unknown,
@@ -41,7 +37,11 @@ export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
                 [
                   rehypeShiki,
                   {
-                    theme: "material-theme",
+                    themes: {
+                      light: "github-light",
+                      dark: "github-dark",
+                    },
+                    // defaultColor: false,
                   },
                 ],
                 headings,
@@ -59,7 +59,7 @@ export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
             run(vFile, {
               ...runtime,
               baseUrl: import.meta.url,
-              useMDXComponents: () => MDX_COMPONENTS,
+              useMDXComponents: () => MdxComponents,
             }) as Promise<MDXModule>,
           catch: (error) => new MdxError({ error, type: "run" }),
         }).pipe(Effect.tapError(Effect.logError)),

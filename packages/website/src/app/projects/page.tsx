@@ -6,6 +6,7 @@ import type { ContentService } from "@/lib/services/Content"
 import { RuntimeServer } from "@/lib/RuntimeServer"
 import { ArrowCard } from "@/ui/ArrowCard"
 import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
+import { ComingSoon } from "@/ui/ComingSoon"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
@@ -26,6 +27,7 @@ export const metadata: NextMetadata = {
 
 export default async function Page() {
   const projects = await RuntimeServer.runPromise(main)
+  const hasProjects = projects.length !== 0
   return (
     <>
       <PageNavigationAnimation />
@@ -33,6 +35,7 @@ export default async function Page() {
         <div className="py-10">
           <div className="animate font-semibold text-black dark:text-white">Projects</div>
           <ul className="animate flex flex-col gap-4">
+            {!hasProjects && <ComingSoon />}
             {projects.map(({ data, slug }) => (
               <li key={slug}>
                 <ArrowCard collection="projects" metadata={data} slug={slug} />

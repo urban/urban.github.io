@@ -9,5 +9,6 @@
 
   --color-link: oklch(0.56 0.2 255);
   --color-link-visited: var(--color-crimson);
+  --color-link-bright-visited: var(--color-bright-crimson);
   --color-link-hover: oklch(0.48, 0.2, 255);
 }

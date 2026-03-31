@@ -3,11 +3,11 @@ import { notFound } from "next/navigation"
 import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
 import type { ContentService, VaultEntry } from "@/lib/services/Content"
-import { readingTime } from "@/lib/utils"
+// import { readingTime } from "@/lib/utils"
 import { getSelectedVaultNodeId, getVaultGraphModel } from "@/lib/vaultGraph"
 import { BackToPrev } from "@/ui/BackToPrev"
 import { Container } from "@/ui/Container"
-import { FormattedDate } from "@/ui/FormattedDate"
+// import { FormattedDate } from "@/ui/FormattedDate"
 import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 import { VaultGraphHost } from "@/ui/VaultGraphHost"
 
@@ -58,11 +58,11 @@ export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEn
               <h1 className="mt-2 text-2xl font-semibold text-black dark:text-white">
                 {entry.data.title}
               </h1>
-              <div className="flex items-center gap-1.5 text-sm">
+              {/*<div className="flex items-center gap-1.5 text-sm">
                 <FormattedDate date={entry.data.updated} />
                 <span>&bull;</span>
                 <span>{readingTime(entry.source)}</span>
-              </div>
+              </div>*/}
             </div>
             <article className="animate">
               <entry.Content />

@@ -2,11 +2,16 @@
 @plugin "@tailwindcss/typography";
 @import "./theme.css";
 
+:root {
+  --external-link-icon: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTcxYzIiIHN0cm9rZS13aWR0aD0iMS43NSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWV4dGVybmFsLWxpbmsiPjxwYXRoIGQ9Ik0xOCAxM3Y2YTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0yVjhhMiAyIDAgMCAxIDItMmg2Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iMTUgMyAyMSAzIDIxIDkiPjwvcG9seWxpbmU+PGxpbmUgeDE9IjEwIiB5MT0iMTQiIHgyPSIyMSIgeTI9IjMiPjwvbGluZT48L3N2Zz4K");
+  --external-link-mask: var(--external-link-icon) center / contain no-repeat;
+}
+
 html {
   overflow-y: scroll;
   color-scheme: light;
 }
-html[data-color-scheme="dark"] {
+html.dark {
   color-scheme: dark;
 }
 
@@ -15,21 +20,31 @@ body {
   @apply size-full;
 }
 
+html.dark .shiki,
+html.dark .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  /* Optional, if you also want font styles */
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
 body {
   @apply font-sans antialiased;
   @apply flex flex-col;
-  @apply bg-stone-100 dark:bg-stone-900;
+  /*@apply bg-stone-100 dark:bg-stone-900;*/
+  @apply bg-white dark:bg-stone-900;
   @apply text-black/50 dark:text-white/75;
 }
 
 header {
   @apply fixed top-0 left-0 right-0 z-50 py-5;
-  @apply bg-stone-100/75 dark:bg-stone-900/25;
   @apply backdrop-blur-sm saturate-200;
 }
 
 main {
-  @apply flex-1 py-16;
+  @apply flex-1 py-24;
 }
 
 footer {
@@ -37,51 +52,47 @@ footer {
 }
 
 article {
-  /*@apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;*/
-  @apply max-w-full prose-img:mx-auto prose-img:my-auto;
+  @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
   @apply prose-headings:font-semibold prose-p:font-serif;
-  /*@apply prose-headings:text-black prose-headings:dark:text-white;*/
+  @apply prose-headings:text-black prose-headings:dark:text-white;
+}
+
+:not(pre) > code {
+  @apply bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-black/80 dark:text-white/80;
 }
 
 @layer components {
   .nav-link {
-    @apply inline-block relative;
-    @apply text-black/80 dark:text-white/50;
+    @apply inline-block relative cursor-pointer;
+    @apply text-black/50 dark:text-white/50 hover:text-black/80 dark:hover:text-white/80;
     @apply transform-3d;
   }
   .nav-link:hover {
     @apply text-link-hover;
   }
-  .nav-link.selected {
-    @apply decoration-black/80 dark:decoration-white/50 underline underline-offset-4;
-  }
   .nav-link > span {
     @apply inline-block;
     @apply transition-transform duration-300;
-  }
-  .nav-link:hover > span {
-    @apply -translate-y-0.5;
-  }
-  .nav-link:visited {
-    @apply text-black/80 dark:text-white/50;
   }
   .nav-link::after {
     @apply content-[''] absolute w-full h-px left-0 bottom-0.5;
     @apply bg-black/80 dark:bg-white/50;
     @apply scale-x-0 origin-left transition-transform duration-300;
   }
-  .nav-link:visited::after,
-  .nav-link:visited:hover::after {
-    @apply text-black/80 dark:text-white/50;
-  }
-  article a:hover::after,
-  .nav-link.selected::after {
+  .nav-link:hover::after {
     @apply scale-x-100;
   }
 }
 
 @layer utilities {
   article a {
+    @apply underline underline-offset-4;
+    @apply hover:text-black/80;
+    @apply decoration-black/30 dark:decoration-white/30 hover:decoration-black/80 dark:hover:decoration-white/80;
+    @apply transition-colors duration-300;
+  }
+
+  /*article a {
     @apply inline-block relative;
     @apply text-link;
     @apply transform-3d;
@@ -100,7 +111,7 @@ article {
     @apply -translate-y-0.5;
   }
   article a:visited {
-    @apply text-link-visited;
+    @apply text-link-visited dark:text-link-bright-visited;
   }
   article a::after {
     @apply content-[''] absolute w-full h-px left-0 bottom-0.5;
@@ -109,11 +120,27 @@ article {
   }
   article a:visited::after,
   article a:visited:hover::after {
-    @apply bg-link-visited;
+    @apply bg-link-visited dark:bg-link-bright-visited;
   }
   article a:hover::after,
   article a.selected::after {
     @apply scale-x-100;
+  }*/
+
+  /* append external link symbol */
+  .external-link {
+    @apply inline pe-4;
+    @apply bg-black/50 dark:bg-white/30;
+    -webkit-mask: var(--external-link-mask);
+    mask: var(--external-link-mask);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    -webkit-mask-position: center center;
+    mask-position: center center;
+
+    -webkit-mask-size: 16px 16px;
+    mask-size: 16px 16px;
   }
 }
 
