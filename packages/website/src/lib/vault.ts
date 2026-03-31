@@ -119,6 +119,9 @@ const escapeHtml = (value: string): string =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;")
 
+const escapeMarkdownLinkLabel = (value: string): string =>
+  value.replaceAll("\\", "\\\\").replaceAll("[", "\\[").replaceAll("]", "\\]")
+
 const normalizeVaultWikiLookupToken = (value: string): string | undefined => {
   const token = value.trim().replace(/\s+/g, " ").toLowerCase()
   return token.length === 0 ? undefined : token
@@ -327,7 +330,7 @@ export const preprocessVaultMarkdownSource = (
           ? resolution.link.label.text
           : resolution.entry.title
 
-      return `<a href="${escapeHtml(toVaultRoutePath(resolution.entry.slug))}">${escapeHtml(visibleText)}</a>`
+      return `[${escapeMarkdownLinkLabel(visibleText)}](${toVaultRoutePath(resolution.entry.slug)})`
     })
     .join("")
 

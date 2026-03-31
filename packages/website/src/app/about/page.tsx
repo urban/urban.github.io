@@ -40,7 +40,7 @@ const main = Effect.gen(function* () {
 })
 
 export const metadata: Metadata = {
-  title: "Home",
+  title: "About",
   description: "Urban Faubion's personal website.",
 }
 

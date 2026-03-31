@@ -226,9 +226,12 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
 
           const preparedEntries: ReadonlyArray<PreparedVaultEntry> = yield* Effect.all(
             sourceEntries.map((entry) =>
-              metadata
-                .vaultSeed(entry.data)
-                .pipe(Effect.map((vaultMetadata) => ({ ...entry, metadata: vaultMetadata }))),
+              metadata.vaultSeed(entry.data).pipe(
+                Effect.map((vaultMetadata) => ({
+                  ...entry,
+                  metadata: vaultMetadata,
+                })),
+              ),
             ),
           )
 
@@ -251,7 +254,10 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
 
               return mdx
                 .compile(
-                  new VFile({ data: { filepath: entry.filepath }, value: preprocessedSource }),
+                  new VFile({
+                    data: { filepath: entry.filepath },
+                    value: preprocessedSource,
+                  }),
                 )
                 .pipe(
                   Effect.flatMap((compiled) =>

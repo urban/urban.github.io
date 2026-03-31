@@ -1,13 +1,13 @@
 import { Array, Effect, flow } from "effect"
 import type { Metadata, ResolvingMetadata } from "next"
-import { RuntimeServer } from "../../../lib/RuntimeServer"
-import { Content } from "../../../lib/services/Content"
-import type { ContentService } from "../../../lib/services/Content"
-import { readingTime } from "../../../lib/utils"
-import { BackToPrev } from "../../../ui/BackToPrev"
-import { Container } from "../../../ui/Container"
-import { FormattedDate } from "../../../ui/FormattedDate"
-import { PageNavigationAnimation } from "../../../ui/PageNavigationAnimation"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { readingTime } from "@/lib/utils"
+import { BackToPrev } from "@/ui/BackToPrev"
+import { Container } from "@/ui/Container"
+import { FormattedDate } from "@/ui/FormattedDate"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 
 const main = (pathSlug: string) =>
   Effect.gen(function* () {

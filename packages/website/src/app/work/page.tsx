@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
-import { Container } from "../../ui/Container"
+import { Container } from "@/ui/Container"
 import { Array, Effect, pipe, Record } from "effect"
-import { Content } from "../../lib/services/Content"
-import type { ContentService } from "../../lib/services/Content"
-import { RuntimeServer } from "../../lib/RuntimeServer"
-import { PageNavigationAnimation } from "../../ui/PageNavigationAnimation"
-import { PageTitle } from "../../ui/PageTitle"
-import { WorkList } from "../../ui/WorkList"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
+import { PageTitle } from "@/ui/PageTitle"
+import { WorkList } from "@/ui/WorkList"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content

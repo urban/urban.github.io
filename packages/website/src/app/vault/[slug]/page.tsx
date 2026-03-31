@@ -1,5 +1,5 @@
 import type { Metadata, ResolvingMetadata } from "next"
-import { RuntimeServer } from "../../../lib/RuntimeServer"
+import { RuntimeServer } from "@/lib/RuntimeServer"
 import { VaultEntryPage, getRequiredVaultEntry, getVaultStaticParams } from "../VaultEntryPage"
 
 type PageProps = {

@@ -333,7 +333,9 @@ See [[fixture-target]].
   expect(entry.source).toContain("[[fixture-target]]")
 
   const markup = renderToStaticMarkup(createElement(entry.Content))
-  expect(markup).toContain('<p>See <a href="/vault/fixture-target">Fixture Target</a>.</p>')
+  expect(markup).toContain(
+    '<p>See <a class="styled-link" href="/vault/fixture-target"><span>Fixture Target</span></a>.</p>',
+  )
 })
 
 test("content service renders resolved and unresolved vault wiki-links across mixed inline content", async () => {
@@ -396,7 +398,7 @@ Start [[fixture-target-alpha]], continue with [[fixture-target-beta|Beta Label]]
   const markup = renderToStaticMarkup(createElement(entry.Content))
 
   expect(markup).toContain(
-    `<p>Start <a href="/vault/fixture-target-alpha">Fixture Target Alpha</a>, continue with <a href="/vault/fixture-target-beta">Beta Label</a>, and end on <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Missing Target</span>.</p>`,
+    `<p>Start <a class="styled-link" href="/vault/fixture-target-alpha"><span>Fixture Target Alpha</span></a>, continue with <a class="styled-link" href="/vault/fixture-target-beta"><span>Beta Label</span></a>, and end on <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Missing Target</span>.</p>`,
   )
   expect(markup).not.toContain("[[")
 })

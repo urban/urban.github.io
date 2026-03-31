@@ -1,11 +1,11 @@
 import type { Metadata as NextMetadata } from "next"
-import { Container } from "../../ui/Container"
+import { Container } from "@/ui/Container"
 import { Array, Effect, flow, Order } from "effect"
-import { Content } from "../../lib/services/Content"
-import type { ContentService } from "../../lib/services/Content"
-import { RuntimeServer } from "../../lib/RuntimeServer"
-import { ArrowCard } from "../../ui/ArrowCard"
-import { PageNavigationAnimation } from "../../ui/PageNavigationAnimation"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { ArrowCard } from "@/ui/ArrowCard"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content

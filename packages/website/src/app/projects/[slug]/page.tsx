@@ -1,14 +1,14 @@
 import { Array, Effect } from "effect"
 import type { Metadata, ResolvingMetadata } from "next"
-import { RuntimeServer } from "../../../lib/RuntimeServer"
-import { Content } from "../../../lib/services/Content"
-import type { ContentService } from "../../../lib/services/Content"
-import { readingTime } from "../../../lib/utils"
-import { BackToPrev } from "../../../ui/BackToPrev"
-import { Container } from "../../../ui/Container"
-import { FormattedDate } from "../../../ui/FormattedDate"
-import { Link } from "../../../ui/Link"
-import { PageNavigationAnimation } from "../../../ui/PageNavigationAnimation"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { readingTime } from "@/lib/utils"
+import { BackToPrev } from "@/ui/BackToPrev"
+import { Container } from "@/ui/Container"
+import { FormattedDate } from "@/ui/FormattedDate"
+import { Link } from "@/ui/NavLink"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 
 const main = (pathSlug: string) =>
   Effect.gen(function* () {
@@ -70,17 +70,9 @@ export default async function Page({ params }: PageProps) {
           </div>
           {(project.data.demoURL || project.data.repoURL) && (
             <nav className="animate flex gap-1">
-              {project.data.demoURL && (
-                <Link href={project.data.demoURL} external>
-                  demo
-                </Link>
-              )}
+              {project.data.demoURL && <Link href={project.data.demoURL}>demo</Link>}
               {project.data.demoURL && project.data.repoURL && <span>/</span>}
-              {project.data.repoURL && (
-                <Link href={project.data.repoURL} external>
-                  repo
-                </Link>
-              )}
+              {project.data.repoURL && <Link href={project.data.repoURL}>repo</Link>}
             </nav>
           )}
         </div>
