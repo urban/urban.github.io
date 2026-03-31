@@ -5,12 +5,12 @@ export const LIGHT_VAULT_GRAPH_THEME: GraphTheme = {
   node: {
     variants: {
       default: { fill: 0x57534e, stroke: 0xf5f5f4, strokeWidth: 1, alpha: 1 },
-      selected: { fill: 0xea580c, stroke: 0xffedd5, strokeWidth: 2, alpha: 1 },
+      selected: { fill: 0x57534e, stroke: 0xf5f5f4, strokeWidth: 2, alpha: 1 },
       muted: { fill: 0xd6d3d1, stroke: 0xf5f5f4, strokeWidth: 1, alpha: 0.4 },
     },
     scales: {
       default: 1,
-      selected: 2,
+      selected: 2.5,
       muted: 1,
     },
   },
