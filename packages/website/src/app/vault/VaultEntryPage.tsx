@@ -4,12 +4,13 @@ import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
 import type { ContentService, VaultEntry } from "@/lib/services/Content"
 // import { readingTime } from "@/lib/utils"
-import { getSelectedVaultNodeId, getVaultGraphModel } from "@/lib/vaultGraph"
+import { getSelectedVaultNodeId, getVaultBacklinks, getVaultGraphModel } from "@/lib/vaultGraph"
 import { BackToPrev } from "@/ui/BackToPrev"
 import { Container } from "@/ui/Container"
 // import { FormattedDate } from "@/ui/FormattedDate"
 import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 import { VaultGraphHost } from "@/ui/VaultGraphHost"
+import { Backlinks } from "@/ui/VaultBacklinks"
 
 export const getVaultEntry = (slug: string) =>
   Effect.gen(function* () {
@@ -42,6 +43,7 @@ export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEn
     getVaultGraphModel(),
     getSelectedVaultNodeId(entry.slug),
   ])
+  const backlinks = getVaultBacklinks(snapshot, selectedNodeId)
 
   return (
     <>
@@ -75,6 +77,9 @@ export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEn
               scrollZoomEnabled={false}
             />
           </div>
+          <section className="animate">
+            <Backlinks backlinks={backlinks} />
+          </section>
         </div>
       </Container>
     </>

@@ -24,4 +24,9 @@ export {
   type MarkdownSourceFile,
   type ValidatedMarkdownFile,
 } from "./core/validate"
-export { GraphSnapshotSchema, type BuildGraphOptions, type GraphSnapshot } from "./domain/schema"
+export {
+  GraphSnapshotSchema,
+  type BuildGraphOptions,
+  type GraphSnapshot,
+  type GraphSnapshotNoteNode,
+} from "./domain/schema"
