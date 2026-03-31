@@ -67,6 +67,7 @@
       }
 
       .hint,
+      .controls-panel,
       .theme-controls {
         position: fixed;
         z-index: 1;
@@ -74,16 +75,67 @@
         -webkit-backdrop-filter: blur(8px) saturate(160%);
         background: var(--panel-bg);
         border: 1px solid var(--panel-border);
-        border-radius: 999px;
       }
 
       .hint {
         left: 12px;
         top: 12px;
         padding: 8px 12px;
+        border-radius: 999px;
         font-size: 12px;
         line-height: 1.4;
         user-select: none;
+      }
+
+      .controls-panel {
+        left: 12px;
+        bottom: 12px;
+        display: grid;
+        gap: 12px;
+        min-width: 220px;
+        padding: 12px;
+        border-radius: 16px;
+      }
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-strong);
+      }
+
+      .toggle-row input {
+        margin: 0;
+      }
+
+      .zoom-controls {
+        display: flex;
+        gap: 8px;
+      }
+
+      .control-button,
+      .theme-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        background: transparent;
+        color: var(--text-strong);
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      .control-button {
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 999px;
+        font-size: 18px;
+        font-weight: 600;
       }
 
       .theme-controls {
@@ -94,29 +146,21 @@
         gap: 4px;
         align-items: center;
         padding: 4px;
+        border-radius: 999px;
       }
 
       .theme-button {
         width: 32px;
         height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
         border-radius: 999px;
-        background: transparent;
-        color: var(--text-strong);
-        cursor: pointer;
-        transition:
-          background-color 0.2s ease,
-          color 0.2s ease,
-          opacity 0.2s ease;
       }
 
+      .control-button:hover,
       .theme-button:hover {
         background: var(--button-hover);
       }
 
+      .control-button:focus-visible,
       .theme-button:focus-visible {
         outline: 2px solid var(--text-strong);
         outline-offset: 2px;
@@ -133,10 +177,25 @@
     <div
       id="app"
       data-graph-snapshot-url="/graph-snapshot.json"
+      data-scroll-zoom-enabled="true"
       data-light-graph-theme='{"view":{"backgroundColor":16119285},"node":{"variants":{"default":{"fill":7893356,"stroke":16119284,"strokeWidth":1,"alpha":1},"selected":{"fill":789335,"stroke":16119284,"strokeWidth":2,"alpha":1},"muted":{"fill":14079761,"stroke":16119284,"strokeWidth":1,"alpha":0.45}},"scales":{"default":1,"selected":2,"muted":1}},"edge":{"variants":{"default":{"width":2,"color":5722958,"alpha":0.55},"muted":{"width":2,"color":11051678,"alpha":0.18}}},"label":{"variants":{"default":{"fill":789335,"alpha":1},"selected":{"fill":789335,"alpha":1},"muted":{"fill":7893356,"alpha":0.45}},"style":{"fontFamily":"Arial","fontSize":16,"fontWeight":"400"}}}'
       data-dark-graph-theme='{"view":{"backgroundColor":1777943},"node":{"variants":{"default":{"fill":11051678,"stroke":789335,"strokeWidth":1,"alpha":1},"selected":{"fill":16119284,"stroke":789335,"strokeWidth":2,"alpha":1},"muted":{"fill":4473924,"stroke":789335,"strokeWidth":1,"alpha":0.45}},"scales":{"default":1,"selected":2,"muted":1}},"edge":{"variants":{"default":{"width":2,"color":14079761,"alpha":0.5},"muted":{"width":2,"color":5722958,"alpha":0.25}}},"label":{"variants":{"default":{"fill":16119284,"alpha":1},"selected":{"fill":16119284,"alpha":1},"muted":{"fill":11051678,"alpha":0.45}},"style":{"fontFamily":"Arial","fontSize":16,"fontWeight":"400"}}}'
     ></div>
-    <div class="hint">Drag nodes. Drag background to pan. Use mouse wheel to zoom.</div>
+    <div class="hint">Drag nodes. Drag background to pan. Toggle wheel zoom as needed.</div>
+    <div class="controls-panel" aria-label="Graph zoom controls">
+      <label class="toggle-row" for="scroll-zoom-toggle">
+        <input id="scroll-zoom-toggle" type="checkbox" checked />
+        <span>Enable scroll zoom</span>
+      </label>
+      <div class="zoom-controls">
+        <button id="zoom-out-button" class="control-button" type="button" aria-label="Zoom out">
+          −
+        </button>
+        <button id="zoom-in-button" class="control-button" type="button" aria-label="Zoom in">
+          +
+        </button>
+      </div>
+    </div>
     <div class="theme-controls" aria-label="Color scheme controls">
       <button id="light-theme-button" class="theme-button" aria-label="Light theme" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" aria-hidden="true">
@@ -227,6 +286,48 @@
         }
       })
     </script>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module">
+      import { bootstrapGraphVisualizer } from "/src/bootstrap.ts"
+
+      const appElement = document.getElementById("app")
+      const scrollZoomToggle = document.getElementById("scroll-zoom-toggle")
+      const zoomInButton = document.getElementById("zoom-in-button")
+      const zoomOutButton = document.getElementById("zoom-out-button")
+
+      if (
+        !(appElement instanceof HTMLElement) ||
+        !(scrollZoomToggle instanceof HTMLInputElement) ||
+        !(zoomInButton instanceof HTMLButtonElement) ||
+        !(zoomOutButton instanceof HTMLButtonElement)
+      ) {
+        throw new Error("Missing graph demo controls.")
+      }
+
+      const initialScrollZoomEnabled = appElement.dataset.scrollZoomEnabled !== "false"
+      scrollZoomToggle.checked = initialScrollZoomEnabled
+
+      const dispose = await bootstrapGraphVisualizer({
+        scrollZoomEnabled: initialScrollZoomEnabled,
+        onReady: (graphHandle) => {
+          scrollZoomToggle.addEventListener("change", () => {
+            graphHandle.setScrollZoomEnabled(scrollZoomToggle.checked)
+          })
+          zoomInButton.addEventListener("click", () => {
+            graphHandle.zoomIn()
+          })
+          zoomOutButton.addEventListener("click", () => {
+            graphHandle.zoomOut()
+          })
+        },
+      })
+
+      window.addEventListener(
+        "beforeunload",
+        () => {
+          dispose()
+        },
+        { once: true },
+      )
+    </script>
   </body>
 </html>

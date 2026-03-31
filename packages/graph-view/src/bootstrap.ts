@@ -45,6 +45,9 @@ export type GraphVisualizerHandle = {
   hoverNode: (nodeId: NodeId | null) => void
   selectNode: (nodeId: NodeId) => void
   settleLayout: (tickCount?: number) => void
+  setScrollZoomEnabled: (enabled: boolean) => void
+  zoomIn: () => void
+  zoomOut: () => void
 }
 
 export type GraphVisualizerBootstrapOptions = {
@@ -53,6 +56,7 @@ export type GraphVisualizerBootstrapOptions = {
   disableAnimations?: boolean
   selectedNodeId?: NodeId | null
   themeSet?: GraphThemeSet
+  scrollZoomEnabled?: boolean
   documentObject?: Document
 }
 
@@ -211,6 +215,13 @@ export function resolveInitialSelectedNodeIdFromHtmlConfig(
 
   const normalizedSelectedNodeId = selectedNodeId.trim()
   return normalizedSelectedNodeId === "" ? null : normalizedSelectedNodeId
+}
+
+export function resolveScrollZoomEnabledFromHtmlConfig(
+  scrollZoomEnabled: string | null | undefined,
+): boolean {
+  const normalizedScrollZoomEnabled = scrollZoomEnabled?.trim().toLowerCase()
+  return normalizedScrollZoomEnabled !== "false"
 }
 
 const FontWeightSchema = Schema.Union([
@@ -454,6 +465,15 @@ function readInitialSelectedNodeIdFromDocument(documentObject: Document): NodeId
   return resolveInitialSelectedNodeIdFromHtmlConfig(appElement.dataset.selectedNodeId)
 }
 
+function readScrollZoomEnabledFromDocument(documentObject: Document): boolean {
+  const appElement = documentObject.getElementById("app")
+  if (appElement === null) {
+    throw new Error("Missing #app container element for graph visualizer bootstrap.")
+  }
+
+  return resolveScrollZoomEnabledFromHtmlConfig(appElement.dataset.scrollZoomEnabled)
+}
+
 function setNodeFixedToPointer({
   nodeId,
   pointerGlobal,
@@ -594,6 +614,19 @@ const readInitialSelectedNodeIdFromDocumentEffect = Effect.fn(
   })
 })
 
+const readScrollZoomEnabledFromDocumentEffect = Effect.fn(
+  "readScrollZoomEnabledFromDocumentEffect",
+)(function* (documentObject: Document): Effect.fn.Return<boolean, GraphVisualizerBootstrapError> {
+  return yield* Effect.try({
+    try: () => readScrollZoomEnabledFromDocument(documentObject),
+    catch: (error: unknown) =>
+      new GraphVisualizerBootstrapError({
+        message:
+          error instanceof Error ? error.message : "Failed to read scroll zoom settings from HTML.",
+      }),
+  })
+})
+
 const loadGraphDataEffect = Effect.fn("loadGraphDataEffect")(function* (
   graphSource: HtmlGraphSnapshotSource,
 ): Effect.fn.Return<
@@ -643,6 +676,7 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
     disableAnimations = false,
     selectedNodeId,
     themeSet,
+    scrollZoomEnabled,
     documentObject = document,
   }: GraphVisualizerBootstrapOptions = {}): Effect.fn.Return<
     () => void,
@@ -698,6 +732,10 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
       selectedNodeId === undefined
         ? yield* readInitialSelectedNodeIdFromDocumentEffect(documentObject)
         : selectedNodeId
+    const initialScrollZoomEnabled =
+      scrollZoomEnabled === undefined
+        ? yield* readScrollZoomEnabledFromDocumentEffect(documentObject)
+        : scrollZoomEnabled
     let appState = createAppState(context, initialSelectedNodeId)
     simulationController.setSelectedNodeId(selectedNodeIdFromSelection(appState.graph.selection))
 
@@ -770,16 +808,16 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
       })
     }
 
-    lifecycle.add(
-      bindPointerInteractions({
-        app,
-        world,
-        nodes: graph.nodes,
-        nodeSprites: renderer.nodeSprites,
-        dispatch,
-        onZoom: () => renderer.render(appState.graph.renderModel),
-      }),
-    )
+    const pointerInteractions = bindPointerInteractions({
+      app,
+      world,
+      nodes: graph.nodes,
+      nodeSprites: renderer.nodeSprites,
+      dispatch,
+      onZoom: () => renderer.render(appState.graph.renderModel),
+      scrollZoomEnabled: initialScrollZoomEnabled,
+    })
+    lifecycle.add(pointerInteractions.dispose)
 
     renderer.render(appState.graph.renderModel)
 
@@ -826,6 +864,15 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
         simulation.stop()
         simulation.tick(tickCount)
         dispatch({ type: "graph/action", action: { type: "simulation/tick" } })
+      },
+      setScrollZoomEnabled: (enabled) => {
+        pointerInteractions.setScrollZoomEnabled(enabled)
+      },
+      zoomIn: () => {
+        pointerInteractions.zoomByFactor(1.1, { x: app.screen.width / 2, y: app.screen.height / 2 })
+      },
+      zoomOut: () => {
+        pointerInteractions.zoomByFactor(0.9, { x: app.screen.width / 2, y: app.screen.height / 2 })
       },
     })
 

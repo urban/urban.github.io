@@ -38,9 +38,10 @@ export const resolveVaultGraphSelectionNavigationHref = ({
 
 type VaultGraphBootProps = {
   readonly themeSet?: GraphThemeSet
+  readonly scrollZoomEnabled?: boolean
 }
 
-export const VaultGraphBoot = ({ themeSet }: VaultGraphBootProps) => {
+export const VaultGraphBoot = ({ themeSet, scrollZoomEnabled }: VaultGraphBootProps) => {
   const router = useRouter()
   const pathname = usePathname()
 
@@ -64,6 +65,7 @@ export const VaultGraphBoot = ({ themeSet }: VaultGraphBootProps) => {
           dispose = await Effect.runPromise(
             bootstrapGraphVisualizerEffect({
               themeSet,
+              scrollZoomEnabled,
               onSelectionChange: (selection) => {
                 const nextHref = resolveVaultGraphSelectionNavigationHref({
                   selection,
@@ -97,7 +99,7 @@ export const VaultGraphBoot = ({ themeSet }: VaultGraphBootProps) => {
       disposed = true
       dispose?.()
     }
-  }, [pathname, router, themeSet])
+  }, [pathname, router, scrollZoomEnabled, themeSet])
 
   return null
 }

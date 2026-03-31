@@ -6,6 +6,7 @@ export {
   createGraphVisualizerSelectionChange,
   renderGraphVisualizerBootstrapError,
   resolveInitialSelectedNodeIdFromHtmlConfig,
+  resolveScrollZoomEnabledFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
   resolveGraphThemeSetFromHtmlConfig,
   resolveGraphThemeSetFromHtmlConfigEffect,

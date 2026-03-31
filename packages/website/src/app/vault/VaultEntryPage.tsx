@@ -69,7 +69,11 @@ export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEn
             </article>
           </div>
           <div className="animate">
-            <VaultGraphHost snapshot={snapshot} selectedNodeId={selectedNodeId} />
+            <VaultGraphHost
+              snapshot={snapshot}
+              selectedNodeId={selectedNodeId}
+              scrollZoomEnabled={false}
+            />
           </div>
         </div>
       </Container>
