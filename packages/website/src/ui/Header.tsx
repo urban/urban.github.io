@@ -19,7 +19,7 @@ const Header = ({ siteName }: { siteName: string }) => {
             <Link href="/articles">Articles</Link>
             <Link href="/projects">Projects</Link>
             <Link href="/vault">Vault</Link>
-            <Link href="/about">About</Link>
+            {/*<Link href="/about">About</Link>*/}
           </nav>
         </div>
       </Container>

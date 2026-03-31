@@ -43,7 +43,8 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning={true}
-      className={cn(`antialiased optimize-legibility`, inter.className, lora.className)}
+      // className={cn(`antialiased optimize-legibility`, inter.className, lora.className)}
+      className={cn(`antialiased optimize-legibility`, inter.className)}
     >
       <head>
         <Script

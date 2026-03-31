@@ -4,7 +4,7 @@ type ClassValue = Parameters<typeof twMerge>[0]
 
 const clsx = (...classes: ClassValue[]) => classes.filter(Boolean).join(" ")
 
-const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs))
+const cn = (...inputs: ClassValue[]) => twMerge(clsx(...inputs))
 
 const formatDate = (date: Date) =>
   Intl.DateTimeFormat("en-US", {

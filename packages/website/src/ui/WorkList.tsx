@@ -6,7 +6,7 @@ import { Text } from "./Text"
 type Work = Effect.Success<ReturnType<typeof Content.Service.getWork>>[0]
 
 const WorkTransferOrPromotion = ({ children }: { children: React.ReactNode }) => (
-  <div className="before:content-[' '] before:absolute before:-left-[calc(--spacing(7.25))] before:top-8 before:w-0.5 before:h-[calc(100%_-_1.5rem)] before:bg-gray-300 dark:before:bg-gray-500">
+  <div className="before:content-[' '] before:absolute before:-left-[calc(--spacing(6.8))] before:top-8 before:w-px before:h-[calc(100%_-_1.5rem)] before:bg-gray-300 dark:before:bg-gray-500">
     {children}
   </div>
 )
