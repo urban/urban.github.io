@@ -22,7 +22,7 @@ export const VaultGraphHost = ({ snapshot, selectedNodeId }: Props) => (
       id="app"
       data-graph-snapshot-script-id={GRAPH_SNAPSHOT_SCRIPT_ID}
       data-selected-node-id={selectedNodeId}
-      className="min-h-[420px] overflow-hidden rounded-md border border-black/10 bg-stone-50 dark:border-white/10 dark:bg-stone-950"
+      className="min-h-105 overflow-hidden rounded-md border border-black/10 dark:border-white/10 bg-stone-50 dark:bg-stone-950"
     />
     <script
       id={GRAPH_SNAPSHOT_SCRIPT_ID}

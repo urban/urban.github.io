@@ -27,6 +27,7 @@ scratchpad/**/*
 # Testing
 coverage/
 test-results/
+.playwright-cli/
 
 # Misc
 .agents/

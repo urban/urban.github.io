@@ -37,20 +37,83 @@ footer {
 }
 
 article {
-  @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
+  /*@apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;*/
+  @apply max-w-full prose-img:mx-auto prose-img:my-auto;
   @apply prose-headings:font-semibold prose-p:font-serif;
-  @apply prose-headings:text-black prose-headings:dark:text-white;
+  /*@apply prose-headings:text-black prose-headings:dark:text-white;*/
+}
+
+@layer components {
+  .nav-link {
+    @apply inline-block relative;
+    @apply text-black/80 dark:text-white/50;
+    @apply transform-3d;
+  }
+  .nav-link:hover {
+    @apply text-link-hover;
+  }
+  .nav-link.selected {
+    @apply decoration-black/80 dark:decoration-white/50 underline underline-offset-4;
+  }
+  .nav-link > span {
+    @apply inline-block;
+    @apply transition-transform duration-300;
+  }
+  .nav-link:hover > span {
+    @apply -translate-y-0.5;
+  }
+  .nav-link:visited {
+    @apply text-black/80 dark:text-white/50;
+  }
+  .nav-link::after {
+    @apply content-[''] absolute w-full h-px left-0 bottom-0.5;
+    @apply bg-black/80 dark:bg-white/50;
+    @apply scale-x-0 origin-left transition-transform duration-300;
+  }
+  .nav-link:visited::after,
+  .nav-link:visited:hover::after {
+    @apply text-black/80 dark:text-white/50;
+  }
+  article a:hover::after,
+  .nav-link.selected::after {
+    @apply scale-x-100;
+  }
 }
 
 @layer utilities {
   article a {
-    @apply font-sans text-current underline underline-offset-2;
-    @apply decoration-black/15 dark:decoration-white/30;
-    @apply transition-colors duration-300 ease-in-out;
+    @apply inline-block relative;
+    @apply text-link;
+    @apply transform-3d;
   }
   article a:hover {
-    @apply text-black dark:text-white;
-    @apply decoration-black/25 dark:decoration-white/50;
+    @apply text-link-hover;
+  }
+  article a.selected {
+    @apply decoration-link underline underline-offset-4;
+  }
+  article a > span {
+    @apply inline-block;
+    @apply transition-transform duration-300;
+  }
+  article a:hover > span {
+    @apply -translate-y-0.5;
+  }
+  article a:visited {
+    @apply text-link-visited;
+  }
+  article a::after {
+    @apply content-[''] absolute w-full h-px left-0 bottom-0.5;
+    @apply bg-link;
+    @apply scale-x-0 origin-left transition-transform duration-300;
+  }
+  article a:visited::after,
+  article a:visited:hover::after {
+    @apply bg-link-visited;
+  }
+  article a:hover::after,
+  article a.selected::after {
+    @apply scale-x-100;
   }
 }
 

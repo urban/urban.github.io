@@ -2,10 +2,10 @@ import type { Metadata } from "next"
 import { Inter, Lora } from "next/font/google"
 import Script from "next/script"
 import pkg from "../../package.json"
-import { cn } from "../lib/utils"
-import "../styles/globals.css"
-import { Footer } from "../ui/Footer"
-import { Header } from "../ui/Header"
+import { cn } from "@/lib/utils"
+import "@/styles/globals.css"
+import { Footer } from "@/ui/Footer"
+import { Header } from "@/ui/Header"
 
 // If loading a variable font, you don't need to specify the font weight
 const inter = Inter({

@@ -3,8 +3,10 @@ import { BackToTop } from "./BackToTop"
 import { ToggleColorScheme } from "./ToggleColorScheme"
 
 function Footer({ siteName }: { siteName: string }) {
+  const currentYear = new Date().getFullYear()
+
   return (
-    <footer className="animate">
+    <footer className="animate border-t border-black/10 dark:border-white/10">
       <Container>
         <div className="relative">
           <div className="absolute right-0 -top-20">
@@ -13,7 +15,8 @@ function Footer({ siteName }: { siteName: string }) {
         </div>
         <div className="flex justify-between items-center">
           <div>
-            &copy; 2025 {`|`} {siteName}
+            &copy; <time dateTime={String(currentYear)}>{currentYear}</time> {siteName}. All rights
+            reserved.
           </div>
           <ToggleColorScheme />
         </div>

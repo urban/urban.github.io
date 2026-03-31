@@ -57,4 +57,4 @@ const dateRange = (startDate: Date, endDate?: Date | string) => {
   return `${startMonth} ${startYear} – ${endMonth} ${endYear} · ${tenure}`
 }
 
-export { cn, formatDate, readingTime, dateRange, dateTenure }
+export { clsx, cn, formatDate, readingTime, dateRange, dateTenure }

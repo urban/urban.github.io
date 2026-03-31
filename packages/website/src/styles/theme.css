@@ -3,4 +3,11 @@
 @theme inline {
   --font-sans: var(--font-inter), sans-serif;
   --font-serif: var(--font-lora), serif;
+
+  --color-bright-crimson: #960462;
+  --color-crimson: #5f023e;
+
+  --color-link: oklch(0.56 0.2 255);
+  --color-link-visited: var(--color-crimson);
+  --color-link-hover: oklch(0.48, 0.2, 255);
 }
