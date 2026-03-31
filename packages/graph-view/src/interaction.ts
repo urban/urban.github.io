@@ -127,43 +127,38 @@ export function scaleWorldAroundAnchor({
   }
 }
 
-function addWheelZoomHandler({
-  canvas,
+export function applyWorldZoom({
   world,
-  onZoom,
+  nextScale,
+  anchor,
 }: {
-  canvas: HTMLCanvasElement
   world: PIXI.Container
-  onZoom: () => void
-}): Disposer {
-  const onWheel = (event: WheelEvent) => {
-    event.preventDefault()
-    const zoomFactor = event.deltaY < 0 ? 1.1 : 0.9
-    const currentScale = world.scale.x
-    const newScale = clamp(currentScale * zoomFactor, GRAPH_CONFIG.zoom.min, GRAPH_CONFIG.zoom.max)
-    const anchor = getCanvasPointerPosition({
-      canvas,
-      clientX: event.clientX,
-      clientY: event.clientY,
-    })
-    const nextWorldPosition = scaleWorldAroundAnchor({
-      worldX: world.x,
-      worldY: world.y,
-      currentScale,
-      nextScale: newScale,
-      anchor,
-    })
-
-    world.scale.set(newScale)
-    world.position.set(nextWorldPosition.x, nextWorldPosition.y)
-    onZoom()
+  nextScale: number
+  anchor: Point
+}): boolean {
+  const currentScale = world.scale.x
+  const clampedScale = clamp(nextScale, GRAPH_CONFIG.zoom.min, GRAPH_CONFIG.zoom.max)
+  if (clampedScale === currentScale) {
+    return false
   }
 
-  canvas.addEventListener(WHEEL_EVENT, onWheel, { passive: false })
+  const nextWorldPosition = scaleWorldAroundAnchor({
+    worldX: world.x,
+    worldY: world.y,
+    currentScale,
+    nextScale: clampedScale,
+    anchor,
+  })
 
-  return () => {
-    canvas.removeEventListener(WHEEL_EVENT, onWheel)
-  }
+  world.scale.set(clampedScale)
+  world.position.set(nextWorldPosition.x, nextWorldPosition.y)
+  return true
+}
+
+export type PointerInteractionBinding = {
+  dispose: Disposer
+  setScrollZoomEnabled: (enabled: boolean) => void
+  zoomByFactor: (zoomFactor: number, anchor: Point) => boolean
 }
 
 export function bindPointerInteractions({
@@ -173,6 +168,7 @@ export function bindPointerInteractions({
   nodeSprites,
   dispatch,
   onZoom,
+  scrollZoomEnabled = true,
 }: {
   app: PIXI.Application
   world: PIXI.Container
@@ -180,20 +176,57 @@ export function bindPointerInteractions({
   nodeSprites: ReadonlyMap<NodeId, NodeSpriteController>
   dispatch: (action: AppAction) => void
   onZoom: () => void
-}): Disposer {
+  scrollZoomEnabled?: boolean
+}): PointerInteractionBinding {
   app.stage.eventMode = "static"
   app.stage.hitArea = app.screen
   if (!(app.canvas instanceof HTMLCanvasElement)) {
     throw new Error("Expected PIXI canvas to be HTMLCanvasElement")
   }
 
+  let isScrollZoomEnabled = scrollZoomEnabled
+
+  const zoomByFactor = (zoomFactor: number, anchor: Point) => {
+    const didZoom = applyWorldZoom({
+      world,
+      nextScale: world.scale.x * zoomFactor,
+      anchor,
+    })
+    if (didZoom) {
+      onZoom()
+    }
+    return didZoom
+  }
+
+  const onWheel = (event: WheelEvent) => {
+    if (!isScrollZoomEnabled) {
+      return
+    }
+
+    event.preventDefault()
+    zoomByFactor(
+      event.deltaY < 0 ? 1.1 : 0.9,
+      getCanvasPointerPosition({
+        canvas: app.canvas,
+        clientX: event.clientX,
+        clientY: event.clientY,
+      }),
+    )
+  }
+
   const disposeStage = addStagePointerHandlers({ stage: app.stage, world, dispatch })
   const disposeNodes = addNodePointerHandlers({ nodes, nodeSprites, dispatch })
-  const disposeWheel = addWheelZoomHandler({ canvas: app.canvas, world, onZoom })
+  app.canvas.addEventListener(WHEEL_EVENT, onWheel, { passive: false })
 
-  return () => {
-    disposeWheel()
-    disposeNodes()
-    disposeStage()
+  return {
+    dispose: () => {
+      app.canvas.removeEventListener(WHEEL_EVENT, onWheel)
+      disposeNodes()
+      disposeStage()
+    },
+    setScrollZoomEnabled: (enabled) => {
+      isScrollZoomEnabled = enabled
+    },
+    zoomByFactor,
   }
 }

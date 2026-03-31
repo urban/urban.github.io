@@ -10,9 +10,10 @@ const serializeInlineSnapshot = (snapshot: GraphSnapshot): string =>
 type Props = {
   snapshot: GraphSnapshot
   selectedNodeId: string
+  scrollZoomEnabled?: boolean
 }
 
-export const VaultGraphHost = ({ snapshot, selectedNodeId }: Props) => (
+export const VaultGraphHost = ({ snapshot, selectedNodeId, scrollZoomEnabled = true }: Props) => (
   <>
     {/*<div className="mb-3 flex items-baseline justify-between gap-3">
       <h2 className="font-semibold text-black dark:text-white">Graph</h2>
@@ -29,6 +30,6 @@ export const VaultGraphHost = ({ snapshot, selectedNodeId }: Props) => (
       type="application/json"
       dangerouslySetInnerHTML={{ __html: serializeInlineSnapshot(snapshot) }}
     />
-    <VaultGraphBoot themeSet={VAULT_GRAPH_THEME_SET} />
+    <VaultGraphBoot themeSet={VAULT_GRAPH_THEME_SET} scrollZoomEnabled={scrollZoomEnabled} />
   </>
 )

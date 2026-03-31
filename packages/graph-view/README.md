@@ -26,6 +26,29 @@ Semantics:
 - emits `note`, `placeholder`, or `none`
 - keeps browser auto-bootstrap unchanged when callback omitted
 
+## Zoom controls
+
+`bootstrapGraphVisualizer` accepts `scrollZoomEnabled` to enable or disable wheel-based zooming.
+The `onReady` handle also exposes `setScrollZoomEnabled`, `zoomIn`, and `zoomOut` for external UI.
+
+```ts
+import { bootstrapGraphVisualizer } from "@urban/graph-view"
+
+await bootstrapGraphVisualizer({
+  scrollZoomEnabled: false,
+  onReady: (graphHandle) => {
+    document.getElementById("zoom-in")?.addEventListener("click", () => {
+      graphHandle.zoomIn()
+    })
+    document.getElementById("zoom-out")?.addEventListener("click", () => {
+      graphHandle.zoomOut()
+    })
+  },
+})
+```
+
+When using HTML auto-bootstrap, `#app[data-scroll-zoom-enabled="false"]` disables wheel zoom by default.
+
 ## JS theme overrides
 
 `bootstrapGraphVisualizer` can accept a typed `themeSet` directly, which avoids serializing

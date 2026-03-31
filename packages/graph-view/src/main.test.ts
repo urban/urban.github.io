@@ -15,6 +15,7 @@ import {
   resolveGraphThemeSetFromHtmlConfig,
   resolveGraphThemeSetFromHtmlConfigEffect,
   resolveInitialSelectedNodeIdFromHtmlConfig,
+  resolveScrollZoomEnabledFromHtmlConfig,
   resolveGraphSnapshotSourceFromHtmlConfig,
   DARK_GRAPH_THEME,
   LIGHT_GRAPH_THEME,
@@ -309,6 +310,16 @@ describe("resolveInitialSelectedNodeIdFromHtmlConfig", () => {
     expect(resolveInitialSelectedNodeIdFromHtmlConfig(null)).toBeNull()
     expect(resolveInitialSelectedNodeIdFromHtmlConfig(undefined)).toBeNull()
     expect(resolveInitialSelectedNodeIdFromHtmlConfig("   ")).toBeNull()
+  })
+})
+
+describe("resolveScrollZoomEnabledFromHtmlConfig", () => {
+  test("defaults to enabled unless explicitly set to false", () => {
+    expect(resolveScrollZoomEnabledFromHtmlConfig(null)).toBeTrue()
+    expect(resolveScrollZoomEnabledFromHtmlConfig(undefined)).toBeTrue()
+    expect(resolveScrollZoomEnabledFromHtmlConfig("   ")).toBeTrue()
+    expect(resolveScrollZoomEnabledFromHtmlConfig("true")).toBeTrue()
+    expect(resolveScrollZoomEnabledFromHtmlConfig(" false ")).toBeFalse()
   })
 })
 
