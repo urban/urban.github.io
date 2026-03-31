@@ -4,6 +4,7 @@ import {
   GraphSnapshotSchema,
   buildGraphSnapshotFromMarkdownSources,
   type GraphSnapshot,
+  type GraphSnapshotNoteNode,
   type MarkdownSourceFile,
 } from "@urban/build-graph"
 import { RuntimeServer } from "./RuntimeServer"
@@ -14,6 +15,14 @@ import { toVaultRoutePath } from "./vault"
 
 export type VaultGraphModel = {
   readonly snapshot: GraphSnapshot
+}
+
+export type VaultBacklink = {
+  readonly count: number
+  readonly nodeId: string
+  readonly routePath: string
+  readonly slug: string
+  readonly title: string
 }
 
 const buildGraphModelEffect = Effect.gen(function* () {
@@ -56,6 +65,53 @@ export const resolveSelectedVaultNodeId = (snapshot: GraphSnapshot, slug: string
   }
 
   return selectedNodeId
+}
+
+const getVaultBacklinkTitle = (node: GraphSnapshotNoteNode): string =>
+  node.title ?? node.label ?? node.slug ?? node.relativePath
+
+export const getVaultBacklinks = (
+  snapshot: GraphSnapshot,
+  targetNodeId: string,
+): ReadonlyArray<VaultBacklink> => {
+  const incomingEdges = snapshot.indexes.edgesByTargetNodeId[targetNodeId] ?? []
+  const backlinksBySourceNodeId = new Map<string, VaultBacklink>()
+
+  for (const edge of incomingEdges) {
+    const sourceNode = snapshot.indexes.nodesById[edge.sourceNodeId]
+    if (sourceNode === undefined || sourceNode.kind !== "note") {
+      continue
+    }
+
+    if (sourceNode.routePath === undefined || sourceNode.slug === undefined) {
+      continue
+    }
+
+    const backlink = backlinksBySourceNodeId.get(sourceNode.id)
+    if (backlink === undefined) {
+      backlinksBySourceNodeId.set(sourceNode.id, {
+        count: 1,
+        nodeId: sourceNode.id,
+        routePath: sourceNode.routePath,
+        slug: sourceNode.slug,
+        title: getVaultBacklinkTitle(sourceNode),
+      })
+      continue
+    }
+
+    backlinksBySourceNodeId.set(sourceNode.id, {
+      ...backlink,
+      count: backlink.count + 1,
+    })
+  }
+
+  return [...backlinksBySourceNodeId.values()].sort((left, right) => {
+    if (right.count !== left.count) {
+      return right.count - left.count
+    }
+
+    return left.title.localeCompare(right.title)
+  })
 }
 
 export const getSelectedVaultNodeId = async (slug: string): Promise<string> => {

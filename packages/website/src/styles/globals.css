@@ -51,10 +51,16 @@ footer {
   @apply py-5 text-sm;
 }
 
-article {
+article,
+section.prose {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
   @apply prose-headings:font-semibold prose-p:font-serif;
   @apply prose-headings:text-black prose-headings:dark:text-white;
+  /* anchors */
+  @apply prose-a:underline prose-a:underline-offset-4;
+  @apply prose-a:text-black/50 prose-a:hover:text-black/80;
+  @apply prose-a:decoration-black/30 dark:prose-a:decoration-white/30 prose-a:hover:decoration-black/80 dark:prose-a:hover:decoration-white/80;
+  @apply prose-a:transition-colors prose-a:duration-300;
 }
 
 :not(pre) > code {
@@ -85,13 +91,6 @@ article {
 }
 
 @layer utilities {
-  article a {
-    @apply underline underline-offset-4;
-    @apply hover:text-black/80;
-    @apply decoration-black/30 dark:decoration-white/30 hover:decoration-black/80 dark:hover:decoration-white/80;
-    @apply transition-colors duration-300;
-  }
-
   /*article a {
     @apply inline-block relative;
     @apply text-link;
