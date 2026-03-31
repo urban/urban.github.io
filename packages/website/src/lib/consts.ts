@@ -1,7 +1,7 @@
 export const SITE = {
   name: "Urban Faubion",
   email: "urban.faubion@gmail.com",
-  numOfArticles: 3,
+  numOfEssays: 3,
   numOfWork: 3,
   numOfProjects: 3,
 } as const

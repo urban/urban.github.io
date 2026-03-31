@@ -16,7 +16,7 @@ import { createElement } from "react"
 import type { JSX } from "react"
 import { glob } from "tinyglobby"
 import { VFile } from "vfile"
-import { Article, CollectionEntry, CompiledVFileData, Project, Work } from "../schemas"
+import { Essay, CollectionEntry, CompiledVFileData, Project, Work } from "../schemas"
 import {
   buildPublishedVaultWikiLinkLookup,
   finalizeVaultData,
@@ -61,10 +61,10 @@ type PreparedVaultEntry = VaultSourceEntry & {
 
 export type ContentService = {
   readonly getCollection: (
-    collection: "articles" | "projects" | "work",
+    collection: "essays" | "projects" | "work",
   ) => Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError>
-  readonly getArticles: () => Effect.Effect<
-    ReadonlyArray<CompiledCollectionEntry<typeof Article.Type>>,
+  readonly getEssays: () => Effect.Effect<
+    ReadonlyArray<CompiledCollectionEntry<typeof Essay.Type>>,
     ContentError
   >
   readonly getProjects: () => Effect.Effect<
@@ -90,7 +90,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
     const metadata = yield* Metadata
     const currentDate = pipe(yield* DateTime.now, DateTime.toDate)
 
-    const getCollection = (collection: "articles" | "work" | "projects") =>
+    const getCollection = (collection: "essays" | "work" | "projects") =>
       Effect.gen(function* () {
         const isPathWithIndex = collection !== "work"
         const pattern = isPathWithIndex ? "*/index.{md,mdx}" : "*.{md,mdx}"
@@ -141,21 +141,21 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
 
     return {
       getCollection: (
-        collection: "articles" | "projects" | "work",
+        collection: "essays" | "projects" | "work",
       ): Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError> =>
         getCollection(collection).pipe(
           Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
-      getArticles: (): Effect.Effect<
-        ReadonlyArray<CompiledCollectionEntry<typeof Article.Type>>,
+      getEssays: (): Effect.Effect<
+        ReadonlyArray<CompiledCollectionEntry<typeof Essay.Type>>,
         ContentError
       > =>
-        getCollection("articles").pipe(
+        getCollection("essays").pipe(
           Effect.flatMap((entries) =>
             Effect.all(
               entries.map((entry) =>
-                metadata.article(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
+                metadata.essay(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
               ),
             ),
           ),

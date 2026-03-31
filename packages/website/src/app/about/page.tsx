@@ -20,9 +20,9 @@ import { WorkList } from "@/ui/WorkList"
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
 
-  // const articles = yield* content.getArticles().pipe(
-  //   Effect.map((articles) => articles.filter(({ data }) => !data.draft)),
-  //   Effect.map(Array.take(SITE.numOfArticles)),
+  // const essays = yield* content.getEssays().pipe(
+  //   Effect.map((essays) => essays.filter(({ data }) => !data.draft)),
+  //   Effect.map(Array.take(SITE.numOfEssays)),
   // );
   // const projects = yield* content
   //   .getProjects()
@@ -35,7 +35,7 @@ const main = Effect.gen(function* () {
     Record.values,
   )
 
-  // return { articles, projects, work };
+  // return { essays, projects, work };
   return { work: groupedWork }
 })
 
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  // const { articles, projects, work } = await RuntimeServer.runPromise(main);
+  // const { essays, projects, work } = await RuntimeServer.runPromise(main);
   const { work } = await RuntimeServer.runPromise(main)
   return (
     <>
@@ -86,17 +86,17 @@ export default async function Page() {
           {/*<section className="animate py-6">
             <div className="flex flex-wrap gap-y-2 items-center justify-between">
               <h5 className="font-semibold text-black dark:text-white">
-                Latest articles
+                Latest essays
               </h5>
-              <Link href="/articles">See all articles</Link>
+              <Link href="/essays">See all essays</Link>
             </div>
             <ul className="flex flex-col gap-4">
-              {articles.map((article, idx) => (
+              {essays.map((essay, idx) => (
                 <li key={idx}>
                   <ArrowCard
-                    metadata={article.data}
-                    slug={article.slug}
-                    collection="articles"
+                    metadata={essay.data}
+                    slug={essay.slug}
+                    collection="essays"
                   />
                 </li>
               ))}
