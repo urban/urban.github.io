@@ -68,6 +68,7 @@
 
       .hint,
       .controls-panel,
+      .zoom-slider-panel,
       .theme-controls {
         position: fixed;
         z-index: 1;
@@ -109,11 +110,6 @@
         margin: 0;
       }
 
-      .zoom-controls {
-        display: flex;
-        gap: 8px;
-      }
-
       .control-button,
       .theme-button {
         display: flex;
@@ -136,6 +132,41 @@
         border-radius: 999px;
         font-size: 18px;
         font-weight: 600;
+      }
+
+      .zoom-slider-panel {
+        top: 50%;
+        right: 12px;
+        display: grid;
+        justify-items: center;
+        gap: 10px;
+        padding: 12px 10px;
+        border-radius: 999px;
+        transform: translateY(-50%);
+      }
+
+      .zoom-slider-controls {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+      }
+
+      .zoom-slider-label {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: var(--text-strong);
+        user-select: none;
+      }
+
+      .zoom-slider {
+        width: 28px;
+        height: 220px;
+        margin: 0;
+        accent-color: var(--text-strong);
+        writing-mode: vertical-lr;
+        direction: rtl;
       }
 
       .theme-controls {
@@ -187,12 +218,24 @@
         <input id="scroll-zoom-toggle" type="checkbox" checked />
         <span>Enable scroll zoom</span>
       </label>
-      <div class="zoom-controls">
-        <button id="zoom-out-button" class="control-button" type="button" aria-label="Zoom out">
-          −
-        </button>
+    </div>
+    <div class="zoom-slider-panel" aria-label="Zoom slider controls">
+      <div class="zoom-slider-controls">
         <button id="zoom-in-button" class="control-button" type="button" aria-label="Zoom in">
           +
+        </button>
+        <input
+          id="zoom-slider"
+          class="zoom-slider"
+          type="range"
+          min="0.2"
+          max="3"
+          step="0.01"
+          value="1"
+          aria-label="Graph zoom slider"
+        />
+        <button id="zoom-out-button" class="control-button" type="button" aria-label="Zoom out">
+          −
         </button>
       </div>
     </div>
@@ -291,12 +334,14 @@
 
       const appElement = document.getElementById("app")
       const scrollZoomToggle = document.getElementById("scroll-zoom-toggle")
+      const zoomSlider = document.getElementById("zoom-slider")
       const zoomInButton = document.getElementById("zoom-in-button")
       const zoomOutButton = document.getElementById("zoom-out-button")
 
       if (
         !(appElement instanceof HTMLElement) ||
         !(scrollZoomToggle instanceof HTMLInputElement) ||
+        !(zoomSlider instanceof HTMLInputElement) ||
         !(zoomInButton instanceof HTMLButtonElement) ||
         !(zoomOutButton instanceof HTMLButtonElement)
       ) {
@@ -309,14 +354,33 @@
       const dispose = await bootstrapGraphVisualizer({
         scrollZoomEnabled: initialScrollZoomEnabled,
         onReady: (graphHandle) => {
+          const syncZoomSlider = () => {
+            zoomSlider.value = String(graphHandle.getZoomScale())
+          }
+
+          syncZoomSlider()
+
           scrollZoomToggle.addEventListener("change", () => {
             graphHandle.setScrollZoomEnabled(scrollZoomToggle.checked)
           })
+          zoomSlider.addEventListener("input", () => {
+            graphHandle.setZoomScale(Number(zoomSlider.value))
+            syncZoomSlider()
+          })
+          appElement.addEventListener(
+            "wheel",
+            () => {
+              window.requestAnimationFrame(syncZoomSlider)
+            },
+            { passive: true },
+          )
           zoomInButton.addEventListener("click", () => {
             graphHandle.zoomIn()
+            syncZoomSlider()
           })
           zoomOutButton.addEventListener("click", () => {
             graphHandle.zoomOut()
+            syncZoomSlider()
           })
         },
       })

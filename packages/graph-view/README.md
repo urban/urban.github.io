@@ -29,7 +29,7 @@ Semantics:
 ## Zoom controls
 
 `bootstrapGraphVisualizer` accepts `scrollZoomEnabled` to enable or disable wheel-based zooming.
-The `onReady` handle also exposes `setScrollZoomEnabled`, `zoomIn`, and `zoomOut` for external UI.
+The `onReady` handle also exposes `getZoomScale`, `setZoomScale`, `setScrollZoomEnabled`, `zoomIn`, and `zoomOut` for external UI.
 
 ```ts
 import { bootstrapGraphVisualizer } from "@urban/graph-view"

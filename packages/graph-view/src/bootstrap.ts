@@ -41,11 +41,13 @@ export type GraphVisualizerStaticLayoutEntry = {
 export type GraphVisualizerHandle = {
   getNodePosition: (nodeId: NodeId) => { x: number; y: number } | null
   getCanvasClientRect: () => DOMRect
+  getZoomScale: () => number
   applyStaticLayout: (layout: ReadonlyArray<GraphVisualizerStaticLayoutEntry>) => void
   hoverNode: (nodeId: NodeId | null) => void
   selectNode: (nodeId: NodeId) => void
   settleLayout: (tickCount?: number) => void
   setScrollZoomEnabled: (enabled: boolean) => void
+  setZoomScale: (zoomScale: number) => void
   zoomIn: () => void
   zoomOut: () => void
 }
@@ -829,6 +831,7 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
           : null
       },
       getCanvasClientRect: () => app.canvas.getBoundingClientRect(),
+      getZoomScale: () => pointerInteractions.getZoomScale(),
       applyStaticLayout: (layout) => {
         simulation.stop()
         for (const entry of layout) {
@@ -867,6 +870,12 @@ export const bootstrapGraphVisualizerEffect = Effect.fn("bootstrapGraphVisualize
       },
       setScrollZoomEnabled: (enabled) => {
         pointerInteractions.setScrollZoomEnabled(enabled)
+      },
+      setZoomScale: (zoomScale) => {
+        pointerInteractions.setZoomScale(zoomScale, {
+          x: app.screen.width / 2,
+          y: app.screen.height / 2,
+        })
       },
       zoomIn: () => {
         pointerInteractions.zoomByFactor(1.1, { x: app.screen.width / 2, y: app.screen.height / 2 })

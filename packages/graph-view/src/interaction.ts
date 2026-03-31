@@ -158,6 +158,8 @@ export function applyWorldZoom({
 export type PointerInteractionBinding = {
   dispose: Disposer
   setScrollZoomEnabled: (enabled: boolean) => void
+  getZoomScale: () => number
+  setZoomScale: (zoomScale: number, anchor: Point) => boolean
   zoomByFactor: (zoomFactor: number, anchor: Point) => boolean
 }
 
@@ -186,16 +188,20 @@ export function bindPointerInteractions({
 
   let isScrollZoomEnabled = scrollZoomEnabled
 
-  const zoomByFactor = (zoomFactor: number, anchor: Point) => {
+  const setZoomScale = (zoomScale: number, anchor: Point) => {
     const didZoom = applyWorldZoom({
       world,
-      nextScale: world.scale.x * zoomFactor,
+      nextScale: zoomScale,
       anchor,
     })
     if (didZoom) {
       onZoom()
     }
     return didZoom
+  }
+
+  const zoomByFactor = (zoomFactor: number, anchor: Point) => {
+    return setZoomScale(world.scale.x * zoomFactor, anchor)
   }
 
   const onWheel = (event: WheelEvent) => {
@@ -227,6 +233,8 @@ export function bindPointerInteractions({
     setScrollZoomEnabled: (enabled) => {
       isScrollZoomEnabled = enabled
     },
+    getZoomScale: () => world.scale.x,
+    setZoomScale,
     zoomByFactor,
   }
 }
