@@ -10,55 +10,55 @@ import { ComingSoon } from "@/ui/ComingSoon"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const allArticles = yield* content.getArticles()
-  const articlesMetadata = allArticles.map(({ data, slug }) => ({
+  const allEssays = yield* content.getEssays()
+  const essaysMetadata = allEssays.map(({ data, slug }) => ({
     metadata: data,
     slug,
   }))
 
-  const articles = pipe(
-    articlesMetadata,
+  const essays = pipe(
+    essaysMetadata,
     Array.filter(({ metadata }) => !metadata.draft),
     Array.sortBy(Order.flip(Order.mapInput(Order.Date, ({ metadata }) => metadata.updatedAt))),
     Array.groupBy(({ metadata }) => metadata.date.getFullYear().toString()),
   )
 
   const years = pipe(
-    articles,
+    essays,
     Record.keys,
     Array.sortBy(Order.flip(Order.mapInput(Order.Number, (a) => parseInt(a)))),
   )
 
-  return { articles, years }
+  return { essays, years }
 })
 
 export const metadata: Metadata = {
-  title: "Articles",
-  description: "A collection of articles on topics I am passionate about.",
+  title: "Essays",
+  description: "A collection of essays on topics I am passionate about.",
 }
 
 export default async function Page() {
-  const { articles, years } = await RuntimeServer.runPromise(main)
-  const hasArticles = Object.values(articles).length !== 0
+  const { essays, years } = await RuntimeServer.runPromise(main)
+  const hasEssays = Object.values(essays).length !== 0
   return (
     <>
       <PageNavigationAnimation />
       <Container>
         <div className="py-10">
-          <div className="animate font-semibold text-black dark:text-white">Articles</div>
+          <div className="animate font-semibold text-black dark:text-white">Essays</div>
           <div className="space-y-4">
-            {!hasArticles && <ComingSoon />}
+            {!hasEssays && <ComingSoon />}
             {years.map((year) => (
               <section key={year} className="animate py-4">
                 <div className="font-semibold text-black dark:text-white">{year}</div>
                 <div>
                   <ul className="flex flex-col gap-4">
-                    {articles[year]?.map((article, idx) => (
+                    {essays[year]?.map((essay, idx) => (
                       <li key={idx}>
                         <ArrowCard
-                          metadata={article.metadata}
-                          slug={article.slug}
-                          collection="articles"
+                          metadata={essay.metadata}
+                          slug={essay.slug}
+                          collection="essays"
                         />
                       </li>
                     ))}

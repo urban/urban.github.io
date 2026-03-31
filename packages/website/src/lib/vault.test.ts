@@ -18,7 +18,7 @@ import {
 
 const contentDir = join(import.meta.dir, "..", "..", "content")
 const vaultDir = join(contentDir, "vault")
-const articlesDir = join(contentDir, "articles")
+const essaysDir = join(contentDir, "essays")
 const createdPaths: string[] = []
 
 afterEach(async () => {
@@ -35,8 +35,8 @@ const writeVaultFixture = async (filename: string, source: string): Promise<void
   createdPaths.push(filepath)
 }
 
-const writeArticleFixture = async (slug: string, source: string): Promise<void> => {
-  const dirpath = join(articlesDir, slug)
+const writeEssayFixture = async (slug: string, source: string): Promise<void> => {
+  const dirpath = join(essaysDir, slug)
   await mkdir(dirpath, { recursive: true })
   await writeFile(join(dirpath, "index.md"), source, "utf8")
   createdPaths.push(dirpath)
@@ -404,11 +404,11 @@ Start [[fixture-target-alpha]], continue with [[fixture-target-beta|Beta Label]]
 })
 
 test("content service leaves non-vault collections on the existing mdx path", async () => {
-  await writeArticleFixture(
+  await writeEssayFixture(
     "fixture-article-wiki-link",
     `---
-title: Fixture Article Wiki Link
-description: Article fixture for wiki-link regression.
+title: Fixture Essay Wiki Link
+description: Essay fixture for wiki-link regression.
 date: "2026-03-01"
 updatedAt: "2026-03-01"
 ---
@@ -419,15 +419,15 @@ See [[fixture-target]].
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.getArticles()
+    return yield* content.getEssays()
   })
-  const articles = await RuntimeServer.runPromise(program)
-  const entry = articles.find(({ slug }) => slug === "fixture-article-wiki-link")
+  const essays = await RuntimeServer.runPromise(program)
+  const entry = essays.find(({ slug }) => slug === "fixture-article-wiki-link")
 
   expect(entry).toBeDefined()
 
   if (entry === undefined) {
-    throw new Error("Missing fixture-article-wiki-link article entry")
+    throw new Error("Missing fixture-article-wiki-link essay entry")
   }
 
   expect(entry.source).toContain("[[fixture-target]]")

@@ -18,7 +18,7 @@ export const Work = Schema.Struct({
   dateEnd: Schema.Union([DateFromString, Schema.Literal("Present")]),
 })
 
-export const Article = Schema.Struct({
+export const Essay = Schema.Struct({
   title: Schema.String,
   description: Schema.String,
   date: DateFromString,

@@ -12,14 +12,14 @@ import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 const main = (pathSlug: string) =>
   Effect.gen(function* () {
     const content: ContentService = yield* Content
-    const articles = yield* content.getArticles()
-    return yield* Array.findFirst(articles, ({ slug }) => slug === pathSlug)
+    const essays = yield* content.getEssays()
+    return yield* Array.findFirst(essays, ({ slug }) => slug === pathSlug)
     // return pipe(Effect.flatMap(Array.findFirst(({ slug }) => slug === pathSlug)))
   })
 
 const mainAll = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  return yield* content.getArticles().pipe(
+  return yield* content.getEssays().pipe(
     Effect.map(
       flow(
         Array.filter(({ data }) => !data.draft),
@@ -42,39 +42,39 @@ export async function generateMetadata(
   _parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { slug } = await params
-  const article = await RuntimeServer.runPromise(main(slug))
+  const essay = await RuntimeServer.runPromise(main(slug))
 
   return {
-    title: article.data.title,
-    description: article.data.description,
+    title: essay.data.title,
+    description: essay.data.description,
   }
 }
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
-  const article = await RuntimeServer.runPromise(main(slug))
+  const essay = await RuntimeServer.runPromise(main(slug))
 
   return (
     <>
       <PageNavigationAnimation />
       <Container>
         <div className="animate">
-          <BackToPrev href="/blog">Back to articles</BackToPrev>
+          <BackToPrev href="/essays">Back to essays</BackToPrev>
         </div>
         <div className="py-1 my-10">
           <div className="animate text-2xl font-semibold text-black dark:text-white">
-            {article.data.title}
+            {essay.data.title}
           </div>
           <div className="animate flex items-center gap-1.5">
             <div className="font-base text-sm">
-              <FormattedDate date={article.data.date} />
+              <FormattedDate date={essay.data.date} />
             </div>
             &bull;
-            <div className="font-base text-sm">{readingTime(article.source)}</div>
+            <div className="font-base text-sm">{readingTime(essay.source)}</div>
           </div>
         </div>
         <article className="animate">
-          <article.Content />
+          <essay.Content />
         </article>
       </Container>
     </>

@@ -1,9 +1,9 @@
-import { Article, Project } from "../lib/schemas"
+import { Essay, Project } from "../lib/schemas"
 import NextLink from "next/link"
 
 type Props = {
-  collection: "articles" | "projects"
-  metadata: typeof Article.Type | typeof Project.Type
+  collection: "essays" | "projects"
+  metadata: typeof Essay.Type | typeof Project.Type
   slug: string
 }
 

@@ -1,5 +1,5 @@
 import { Effect, Layer, Schema, ServiceMap } from "effect"
-import { Article, CollectionEntry, Project, VaultFrontmatter, Work } from "../schemas"
+import { Essay, CollectionEntry, Project, VaultFrontmatter, Work } from "../schemas"
 import { finalizeVaultData, humanizeVaultSlug, normalizeVaultSlug } from "../vault"
 import type { VaultMetadataSeed } from "../vault"
 
@@ -57,7 +57,7 @@ export class Metadata extends ServiceMap.Service<Metadata>()("service/Metadata",
       )
 
     return {
-      article: decode(Article),
+      essay: decode(Essay),
       project: decode(Project),
       work: decode(Work),
       vaultSeed: (data: unknown) => decodeVault(data),
