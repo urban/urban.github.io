@@ -58,15 +58,17 @@ export default async function Page({ params }: PageProps) {
           <BackToPrev href="/projects">Back to projects</BackToPrev>
         </div>
         <div className="py-1 my-10">
+          <div className="animate">
+            <h1 className="mt-2 text-2xl font-semibold text-black dark:text-white">
+              {project.data.title}
+            </h1>
+          </div>
           <div className="animate flex items-center gap-1.5">
             <div className="font-base text-sm">
-              <FormattedDate date={project.data.date} />
+              <FormattedDate date={project.data.createdAt} />
             </div>
             &bull;
             <div className="font-base text-sm">{readingTime(project.source)}</div>
-          </div>
-          <div className="animate text-2xl font-semibold text-black dark:text-white">
-            {project.data.title}
           </div>
           {(project.data.demoURL || project.data.repoURL) && (
             <nav className="animate flex gap-1">

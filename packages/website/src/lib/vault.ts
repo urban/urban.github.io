@@ -1,3 +1,5 @@
+import { DateTime } from "effect"
+
 const VAULT_SLUG_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const VAULT_WIKI_LINK_PATTERN = /\[\[([^[\]]+)\]\]/g
 export const UNRESOLVED_VAULT_WIKI_LINK_CLASS = "text-sm opacity-75"
@@ -7,8 +9,8 @@ export type VaultData = {
   readonly permalink: string
   readonly title: string
   readonly description: string
-  readonly created: Date
-  readonly updated: Date
+  readonly createdAt: DateTime.Utc
+  readonly updatedAt: DateTime.Utc
   readonly aliases: ReadonlyArray<string>
   readonly published: boolean
 }
@@ -18,8 +20,8 @@ export type VaultMetadataSeed = {
   readonly permalink: string
   readonly title: string
   readonly explicitDescription: string | undefined
-  readonly created: Date
-  readonly updated: Date
+  readonly createdAt: DateTime.Utc
+  readonly updatedAt: DateTime.Utc
   readonly aliases: ReadonlyArray<string>
   readonly published: boolean
 }
@@ -355,8 +357,8 @@ export const finalizeVaultData = (
   permalink: metadata.permalink,
   title: metadata.title,
   description: resolveVaultDescription(metadata.explicitDescription, excerpt),
-  created: metadata.created,
-  updated: metadata.updated,
+  createdAt: metadata.createdAt,
+  updatedAt: metadata.updatedAt,
   aliases: metadata.aliases,
   published: metadata.published,
 })

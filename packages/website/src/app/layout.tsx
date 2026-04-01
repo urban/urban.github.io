@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
-import { Inter, Lora } from "next/font/google"
+// import { Inter, Lora } from "next/font/google"
+import { Inter } from "next/font/google"
 import Script from "next/script"
 import pkg from "../../package.json"
 import { cn } from "@/lib/utils"
@@ -13,11 +14,11 @@ const inter = Inter({
   display: "swap",
   variable: "--font-inter",
 })
-const lora = Lora({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-lora",
-})
+// const lora = Lora({
+//   subsets: ["latin"],
+//   display: "swap",
+//   variable: "--font-lora",
+// })
 
 export const metadata: Metadata = {
   title: "Urban Faubion",

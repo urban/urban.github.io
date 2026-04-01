@@ -57,11 +57,11 @@ export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEn
         <div className="my-10 flex flex-col gap-10">
           <div className="max-w-3xl">
             <div className="animate mb-8">
-              <h1 className="mt-2 text-2xl font-semibold text-black dark:text-white">
+              <h1 className="my-2 text-2xl font-semibold text-black dark:text-white">
                 {entry.data.title}
               </h1>
               {/*<div className="flex items-center gap-1.5 text-sm">
-                <FormattedDate date={entry.data.updated} />
+                <FormattedDate date={entry.data.updatedAt} />
                 <span>&bull;</span>
                 <span>{readingTime(entry.source)}</span>
               </div>*/}

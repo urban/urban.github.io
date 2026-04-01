@@ -1,8 +1,8 @@
 ---
 title: Failure Taxonomy
 permalink: failure-taxonomy
-created: 2026-02-27
-updated: 2026-02-27
+createdAt: 2026-02-27
+updatedAt: 2026-02-27
 aliases:
   - failure classes
 published: true

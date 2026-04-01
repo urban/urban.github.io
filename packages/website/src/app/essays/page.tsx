@@ -45,7 +45,9 @@ export default async function Page() {
       <PageNavigationAnimation />
       <Container>
         <div className="py-10">
-          <div className="animate font-semibold text-black dark:text-white">Essays</div>
+          <div className="animate">
+            <h1 className="my-2 text-2xl font-semibold text-black dark:text-white">Essays</h1>
+          </div>
           <div className="space-y-4">
             {!hasEssays && <ComingSoon />}
             {years.map((year) => (

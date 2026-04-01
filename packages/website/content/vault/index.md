@@ -1,8 +1,8 @@
 ---
 title: Index
 permalink: index
-created: 2026-03-27
-updated: 2026-03-27
+createdAt: 2026-03-27
+updatedAt: 2026-03-27
 aliases: []
 published: true
 ---
