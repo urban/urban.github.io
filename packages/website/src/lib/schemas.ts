@@ -1,4 +1,5 @@
 import { Schema, SchemaGetter } from "effect"
+import { Model } from "effect/unstable/schema"
 
 const DateFromString = Schema.Date.pipe(
   Schema.encodeTo(Schema.String, {
@@ -7,7 +8,8 @@ const DateFromString = Schema.Date.pipe(
   }),
 )
 
-const DateFromFrontmatter = Schema.Union([DateFromString, Schema.Date])
+// gray-matter parses bare YAML dates as Date instances instead of strings.
+const DateTimeFromFrontmatter = Schema.Union([Model.Date, Schema.DateTimeUtcFromDate])
 
 export const Work = Schema.Struct({
   company: Schema.String,
@@ -21,28 +23,29 @@ export const Work = Schema.Struct({
 export const Essay = Schema.Struct({
   title: Schema.String,
   description: Schema.String,
-  date: DateFromString,
-  updatedAt: DateFromString,
-  draft: Schema.optional(Schema.Boolean),
+  createdAt: DateTimeFromFrontmatter,
+  updatedAt: DateTimeFromFrontmatter,
+  published: Schema.optional(Schema.Boolean),
 })
 
 export const Project = Schema.Struct({
   title: Schema.String,
   description: Schema.String,
-  date: DateFromString,
-  draft: Schema.optional(Schema.Boolean),
+  createdAt: DateTimeFromFrontmatter,
+  updatedAt: DateTimeFromFrontmatter,
   demoURL: Schema.optional(Schema.String),
   repoURL: Schema.optional(Schema.String),
+  published: Schema.optional(Schema.Boolean),
 })
 
 export const VaultFrontmatter = Schema.Struct({
-  permalink: Schema.NonEmptyString,
-  created: DateFromFrontmatter,
-  updated: DateFromFrontmatter,
-  aliases: Schema.optional(Schema.Array(Schema.NonEmptyString)),
-  published: Schema.optional(Schema.Boolean),
   title: Schema.optional(Schema.NonEmptyString),
   description: Schema.optional(Schema.NonEmptyString),
+  permalink: Schema.NonEmptyString,
+  createdAt: DateTimeFromFrontmatter,
+  updatedAt: DateTimeFromFrontmatter,
+  aliases: Schema.optional(Schema.Array(Schema.NonEmptyString)),
+  published: Schema.optional(Schema.Boolean),
 })
 
 export const CompiledVFileData = Schema.Struct({

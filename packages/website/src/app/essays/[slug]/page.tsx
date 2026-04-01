@@ -62,12 +62,14 @@ export default async function Page({ params }: PageProps) {
           <BackToPrev href="/essays">Back to essays</BackToPrev>
         </div>
         <div className="py-1 my-10">
-          <div className="animate text-2xl font-semibold text-black dark:text-white">
-            {essay.data.title}
+          <div className="animate">
+            <h1 className="mt-2 text-2xl font-semibold text-black dark:text-white">
+              {essay.data.title}
+            </h1>
           </div>
           <div className="animate flex items-center gap-1.5">
             <div className="font-base text-sm">
-              <FormattedDate date={essay.data.date} />
+              <FormattedDate date={essay.data.createdAt} />
             </div>
             &bull;
             <div className="font-base text-sm">{readingTime(essay.source)}</div>

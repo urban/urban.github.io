@@ -25,6 +25,15 @@ export type VaultBacklink = {
   readonly title: string
 }
 
+const normalizeVaultGraphFrontmatter = (source: string): string =>
+  source.replace(/^---\r?\n([\s\S]*?)\r?\n---/u, (match, frontmatter: string) => {
+    const normalizedFrontmatter = frontmatter
+      .replace(/^createdAt:/mu, "created:")
+      .replace(/^updatedAt:/mu, "updated:")
+
+    return match.replace(frontmatter, normalizedFrontmatter)
+  })
+
 const buildGraphModelEffect = Effect.gen(function* () {
   const content: ContentService = yield* Content
   const entries: ReadonlyArray<VaultEntry> = yield* content.getPublishedVault()
@@ -32,7 +41,7 @@ const buildGraphModelEffect = Effect.gen(function* () {
     (entry): MarkdownSourceFile => ({
       absolutePath: entry.filepath,
       relativePath: basename(entry.filepath),
-      source: entry.rawSource,
+      source: normalizeVaultGraphFrontmatter(entry.rawSource),
     }),
   )
   const result = yield* buildGraphSnapshotFromMarkdownSources(markdownSources, {

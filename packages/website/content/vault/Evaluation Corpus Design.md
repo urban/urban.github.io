@@ -1,8 +1,8 @@
 ---
 title: Evaluation Corpus Design
 permalink: evaluation-corpus-design
-created: 2026-02-27
-updated: 2026-02-27
+createdAt: 2026-02-27
+updatedAt: 2026-02-27
 aliases:
   - eval corpus
 published: true

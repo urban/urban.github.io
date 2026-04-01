@@ -58,9 +58,13 @@ section.prose {
   @apply prose-headings:text-black prose-headings:dark:text-white;
   /* anchors */
   @apply prose-a:underline prose-a:underline-offset-4;
-  @apply prose-a:text-black/50 prose-a:hover:text-black/80;
+  @apply prose-a:text-black/50 prose-a:hover:text-black/80 dark:prose-a:text-white/50 dark:prose-a:hover:text-white/80;
   @apply prose-a:decoration-black/30 dark:prose-a:decoration-white/30 prose-a:hover:decoration-black/80 dark:prose-a:hover:decoration-white/80;
   @apply prose-a:transition-colors prose-a:duration-300;
+  /* lists */
+  @apply prose-li:my-0;
+  /* code */
+  @apply prose-code:before:content-[''] prose-code:after:content-[''];
 }
 
 :not(pre) > code {

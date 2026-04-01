@@ -1,8 +1,8 @@
 ---
 title: Trace And Replay
 permalink: trace-and-replay
-created: 2026-02-27
-updated: 2026-02-27
+createdAt: 2026-02-27
+updatedAt: 2026-02-27
 aliases:
   - trace replay
 published: true

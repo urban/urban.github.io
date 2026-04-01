@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test"
 import { mkdir, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
-import { Effect } from "effect"
+import { DateTime, Effect } from "effect"
 import { createElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { RuntimeServer } from "./RuntimeServer"
@@ -190,8 +190,8 @@ test("content service discovers published vault fixtures and excludes unpublishe
     `---
 title: Fixture Published
 permalink: fixture-published
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 aliases:
   - fixture alias
 published: true
@@ -207,8 +207,8 @@ First paragraph for the published fixture.
     `---
 title: Fixture Draft
 permalink: fixture-draft
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: false
 ---
 
@@ -235,8 +235,14 @@ First paragraph for the unpublished fixture.
   expect(publishedEntry?.data.permalink).toBe("fixture-published")
   expect(publishedEntry?.data.aliases).toEqual(["fixture alias"])
   expect(publishedEntry?.data.published).toBe(true)
-  expect(publishedEntry?.data.created).toBeInstanceOf(Date)
-  expect(publishedEntry?.data.updated).toBeInstanceOf(Date)
+  expect(
+    publishedEntry?.data.createdAt !== undefined &&
+      DateTime.formatIsoDateUtc(publishedEntry.data.createdAt),
+  ).toBe("2026-03-01")
+  expect(
+    publishedEntry?.data.updatedAt !== undefined &&
+      DateTime.formatIsoDateUtc(publishedEntry.data.updatedAt),
+  ).toBe("2026-03-01")
   expect(publishedEntry?.data.description).toBe("First paragraph for the published fixture.")
 })
 
@@ -246,8 +252,8 @@ test("content service keeps unpublished vault targets unresolved after preproces
     `---
 title: Fixture Hidden
 permalink: fixture-hidden
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: false
 ---
 
@@ -261,8 +267,8 @@ Hidden paragraph.
     `---
 title: Fixture Source With Draft Link
 permalink: fixture-source-with-draft-link
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 
@@ -294,8 +300,8 @@ test("content service preprocesses vault wiki-links before vault mdx compile", a
     `---
 title: Fixture Target
 permalink: fixture-target
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 
@@ -309,8 +315,8 @@ Target paragraph.
     `---
 title: Fixture Source
 permalink: fixture-source
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 
@@ -344,8 +350,8 @@ test("content service renders resolved and unresolved vault wiki-links across mi
     `---
 title: Fixture Target Alpha
 permalink: fixture-target-alpha
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 
@@ -359,8 +365,8 @@ Alpha paragraph.
     `---
 title: Fixture Target Beta
 permalink: fixture-target-beta
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 
@@ -374,8 +380,8 @@ Beta paragraph.
     `---
 title: Fixture Mixed Source
 permalink: fixture-mixed-source
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 
@@ -409,7 +415,7 @@ test("content service leaves non-vault collections on the existing mdx path", as
     `---
 title: Fixture Essay Wiki Link
 description: Essay fixture for wiki-link regression.
-date: "2026-03-01"
+createdAt: "2026-03-01"
 updatedAt: "2026-03-01"
 ---
 
@@ -442,8 +448,8 @@ test("content service fails on invalid vault frontmatter", async () => {
     `---
 title: Fixture Invalid
 permalink: /
-created: 2026-03-01
-updated: 2026-03-01
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
 published: true
 ---
 

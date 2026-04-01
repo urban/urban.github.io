@@ -1,15 +1,22 @@
+import { DateTime } from "effect"
+
 type Props = {
-  date: Date
+  date: DateTime.Utc
 }
 
-const FormattedDate = ({ date }: Props) => (
-  <time dateTime={date.toISOString()}>
-    {date.toLocaleDateString("en-us", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })}
-  </time>
-)
+const FormattedDate = ({ date }: Props) => {
+  const jsDate = DateTime.toDateUtc(date)
+
+  return (
+    <time dateTime={DateTime.formatIsoDateUtc(date)}>
+      {jsDate.toLocaleDateString("en-us", {
+        timeZone: "UTC",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })}
+    </time>
+  )
+}
 
 export { FormattedDate }

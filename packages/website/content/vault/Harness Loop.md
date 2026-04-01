@@ -1,8 +1,8 @@
 ---
 title: Harness Loop
 permalink: harness-loop
-created: 2026-02-27
-updated: 2026-02-27
+createdAt: 2026-02-27
+updatedAt: 2026-02-27
 aliases:
   - harness loop
 published: true

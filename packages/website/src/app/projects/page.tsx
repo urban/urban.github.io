@@ -33,7 +33,9 @@ export default async function Page() {
       <PageNavigationAnimation />
       <Container>
         <div className="py-10">
-          <div className="animate font-semibold text-black dark:text-white">Projects</div>
+          <div className="animate">
+            <h1 className="my-2 text-2xl font-semibold text-black dark:text-white">Projects</h1>
+          </div>
           <ul className="animate flex flex-col gap-4">
             {!hasProjects && <ComingSoon />}
             {projects.map(({ data, slug }) => (

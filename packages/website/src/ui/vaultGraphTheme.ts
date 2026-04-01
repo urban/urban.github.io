@@ -39,7 +39,7 @@ export const DARK_VAULT_GRAPH_THEME: GraphTheme = {
   node: {
     variants: {
       default: { fill: 0xd6d3d1, stroke: 0x1c1917, strokeWidth: 1, alpha: 1 },
-      selected: { fill: 0xfb923c, stroke: 0x7c2d12, strokeWidth: 2, alpha: 1 },
+      selected: { fill: 0xd6d3d1, stroke: 0x1c1917, strokeWidth: 2, alpha: 1 },
       muted: { fill: 0x44403c, stroke: 0x1c1917, strokeWidth: 1, alpha: 0.4 },
     },
     scales: {
@@ -57,7 +57,7 @@ export const DARK_VAULT_GRAPH_THEME: GraphTheme = {
   label: {
     variants: {
       default: { fill: 0xf5f5f4, alpha: 1 },
-      selected: { fill: 0xfdba74, alpha: 1 },
+      selected: { fill: 0xf5f5f4, alpha: 1 },
       muted: { fill: 0xa8a29e, alpha: 0.45 },
     },
     style: {
