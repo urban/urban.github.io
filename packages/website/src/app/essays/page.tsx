@@ -1,4 +1,4 @@
-import { Array, Effect, Order, pipe, Record } from "effect"
+import { Array, DateTime, Effect, Order, pipe, Record } from "effect"
 import type { Metadata } from "next"
 import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
@@ -19,7 +19,7 @@ const main = Effect.gen(function* () {
   const essays = pipe(
     essaysMetadata,
     Array.filter(({ metadata }) => !metadata.draft),
-    Array.sortBy(Order.flip(Order.mapInput(Order.Date, ({ metadata }) => metadata.updatedAt))),
+    Array.sortBy(Order.flip(Order.mapInput(DateTime.Order, ({ metadata }) => metadata.updatedAt))),
     Array.groupBy(({ metadata }) => metadata.date.getFullYear().toString()),
   )
 

@@ -1,5 +1,4 @@
 import { Schema, SchemaGetter } from "effect"
-import { Model } from "effect/unstable/schema"
 
 const DateFromString = Schema.Date.pipe(
   Schema.encodeTo(Schema.String, {
@@ -9,7 +8,10 @@ const DateFromString = Schema.Date.pipe(
 )
 
 // gray-matter parses bare YAML dates as Date instances instead of strings.
-const DateTimeFromFrontmatter = Schema.Union([Model.Date, Schema.DateTimeUtcFromDate])
+const DateTimeFromFrontmatter = Schema.Union([
+  Schema.DateTimeUtcFromDate,
+  Schema.DateTimeUtcFromString,
+])
 
 export const Work = Schema.Struct({
   company: Schema.String,
