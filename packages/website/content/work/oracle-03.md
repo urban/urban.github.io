@@ -4,7 +4,7 @@ role: "Senior Manager - JET"
 location: "Greater Seattle Area"
 locationType: "Remote"
 dateStart: "09/01/2021"
-dateEnd: "Present"
+dateEnd: "10/01/2025"
 ---
 
 - Led the modernization of Oracle’s JET frontend platform, defining and executing a multi year architecture roadmap used across OCI, Fusion Apps and GBU teams serving thousands of customers.
