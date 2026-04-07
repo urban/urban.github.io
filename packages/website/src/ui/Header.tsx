@@ -16,9 +16,9 @@ const Header = ({ siteName }: { siteName: string }) => {
             <div className="font-semibold">{siteName}</div>
           </NextLink>
           <nav className="flex gap-6">
-            <Link href="/essays">Essays</Link>
+            {/*<Link href="/essays">Essays</Link>*/}
             <Link href="/projects">Projects</Link>
-            <Link href="/vault">Vault</Link>
+            {/*<Link href="/vault">Vault</Link>*/}
             {/*<Link href="/about">About</Link>*/}
           </nav>
         </div>
