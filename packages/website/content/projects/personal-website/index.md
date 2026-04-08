@@ -34,10 +34,10 @@ The site is a content-driven personal portfolio / knowledge garden. It has route
 
 Content lives under packages/website/content:
 
-- work/\*.md — resume-style work entries
-- projects/\*/index.md — projects
-- essays/\*/index.{md,mdx} — essays
-- vault/\*.md — note-taking / wiki-style pages
+- `work/*.md` — resume-style work entries
+- `projects/*/index.md` — projects
+- `essays/*/index.{md,mdx}` — essays
+- `vault/*.md` — note-taking / wiki-style pages
 
 The site loads markdown/MDX through an Effect-based content service in:
 

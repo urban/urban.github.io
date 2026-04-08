@@ -1,5 +1,6 @@
 import { Array, Effect, flow } from "effect"
 import type { Metadata, ResolvingMetadata } from "next"
+import { notFound } from "next/navigation"
 import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
 import type { ContentService } from "@/lib/services/Content"
@@ -22,19 +23,22 @@ const mainAll = Effect.gen(function* () {
   return yield* content.getEssays().pipe(
     Effect.map(
       flow(
-        Array.filter(({ data }) => !data.draft),
+        Array.filter(({ data }) => data.published ?? true),
         Array.map(({ slug }) => ({ slug })),
       ),
     ),
   )
 })
 
+const ESSAY_PLACEHOLDER_SLUG = "__placeholder__"
+
 type PageProps = {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  return await RuntimeServer.runPromise(mainAll)
+  const essays = await RuntimeServer.runPromise(mainAll)
+  return essays.length === 0 ? [{ slug: ESSAY_PLACEHOLDER_SLUG }] : essays
 }
 
 export async function generateMetadata(
@@ -42,6 +46,13 @@ export async function generateMetadata(
   _parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { slug } = await params
+  if (slug === ESSAY_PLACEHOLDER_SLUG) {
+    return {
+      title: "Essays",
+      description: "A collection of essays on topics I am passionate about.",
+    }
+  }
+
   const essay = await RuntimeServer.runPromise(main(slug))
 
   return {
@@ -52,6 +63,10 @@ export async function generateMetadata(
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
+  if (slug === ESSAY_PLACEHOLDER_SLUG) {
+    notFound()
+  }
+
   const essay = await RuntimeServer.runPromise(main(slug))
 
   return (

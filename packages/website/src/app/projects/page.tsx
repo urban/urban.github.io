@@ -6,7 +6,6 @@ import { RuntimeServer } from "@/lib/RuntimeServer"
 import { ComingSoon } from "@/ui/ComingSoon"
 import { Container } from "@/ui/Container"
 import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
-import { ArrowCard } from "@/ui/ArrowCard"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
