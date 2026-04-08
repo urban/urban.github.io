@@ -26,5 +26,5 @@
     "**/*.mts",
     "package.json"
   ],
-  "exclude": ["node_modules", "scripts"]
+  "exclude": ["node_modules", "scripts", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }

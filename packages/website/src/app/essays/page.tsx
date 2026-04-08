@@ -18,9 +18,11 @@ const main = Effect.gen(function* () {
 
   const essays = pipe(
     essaysMetadata,
-    Array.filter(({ metadata }) => !metadata.draft),
+    Array.filter(({ metadata }) => metadata.published ?? true),
     Array.sortBy(Order.flip(Order.mapInput(DateTime.Order, ({ metadata }) => metadata.updatedAt))),
-    Array.groupBy(({ metadata }) => metadata.date.getFullYear().toString()),
+    Array.groupBy(({ metadata }) =>
+      DateTime.toDateUtc(metadata.updatedAt).getUTCFullYear().toString(),
+    ),
   )
 
   const years = pipe(

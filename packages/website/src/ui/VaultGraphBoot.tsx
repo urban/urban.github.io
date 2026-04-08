@@ -62,21 +62,21 @@ export const VaultGraphBoot = ({ themeSet, scrollZoomEnabled }: VaultGraphBootPr
         }
 
         try {
-          dispose = await Effect.runPromise(
-            bootstrapGraphVisualizerEffect({
-              themeSet,
-              scrollZoomEnabled,
-              onSelectionChange: (selection) => {
-                const nextHref = resolveVaultGraphSelectionNavigationHref({
-                  selection,
-                  pathname,
-                })
-                if (nextHref !== null) {
-                  router.push(nextHref)
-                }
-              },
-            }),
-          )
+          const bootstrapOptions = {
+            onSelectionChange: (selection: GraphVisualizerSelectionChange) => {
+              const nextHref = resolveVaultGraphSelectionNavigationHref({
+                selection,
+                pathname,
+              })
+              if (nextHref !== null) {
+                router.push(nextHref)
+              }
+            },
+            ...(themeSet === undefined ? {} : { themeSet }),
+            ...(scrollZoomEnabled === undefined ? {} : { scrollZoomEnabled }),
+          }
+
+          dispose = await Effect.runPromise(bootstrapGraphVisualizerEffect(bootstrapOptions))
         } catch (error: unknown) {
           if (
             error instanceof GraphThemeJsonParseError ||
