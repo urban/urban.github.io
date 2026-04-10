@@ -45,7 +45,7 @@ export default async function Page() {
                   rel="noopener noreferrer"
                   className="relative group flex flex-nowrap py-3 px-4 pr-10 rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
                 >
-                  <div className="flex flex-col flex-1 truncate">
+                  <div className="flex flex-col flex-1">
                     <div className="font-semibold">{data.title}</div>
                     <div className="text-sm">{data.description}</div>
                   </div>
