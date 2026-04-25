@@ -1,21 +1,21 @@
 import { expect, test } from "bun:test"
 import type { GraphSnapshot } from "@urban/build-graph"
-import { getVaultBacklinks, getVaultGraphModel, resolveSelectedVaultNodeId } from "./vaultGraph"
+import { getBacklinks, getGraphModel, resolveSelectedNodeId } from "./noteGraph"
 
-test("resolves canonical selected node ids for vault slugs with spaced source filenames", async () => {
-  const { snapshot } = await getVaultGraphModel()
+test("resolves canonical selected node ids for published garden slugs with spaced source filenames", async () => {
+  const { snapshot } = await getGraphModel()
 
-  expect(resolveSelectedVaultNodeId(snapshot, "harness-loop")).toBe("/vault/harness-loop")
-  expect(resolveSelectedVaultNodeId(snapshot, "effect-runtime-boundary")).toBe(
-    "/vault/effect-runtime-boundary",
+  expect(resolveSelectedNodeId(snapshot, "index")).toBe("/garden/index")
+  expect(resolveSelectedNodeId(snapshot, "what-is-a-digital-garden")).toBe(
+    "/garden/what-is-a-digital-garden",
   )
 })
 
 test("fails fast when a published vault slug has no node mapping", async () => {
-  const { snapshot } = await getVaultGraphModel()
+  const { snapshot } = await getGraphModel()
 
-  expect(() => resolveSelectedVaultNodeId(snapshot, "missing-slug")).toThrow(
-    "Missing vault graph node id for slug: missing-slug",
+  expect(() => resolveSelectedNodeId(snapshot, "missing-slug")).toThrow(
+    "Missing garden graph node id for slug: missing-slug",
   )
 })
 
@@ -24,30 +24,30 @@ test("aggregates incoming vault links into backlink counts per source page", () 
     schemaVersion: "2",
     nodes: [
       {
-        id: "/vault/alpha",
+        id: "/garden/alpha",
         kind: "note",
         relativePath: "alpha.md",
         permalink: "/alpha",
         slug: "alpha",
-        routePath: "/vault/alpha",
+        routePath: "/garden/alpha",
         title: "Alpha",
       },
       {
-        id: "/vault/beta",
+        id: "/garden/beta",
         kind: "note",
         relativePath: "beta.md",
         permalink: "/beta",
         slug: "beta",
-        routePath: "/vault/beta",
+        routePath: "/garden/beta",
         title: "Beta",
       },
       {
-        id: "/vault/gamma",
+        id: "/garden/gamma",
         kind: "note",
         relativePath: "gamma.md",
         permalink: "/gamma",
         slug: "gamma",
-        routePath: "/vault/gamma",
+        routePath: "/garden/gamma",
         title: "Gamma",
       },
       {
@@ -58,16 +58,16 @@ test("aggregates incoming vault links into backlink counts per source page", () 
     ],
     edges: [
       {
-        sourceNodeId: "/vault/beta",
-        targetNodeId: "/vault/alpha",
+        sourceNodeId: "/garden/beta",
+        targetNodeId: "/garden/alpha",
         sourceRelativePath: "beta.md",
         rawWikilink: "[[alpha]]",
         target: "alpha",
         resolutionStrategy: "filename",
       },
       {
-        sourceNodeId: "/vault/beta",
-        targetNodeId: "/vault/alpha",
+        sourceNodeId: "/garden/beta",
+        targetNodeId: "/garden/alpha",
         sourceRelativePath: "beta.md",
         rawWikilink: "[[alpha|Alpha again]]",
         target: "alpha",
@@ -75,8 +75,8 @@ test("aggregates incoming vault links into backlink counts per source page", () 
         resolutionStrategy: "filename",
       },
       {
-        sourceNodeId: "/vault/gamma",
-        targetNodeId: "/vault/alpha",
+        sourceNodeId: "/garden/gamma",
+        targetNodeId: "/garden/alpha",
         sourceRelativePath: "gamma.md",
         rawWikilink: "[[alpha]]",
         target: "alpha",
@@ -84,7 +84,7 @@ test("aggregates incoming vault links into backlink counts per source page", () 
       },
       {
         sourceNodeId: "placeholder:missing",
-        targetNodeId: "/vault/alpha",
+        targetNodeId: "/garden/alpha",
         sourceRelativePath: "missing.md",
         rawWikilink: "[[alpha]]",
         target: "alpha",
@@ -94,31 +94,31 @@ test("aggregates incoming vault links into backlink counts per source page", () 
     diagnostics: [],
     indexes: {
       nodesById: {
-        "/vault/alpha": {
-          id: "/vault/alpha",
+        "/garden/alpha": {
+          id: "/garden/alpha",
           kind: "note",
           relativePath: "alpha.md",
           permalink: "/alpha",
           slug: "alpha",
-          routePath: "/vault/alpha",
+          routePath: "/garden/alpha",
           title: "Alpha",
         },
-        "/vault/beta": {
-          id: "/vault/beta",
+        "/garden/beta": {
+          id: "/garden/beta",
           kind: "note",
           relativePath: "beta.md",
           permalink: "/beta",
           slug: "beta",
-          routePath: "/vault/beta",
+          routePath: "/garden/beta",
           title: "Beta",
         },
-        "/vault/gamma": {
-          id: "/vault/gamma",
+        "/garden/gamma": {
+          id: "/garden/gamma",
           kind: "note",
           relativePath: "gamma.md",
           permalink: "/gamma",
           slug: "gamma",
-          routePath: "/vault/gamma",
+          routePath: "/garden/gamma",
           title: "Gamma",
         },
         "placeholder:missing": {
@@ -128,18 +128,18 @@ test("aggregates incoming vault links into backlink counts per source page", () 
         },
       },
       edgesBySourceNodeId: {
-        "/vault/beta": [
+        "/garden/beta": [
           {
-            sourceNodeId: "/vault/beta",
-            targetNodeId: "/vault/alpha",
+            sourceNodeId: "/garden/beta",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "beta.md",
             rawWikilink: "[[alpha]]",
             target: "alpha",
             resolutionStrategy: "filename",
           },
           {
-            sourceNodeId: "/vault/beta",
-            targetNodeId: "/vault/alpha",
+            sourceNodeId: "/garden/beta",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "beta.md",
             rawWikilink: "[[alpha|Alpha again]]",
             target: "alpha",
@@ -147,10 +147,10 @@ test("aggregates incoming vault links into backlink counts per source page", () 
             resolutionStrategy: "filename",
           },
         ],
-        "/vault/gamma": [
+        "/garden/gamma": [
           {
-            sourceNodeId: "/vault/gamma",
-            targetNodeId: "/vault/alpha",
+            sourceNodeId: "/garden/gamma",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "gamma.md",
             rawWikilink: "[[alpha]]",
             target: "alpha",
@@ -160,7 +160,7 @@ test("aggregates incoming vault links into backlink counts per source page", () 
         "placeholder:missing": [
           {
             sourceNodeId: "placeholder:missing",
-            targetNodeId: "/vault/alpha",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "missing.md",
             rawWikilink: "[[alpha]]",
             target: "alpha",
@@ -169,18 +169,18 @@ test("aggregates incoming vault links into backlink counts per source page", () 
         ],
       },
       edgesByTargetNodeId: {
-        "/vault/alpha": [
+        "/garden/alpha": [
           {
-            sourceNodeId: "/vault/beta",
-            targetNodeId: "/vault/alpha",
+            sourceNodeId: "/garden/beta",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "beta.md",
             rawWikilink: "[[alpha]]",
             target: "alpha",
             resolutionStrategy: "filename",
           },
           {
-            sourceNodeId: "/vault/beta",
-            targetNodeId: "/vault/alpha",
+            sourceNodeId: "/garden/beta",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "beta.md",
             rawWikilink: "[[alpha|Alpha again]]",
             target: "alpha",
@@ -188,8 +188,8 @@ test("aggregates incoming vault links into backlink counts per source page", () 
             resolutionStrategy: "filename",
           },
           {
-            sourceNodeId: "/vault/gamma",
-            targetNodeId: "/vault/alpha",
+            sourceNodeId: "/garden/gamma",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "gamma.md",
             rawWikilink: "[[alpha]]",
             target: "alpha",
@@ -197,7 +197,7 @@ test("aggregates incoming vault links into backlink counts per source page", () 
           },
           {
             sourceNodeId: "placeholder:missing",
-            targetNodeId: "/vault/alpha",
+            targetNodeId: "/garden/alpha",
             sourceRelativePath: "missing.md",
             rawWikilink: "[[alpha]]",
             target: "alpha",
@@ -206,30 +206,30 @@ test("aggregates incoming vault links into backlink counts per source page", () 
         ],
       },
       noteNodeIdBySlug: {
-        alpha: "/vault/alpha",
-        beta: "/vault/beta",
-        gamma: "/vault/gamma",
+        alpha: "/garden/alpha",
+        beta: "/garden/beta",
+        gamma: "/garden/gamma",
       },
       noteNodeIdByRoutePath: {
-        "/vault/alpha": "/vault/alpha",
-        "/vault/beta": "/vault/beta",
-        "/vault/gamma": "/vault/gamma",
+        "/garden/alpha": "/garden/alpha",
+        "/garden/beta": "/garden/beta",
+        "/garden/gamma": "/garden/gamma",
       },
     },
   }
 
-  expect(getVaultBacklinks(snapshot, "/vault/alpha")).toEqual([
+  expect(getBacklinks(snapshot, "/garden/alpha")).toEqual([
     {
       count: 2,
-      nodeId: "/vault/beta",
-      routePath: "/vault/beta",
+      nodeId: "/garden/beta",
+      routePath: "/garden/beta",
       slug: "beta",
       title: "Beta",
     },
     {
       count: 1,
-      nodeId: "/vault/gamma",
-      routePath: "/vault/gamma",
+      nodeId: "/garden/gamma",
+      routePath: "/garden/gamma",
       slug: "gamma",
       title: "Gamma",
     },

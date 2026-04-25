@@ -8,13 +8,14 @@ import { RuntimeServer } from "./RuntimeServer"
 import { Content } from "./services/Content"
 import type { ContentService } from "./services/Content"
 import {
-  buildPublishedVaultWikiLinkLookup,
-  normalizeVaultSlug,
-  resolveVaultDescription,
-  rewriteVaultWikiLinksToHtml,
-  UNRESOLVED_VAULT_WIKI_LINK_CLASS,
-  VaultWikiLinkAliasCollisionError,
-} from "./vault"
+  buildPublishedWikiLinkLookup,
+  normalizeSlug,
+  resolveDescription,
+  rewriteWikiLinksToHtml,
+  toRoutePath,
+  UNRESOLVED_WIKI_LINK_CLASS,
+  WikiLinkAliasCollisionError,
+} from "./note"
 
 const contentDir = join(import.meta.dir, "..", "..", "content")
 const vaultDir = join(contentDir, "vault")
@@ -29,7 +30,7 @@ afterEach(async () => {
   )
 })
 
-const writeVaultFixture = async (filename: string, source: string): Promise<void> => {
+const writeFixture = async (filename: string, source: string): Promise<void> => {
   const filepath = join(vaultDir, filename)
   await writeFile(filepath, source, "utf8")
   createdPaths.push(filepath)
@@ -43,17 +44,22 @@ const writeEssayFixture = async (slug: string, source: string): Promise<void> =>
 }
 
 test("normalizes canonical vault slugs and rejects blank-root permalinks", () => {
-  expect(normalizeVaultSlug("/harness-loop/")).toBe("harness-loop")
-  expect(normalizeVaultSlug("/")).toBeUndefined()
+  expect(normalizeSlug("/harness-loop/")).toBe("harness-loop")
+  expect(normalizeSlug("/")).toBeUndefined()
 })
 
 test("prefers explicit vault description over derived excerpt", () => {
-  expect(resolveVaultDescription("Explicit", "Derived")).toBe("Explicit")
-  expect(resolveVaultDescription(undefined, "Derived")).toBe("Derived")
+  expect(resolveDescription("Explicit", "Derived")).toBe("Explicit")
+  expect(resolveDescription(undefined, "Derived")).toBe("Derived")
+})
+
+test("maps the garden index slug to the garden root route", () => {
+  expect(toRoutePath("index")).toBe("/garden")
+  expect(toRoutePath("harness-loop")).toBe("/garden/harness-loop")
 })
 
 test("rewrites canonical vault wiki-links to canonical vault route anchors", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([
+  const lookup = buildPublishedWikiLinkLookup([
     {
       slug: "harness-loop",
       title: "Harness Loop",
@@ -61,13 +67,13 @@ test("rewrites canonical vault wiki-links to canonical vault route anchors", () 
     },
   ])
 
-  expect(rewriteVaultWikiLinksToHtml("See [[harness-loop]] next.", lookup)).toBe(
-    'See <a href="/vault/harness-loop">Harness Loop</a> next.',
+  expect(rewriteWikiLinksToHtml("See [[harness-loop]] next.", lookup)).toBe(
+    'See <a href="/garden/harness-loop">Harness Loop</a> next.',
   )
 })
 
 test("resolves published vault aliases to canonical vault routes", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([
+  const lookup = buildPublishedWikiLinkLookup([
     {
       slug: "ai-harness-learning",
       title: "AI Harness Learning",
@@ -75,13 +81,13 @@ test("resolves published vault aliases to canonical vault routes", () => {
     },
   ])
 
-  expect(rewriteVaultWikiLinksToHtml("Start at [[vault index]].", lookup)).toBe(
-    'Start at <a href="/vault/ai-harness-learning">AI Harness Learning</a>.',
+  expect(rewriteWikiLinksToHtml("Start at [[vault index]].", lookup)).toBe(
+    'Start at <a href="/garden/ai-harness-learning">AI Harness Learning</a>.',
   )
 })
 
 test("uses custom labels while keeping canonical vault hrefs", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([
+  const lookup = buildPublishedWikiLinkLookup([
     {
       slug: "trace-and-replay",
       title: "Trace And Replay",
@@ -89,29 +95,29 @@ test("uses custom labels while keeping canonical vault hrefs", () => {
     },
   ])
 
-  expect(rewriteVaultWikiLinksToHtml("Read [[trace replay|Replay Traces]].", lookup)).toBe(
-    'Read <a href="/vault/trace-and-replay">Replay Traces</a>.',
+  expect(rewriteWikiLinksToHtml("Read [[trace replay|Replay Traces]].", lookup)).toBe(
+    'Read <a href="/garden/trace-and-replay">Replay Traces</a>.',
   )
 })
 
 test("renders unresolved vault wiki-links as muted spans", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([])
+  const lookup = buildPublishedWikiLinkLookup([])
 
-  expect(rewriteVaultWikiLinksToHtml("Missing [[missing-note]] here.", lookup)).toBe(
-    `Missing <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">missing-note</span> here.`,
+  expect(rewriteWikiLinksToHtml("Missing [[missing-note]] here.", lookup)).toBe(
+    `Missing <span class="${UNRESOLVED_WIKI_LINK_CLASS}">missing-note</span> here.`,
   )
 })
 
 test("renders unresolved custom labels as muted spans", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([])
+  const lookup = buildPublishedWikiLinkLookup([])
 
-  expect(rewriteVaultWikiLinksToHtml("Missing [[missing-note|Missing Note]] here.", lookup)).toBe(
-    `Missing <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Missing Note</span> here.`,
+  expect(rewriteWikiLinksToHtml("Missing [[missing-note|Missing Note]] here.", lookup)).toBe(
+    `Missing <span class="${UNRESOLVED_WIKI_LINK_CLASS}">Missing Note</span> here.`,
   )
 })
 
 test("rewrites multiple vault wiki-links in one block independently", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([
+  const lookup = buildPublishedWikiLinkLookup([
     {
       slug: "harness-loop",
       title: "Harness Loop",
@@ -125,17 +131,17 @@ test("rewrites multiple vault wiki-links in one block independently", () => {
   ])
 
   expect(
-    rewriteVaultWikiLinksToHtml(
+    rewriteWikiLinksToHtml(
       "See [[harness loop]], [[trace-and-replay|Replay]], and [[missing-note]].",
       lookup,
     ),
   ).toBe(
-    `See <a href="/vault/harness-loop">Harness Loop</a>, <a href="/vault/trace-and-replay">Replay</a>, and <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">missing-note</span>.`,
+    `See <a href="/garden/harness-loop">Harness Loop</a>, <a href="/garden/trace-and-replay">Replay</a>, and <span class="${UNRESOLVED_WIKI_LINK_CLASS}">missing-note</span>.`,
   )
 })
 
 test("prefers canonical slugs over alias matches for the same token", () => {
-  const lookup = buildPublishedVaultWikiLinkLookup([
+  const lookup = buildPublishedWikiLinkLookup([
     {
       slug: "harness-loop",
       title: "Harness Loop",
@@ -148,14 +154,14 @@ test("prefers canonical slugs over alias matches for the same token", () => {
     },
   ])
 
-  expect(rewriteVaultWikiLinksToHtml("See [[harness-loop]].", lookup)).toBe(
-    'See <a href="/vault/harness-loop">Harness Loop</a>.',
+  expect(rewriteWikiLinksToHtml("See [[harness-loop]].", lookup)).toBe(
+    'See <a href="/garden/harness-loop">Harness Loop</a>.',
   )
 })
 
 test("fails fast on published vault alias collisions and names both entries", () => {
   expect(() =>
-    buildPublishedVaultWikiLinkLookup([
+    buildPublishedWikiLinkLookup([
       {
         slug: "alpha",
         title: "Alpha",
@@ -168,7 +174,7 @@ test("fails fast on published vault alias collisions and names both entries", ()
       },
     ]),
   ).toThrow(
-    new VaultWikiLinkAliasCollisionError({
+    new WikiLinkAliasCollisionError({
       alias: "shared alias",
       first: {
         slug: "alpha",
@@ -185,7 +191,7 @@ test("fails fast on published vault alias collisions and names both entries", ()
 })
 
 test("content service discovers published vault fixtures and excludes unpublished ones", async () => {
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Published.md",
     `---
 title: Fixture Published
@@ -202,7 +208,7 @@ published: true
 First paragraph for the published fixture.
 `,
   )
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Draft.md",
     `---
 title: Fixture Draft
@@ -220,8 +226,8 @@ First paragraph for the unpublished fixture.
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    const vault = yield* content.getVault()
-    const publishedVault = yield* content.getPublishedVault()
+    const vault = yield* content.getNotes()
+    const publishedVault = yield* content.getPublishedNotes()
     return { vault, publishedVault }
   })
   const { vault, publishedVault } = await RuntimeServer.runPromise(program)
@@ -247,7 +253,7 @@ First paragraph for the unpublished fixture.
 })
 
 test("content service keeps unpublished vault targets unresolved after preprocessing", async () => {
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Hidden.md",
     `---
 title: Fixture Hidden
@@ -262,7 +268,7 @@ published: false
 Hidden paragraph.
 `,
   )
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Source With Draft Link.md",
     `---
 title: Fixture Source With Draft Link
@@ -278,7 +284,7 @@ See [[fixture-hidden|Hidden Draft]].
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.findPublishedVaultBySlug("fixture-source-with-draft-link")
+    return yield* content.findPublishedNotesBySlug("fixture-source-with-draft-link")
   })
   const entry = await RuntimeServer.runPromise(program)
 
@@ -290,12 +296,12 @@ See [[fixture-hidden|Hidden Draft]].
 
   const markup = renderToStaticMarkup(createElement(entry.Content))
   expect(markup).toContain(
-    `<p>See <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Hidden Draft</span>.</p>`,
+    `<p>See <span class="${UNRESOLVED_WIKI_LINK_CLASS}">Hidden Draft</span>.</p>`,
   )
 })
 
 test("content service preprocesses vault wiki-links before vault mdx compile", async () => {
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Target.md",
     `---
 title: Fixture Target
@@ -310,7 +316,7 @@ published: true
 Target paragraph.
 `,
   )
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Source.md",
     `---
 title: Fixture Source
@@ -326,7 +332,7 @@ See [[fixture-target]].
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.findPublishedVaultBySlug("fixture-source")
+    return yield* content.findPublishedNotesBySlug("fixture-source")
   })
   const entry = await RuntimeServer.runPromise(program)
 
@@ -340,12 +346,12 @@ See [[fixture-target]].
 
   const markup = renderToStaticMarkup(createElement(entry.Content))
   expect(markup).toContain(
-    '<p>See <a class="styled-link" href="/vault/fixture-target"><span>Fixture Target</span></a>.</p>',
+    '<p>See <a class="styled-link" href="/garden/fixture-target"><span>Fixture Target</span></a>.</p>',
   )
 })
 
 test("content service renders resolved and unresolved vault wiki-links across mixed inline content", async () => {
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Target Alpha.md",
     `---
 title: Fixture Target Alpha
@@ -360,7 +366,7 @@ published: true
 Alpha paragraph.
 `,
   )
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Target Beta.md",
     `---
 title: Fixture Target Beta
@@ -375,7 +381,7 @@ published: true
 Beta paragraph.
 `,
   )
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Mixed Source.md",
     `---
 title: Fixture Mixed Source
@@ -391,7 +397,7 @@ Start [[fixture-target-alpha]], continue with [[fixture-target-beta|Beta Label]]
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.findPublishedVaultBySlug("fixture-mixed-source")
+    return yield* content.findPublishedNotesBySlug("fixture-mixed-source")
   })
   const entry = await RuntimeServer.runPromise(program)
 
@@ -404,7 +410,7 @@ Start [[fixture-target-alpha]], continue with [[fixture-target-beta|Beta Label]]
   const markup = renderToStaticMarkup(createElement(entry.Content))
 
   expect(markup).toContain(
-    `<p>Start <a class="styled-link" href="/vault/fixture-target-alpha"><span>Fixture Target Alpha</span></a>, continue with <a class="styled-link" href="/vault/fixture-target-beta"><span>Beta Label</span></a>, and end on <span class="${UNRESOLVED_VAULT_WIKI_LINK_CLASS}">Missing Target</span>.</p>`,
+    `<p>Start <a class="styled-link" href="/garden/fixture-target-alpha"><span>Fixture Target Alpha</span></a>, continue with <a class="styled-link" href="/garden/fixture-target-beta"><span>Beta Label</span></a>, and end on <span class="${UNRESOLVED_WIKI_LINK_CLASS}">Missing Target</span>.</p>`,
   )
   expect(markup).not.toContain("[[")
 })
@@ -443,7 +449,7 @@ See [[fixture-target]].
 })
 
 test("content service fails on invalid vault frontmatter", async () => {
-  await writeVaultFixture(
+  await writeFixture(
     "Fixture Invalid.md",
     `---
 title: Fixture Invalid
@@ -461,7 +467,7 @@ Broken permalink fixture.
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.getVault()
+    return yield* content.getNotes()
   })
 
   await expect(RuntimeServer.runPromise(program)).rejects.toBeDefined()

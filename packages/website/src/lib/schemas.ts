@@ -40,7 +40,7 @@ export const Project = Schema.Struct({
   published: Schema.optional(Schema.Boolean),
 })
 
-export const VaultFrontmatter = Schema.Struct({
+export const NoteFrontmatter = Schema.Struct({
   title: Schema.optional(Schema.NonEmptyString),
   description: Schema.optional(Schema.NonEmptyString),
   permalink: Schema.NonEmptyString,

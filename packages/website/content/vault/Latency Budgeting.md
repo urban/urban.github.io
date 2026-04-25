@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - latency budget
-published: true
+published: false
 ---
 
 Set a per-task latency budget before optimization work.

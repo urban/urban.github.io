@@ -1,7 +1,7 @@
 import Link from "next/link"
-import type { VaultBacklink } from "@/lib/vaultGraph"
+import type { Backlink } from "@/lib/noteGraph"
 
-const Backlinks = ({ backlinks }: { backlinks: readonly VaultBacklink[] }) => {
+const Backlinks = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
   return (
     <>
       <h2 className="text-lg font-semibold text-black dark:text-white">Backlinks</h2>
@@ -30,7 +30,7 @@ const Backlinks = ({ backlinks }: { backlinks: readonly VaultBacklink[] }) => {
     </>
   )
 }
-const BacklinksAlt = ({ backlinks }: { backlinks: readonly VaultBacklink[] }) => {
+const BacklinksAlt = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
   return (
     <>
       <h2 className="text-lg font-semibold text-black dark:text-white">Backlinks</h2>

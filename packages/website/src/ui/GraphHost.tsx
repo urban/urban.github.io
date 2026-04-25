@@ -1,6 +1,6 @@
 import type { GraphSnapshot } from "@urban/build-graph/schema"
-import { VaultGraphBoot } from "./VaultGraphBoot"
-import { VAULT_GRAPH_THEME_SET } from "./vaultGraphTheme"
+import { GraphBoot } from "./GraphBoot"
+import { GRAPH_THEME_SET } from "./graphTheme"
 
 const GRAPH_SNAPSHOT_SCRIPT_ID = "graph-snapshot"
 
@@ -13,7 +13,7 @@ type Props = {
   scrollZoomEnabled?: boolean
 }
 
-export const VaultGraphHost = ({ snapshot, selectedNodeId, scrollZoomEnabled = true }: Props) => (
+export const GraphHost = ({ snapshot, selectedNodeId, scrollZoomEnabled = true }: Props) => (
   <>
     {/*<div className="mb-3 flex items-baseline justify-between gap-3">
       <h2 className="font-semibold text-black dark:text-white">Graph</h2>
@@ -30,6 +30,6 @@ export const VaultGraphHost = ({ snapshot, selectedNodeId, scrollZoomEnabled = t
       type="application/json"
       dangerouslySetInnerHTML={{ __html: serializeInlineSnapshot(snapshot) }}
     />
-    <VaultGraphBoot themeSet={VAULT_GRAPH_THEME_SET} scrollZoomEnabled={scrollZoomEnabled} />
+    <GraphBoot themeSet={GRAPH_THEME_SET} scrollZoomEnabled={scrollZoomEnabled} />
   </>
 )

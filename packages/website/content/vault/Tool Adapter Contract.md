@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - tool contract
-published: true
+published: false
 ---
 
 Every tool adapter should expose:

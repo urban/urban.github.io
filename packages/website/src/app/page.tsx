@@ -61,11 +61,14 @@ export default async function Page() {
           <section className="border-b border-gray-300 dark:border-gray-500">
             <article className="py-4">
               <p className="animate">
-                Hello, my name is Urban. I’m a senior software engineer and technical leader with
-                experience building platforms, design systems, and shared infrastructure across
-                large organizations. I’ve spent much of my career working at the intersection of
-                product, design, and engineering, helping teams turn complex problems into systems
-                that improve quality, consistency, and delivery at scale.
+                Hello, my name is Urban. I am a Software Engineer and Engineering Manager with deep
+                experience owning and evolving platforms, design systems, and shared infrastructure
+                that helps product teams move faster while delivering higher-quality products at
+                scale. I take responsibility for ambiguous, high impact problems that sit at the
+                intersection of product, design, and engineering, and I turn them into durable
+                systems that scale. My work has included leading major platform migrations, defining
+                quality standards, and building shared infrastructure that improves consistency,
+                performance, and reliability.
               </p>
               <p className="animate">
                 I’ve led platform modernization efforts, shaped frontend architecture, established

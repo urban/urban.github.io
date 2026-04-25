@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - failure classes
-published: true
+published: false
 ---
 
 Classify harness failures into stable buckets:

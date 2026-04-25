@@ -60,21 +60,27 @@ export default async function Page() {
           <section className="border-b border-gray-300 dark:border-gray-500">
             <article className="py-4">
               <p className="animate">
-                Hello, my name is Urban. I am an Engineering Manager with deep experience owning and
-                evolving UI platforms, design systems, and shared frontend infrastructure used
-                across large, multi team organizations. I take responsibility for ambiguous, high
-                impact problems that sit at the intersection of product, design, and engineering,
-                and I turn them into durable systems that scale. My work has included leading major
-                platform migrations, defining frontend quality standards, and building shared
-                infrastructure that improves consistency, performance, and reliability.
+                Hello, my name is Urban. I am a Software Engineer and Engineering Manager with deep
+                experience owning and evolving platforms, design systems, and shared infrastructure
+                that helps product teams move faster while delivering higher-quality products at
+                scale. I take responsibility for ambiguous, high impact problems that sit at the
+                intersection of product, design, and engineering, and I turn them into durable
+                systems that scale. My work has included leading major platform migrations, defining
+                quality standards, and building shared infrastructure that improves consistency,
+                performance, and reliability.
               </p>
               <p className="animate">
-                I collaborate closely with designers, product leaders, and engineers to translate
-                user experience goals into clear technical direction, aligning stakeholders through
-                concrete proposals, architectural reviews, and shared ownership models. While I have
-                held engineering management roles, my impact has come from hands on technical
-                leadership, making hard architectural decisions, and building platforms that enable
-                other teams to move faster without sacrificing quality.
+                I’ve led platform modernization efforts, shaped frontend architecture, established
+                quality and accessibility standards, and built shared foundations that help teams
+                move faster with more confidence. A big part of my work has been creating alignment
+                across functions by translating user and business needs into clear technical
+                direction and helping teams navigate tradeoffs in ambiguous environments.
+              </p>
+              <p className="animate">
+                I’ve worked as both an IC and an engineering manager, but the work I value most is
+                hands-on technical leadership. I’m focused on roles where I can combine technical
+                depth, systems thinking, and cross-functional leadership while continuing to grow
+                into full-stack systems, AI tooling, and agent-oriented development.
               </p>
               <p className="animate">
                 <strong>Specialties</strong>: Engineering Management • Software Development •

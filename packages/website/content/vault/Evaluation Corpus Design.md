@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - eval corpus
-published: true
+published: false
 ---
 
 Build a corpus of realistic tasks with expected outcomes.

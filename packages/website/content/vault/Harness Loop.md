@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - harness loop
-published: true
+published: false
 ---
 
 An AI harness loop is a repeatable cycle:

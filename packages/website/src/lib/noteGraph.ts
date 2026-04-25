@@ -10,14 +10,14 @@ import {
 import { RuntimeServer } from "./RuntimeServer"
 import { Content } from "./services/Content"
 import type { ContentService } from "./services/Content"
-import type { VaultEntry } from "./services/Content"
-import { toVaultRoutePath } from "./vault"
+import type { NoteEntry } from "./services/Content"
+import { toRoutePath } from "./note"
 
-export type VaultGraphModel = {
+export type GraphModel = {
   readonly snapshot: GraphSnapshot
 }
 
-export type VaultBacklink = {
+export type Backlink = {
   readonly count: number
   readonly nodeId: string
   readonly routePath: string
@@ -25,7 +25,7 @@ export type VaultBacklink = {
   readonly title: string
 }
 
-const normalizeVaultGraphFrontmatter = (source: string): string =>
+const normalizeGraphFrontmatter = (source: string): string =>
   source.replace(/^---\r?\n([\s\S]*?)\r?\n---/u, (match, frontmatter: string) => {
     const normalizedFrontmatter = frontmatter
       .replace(/^createdAt:/mu, "created:")
@@ -36,17 +36,17 @@ const normalizeVaultGraphFrontmatter = (source: string): string =>
 
 const buildGraphModelEffect = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const entries: ReadonlyArray<VaultEntry> = yield* content.getPublishedVault()
+  const entries: ReadonlyArray<NoteEntry> = yield* content.getPublishedNotes()
   const markdownSources = entries.map(
     (entry): MarkdownSourceFile => ({
       absolutePath: entry.filepath,
       relativePath: basename(entry.filepath),
-      source: normalizeVaultGraphFrontmatter(entry.rawSource),
+      source: normalizeGraphFrontmatter(entry.rawSource),
     }),
   )
   const result = yield* buildGraphSnapshotFromMarkdownSources(markdownSources, {
     identityStrategy: "canonical-route",
-    routePrefix: "/vault",
+    routePrefix: "/garden",
   })
 
   return {
@@ -54,37 +54,37 @@ const buildGraphModelEffect = Effect.gen(function* () {
   }
 })
 
-let cachedVaultGraphModelPromise: Promise<VaultGraphModel> | undefined
+let cachedGraphModelPromise: Promise<GraphModel> | undefined
 
-export const getVaultGraphModel = (): Promise<VaultGraphModel> => {
-  if (cachedVaultGraphModelPromise === undefined) {
-    cachedVaultGraphModelPromise = RuntimeServer.runPromise(buildGraphModelEffect)
+export const getGraphModel = (): Promise<GraphModel> => {
+  if (cachedGraphModelPromise === undefined) {
+    cachedGraphModelPromise = RuntimeServer.runPromise(buildGraphModelEffect)
   }
 
-  return cachedVaultGraphModelPromise
+  return cachedGraphModelPromise
 }
 
-export const resolveSelectedVaultNodeId = (snapshot: GraphSnapshot, slug: string): string => {
+export const resolveSelectedNodeId = (snapshot: GraphSnapshot, slug: string): string => {
   const selectedNodeId =
     snapshot.indexes.noteNodeIdBySlug?.[slug] ??
-    snapshot.indexes.noteNodeIdByRoutePath?.[toVaultRoutePath(slug)]
+    snapshot.indexes.noteNodeIdByRoutePath?.[toRoutePath(slug)]
 
   if (selectedNodeId === undefined) {
-    throw new Error(`Missing vault graph node id for slug: ${slug}`)
+    throw new Error(`Missing garden graph node id for slug: ${slug}`)
   }
 
   return selectedNodeId
 }
 
-const getVaultBacklinkTitle = (node: GraphSnapshotNoteNode): string =>
+const getBacklinkTitle = (node: GraphSnapshotNoteNode): string =>
   node.title ?? node.label ?? node.slug ?? node.relativePath
 
-export const getVaultBacklinks = (
+export const getBacklinks = (
   snapshot: GraphSnapshot,
   targetNodeId: string,
-): ReadonlyArray<VaultBacklink> => {
+): ReadonlyArray<Backlink> => {
   const incomingEdges = snapshot.indexes.edgesByTargetNodeId[targetNodeId] ?? []
-  const backlinksBySourceNodeId = new Map<string, VaultBacklink>()
+  const backlinksBySourceNodeId = new Map<string, Backlink>()
 
   for (const edge of incomingEdges) {
     const sourceNode = snapshot.indexes.nodesById[edge.sourceNodeId]
@@ -103,7 +103,7 @@ export const getVaultBacklinks = (
         nodeId: sourceNode.id,
         routePath: sourceNode.routePath,
         slug: sourceNode.slug,
-        title: getVaultBacklinkTitle(sourceNode),
+        title: getBacklinkTitle(sourceNode),
       })
       continue
     }
@@ -123,7 +123,7 @@ export const getVaultBacklinks = (
   })
 }
 
-export const getSelectedVaultNodeId = async (slug: string): Promise<string> => {
-  const { snapshot } = await getVaultGraphModel()
-  return resolveSelectedVaultNodeId(snapshot, slug)
+export const getSelectedNodeId = async (slug: string): Promise<string> => {
+  const { snapshot } = await getGraphModel()
+  return resolveSelectedNodeId(snapshot, slug)
 }

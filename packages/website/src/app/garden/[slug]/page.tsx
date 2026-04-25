@@ -1,13 +1,13 @@
 import type { Metadata, ResolvingMetadata } from "next"
 import { RuntimeServer } from "@/lib/RuntimeServer"
-import { VaultEntryPage, getRequiredVaultEntry, getVaultStaticParams } from "../VaultEntryPage"
+import { GardenEntryPage, getRequiredGardenEntry, getGardenStaticParams } from "../GardenEntryPage"
 
 type PageProps = {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  return await RuntimeServer.runPromise(getVaultStaticParams)
+  return await RuntimeServer.runPromise(getGardenStaticParams)
 }
 
 export async function generateMetadata(
@@ -15,7 +15,7 @@ export async function generateMetadata(
   _parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { slug } = await params
-  const entry = await getRequiredVaultEntry(slug)
+  const entry = await getRequiredGardenEntry(slug)
 
   return {
     title: entry.data.title,
@@ -25,7 +25,7 @@ export async function generateMetadata(
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
-  const entry = await getRequiredVaultEntry(slug)
+  const entry = await getRequiredGardenEntry(slug)
 
-  return <VaultEntryPage entry={entry} />
+  return <GardenEntryPage entry={entry} />
 }

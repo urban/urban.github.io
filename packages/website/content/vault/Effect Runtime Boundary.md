@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - runtime boundary
-published: true
+published: false
 ---
 
 Define where pure planning ends and side effects begin.

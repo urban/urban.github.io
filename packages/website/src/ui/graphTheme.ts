@@ -1,6 +1,6 @@
 import type { GraphTheme, GraphThemeSet } from "@urban/graph-view"
 
-export const LIGHT_VAULT_GRAPH_THEME: GraphTheme = {
+export const LIGHT_GRAPH_THEME: GraphTheme = {
   view: { backgroundColor: 0xfafaf9 },
   node: {
     variants: {
@@ -34,7 +34,7 @@ export const LIGHT_VAULT_GRAPH_THEME: GraphTheme = {
   },
 }
 
-export const DARK_VAULT_GRAPH_THEME: GraphTheme = {
+export const DARK_GRAPH_THEME: GraphTheme = {
   view: { backgroundColor: 0x0c0a09 },
   node: {
     variants: {
@@ -68,7 +68,7 @@ export const DARK_VAULT_GRAPH_THEME: GraphTheme = {
   },
 }
 
-export const VAULT_GRAPH_THEME_SET: GraphThemeSet = {
-  light: LIGHT_VAULT_GRAPH_THEME,
-  dark: DARK_VAULT_GRAPH_THEME,
+export const GRAPH_THEME_SET: GraphThemeSet = {
+  light: LIGHT_GRAPH_THEME,
+  dark: DARK_GRAPH_THEME,
 }

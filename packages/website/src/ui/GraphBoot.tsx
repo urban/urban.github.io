@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import type { GraphThemeSet } from "@urban/graph-view"
 import type { GraphVisualizerSelectionChange } from "@urban/graph-view/bootstrap"
+import { toRoutePath } from "../lib/note"
 
 const normalizePathname = (pathname: string): string => {
   const trimmedPathname = pathname.trim()
@@ -17,7 +18,7 @@ const normalizePathname = (pathname: string): string => {
     : trimmedPathname
 }
 
-export const resolveVaultGraphSelectionNavigationHref = ({
+export const resolveGraphSelectionNavigationHref = ({
   selection,
   pathname,
 }: {
@@ -28,7 +29,10 @@ export const resolveVaultGraphSelectionNavigationHref = ({
     return null
   }
 
-  const nextHref = selection.routePath ?? selection.permalink
+  const nextHref =
+    selection.slug === undefined
+      ? (selection.routePath ?? selection.permalink)
+      : toRoutePath(selection.slug)
   if (nextHref === undefined) {
     return null
   }
@@ -36,12 +40,12 @@ export const resolveVaultGraphSelectionNavigationHref = ({
   return normalizePathname(nextHref) === normalizePathname(pathname) ? null : nextHref
 }
 
-type VaultGraphBootProps = {
+type GraphBootProps = {
   readonly themeSet?: GraphThemeSet
   readonly scrollZoomEnabled?: boolean
 }
 
-export const VaultGraphBoot = ({ themeSet, scrollZoomEnabled }: VaultGraphBootProps) => {
+export const GraphBoot = ({ themeSet, scrollZoomEnabled }: GraphBootProps) => {
   const router = useRouter()
   const pathname = usePathname()
 
@@ -64,7 +68,7 @@ export const VaultGraphBoot = ({ themeSet, scrollZoomEnabled }: VaultGraphBootPr
         try {
           const bootstrapOptions = {
             onSelectionChange: (selection: GraphVisualizerSelectionChange) => {
-              const nextHref = resolveVaultGraphSelectionNavigationHref({
+              const nextHref = resolveGraphSelectionNavigationHref({
                 selection,
                 pathname,
               })

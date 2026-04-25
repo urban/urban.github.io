@@ -2,30 +2,34 @@ import { Effect } from "effect"
 import { notFound } from "next/navigation"
 import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
-import type { ContentService, VaultEntry } from "@/lib/services/Content"
+import type { ContentService, NoteEntry } from "@/lib/services/Content"
 // import { readingTime } from "@/lib/utils"
-import { getSelectedVaultNodeId, getVaultBacklinks, getVaultGraphModel } from "@/lib/vaultGraph"
+import {
+  getSelectedNodeId as getSelectedGardenNodeId,
+  getBacklinks as getGardenBacklinks,
+  getGraphModel as getGardenGraphModel,
+} from "@/lib/noteGraph"
 import { BackToPrev } from "@/ui/BackToPrev"
 import { Container } from "@/ui/Container"
 // import { FormattedDate } from "@/ui/FormattedDate"
 import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
-import { VaultGraphHost } from "@/ui/VaultGraphHost"
-import { Backlinks } from "@/ui/VaultBacklinks"
+import { GraphHost } from "@/ui/GraphHost"
+import { Backlinks } from "@/ui/Backlinks"
 
-export const getVaultEntry = (slug: string) =>
+export const getGardenEntry = (slug: string) =>
   Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.findPublishedVaultBySlug(slug)
+    return yield* content.findPublishedNotesBySlug(slug)
   })
 
-export const getVaultStaticParams = Effect.gen(function* () {
+export const getGardenStaticParams = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const entries: ReadonlyArray<VaultEntry> = yield* content.getPublishedVault()
+  const entries: ReadonlyArray<NoteEntry> = yield* content.getPublishedNotes()
   return entries.filter((entry) => entry.slug !== "index").map((entry) => ({ slug: entry.slug }))
 })
 
-export const getRequiredVaultEntry = async (slug: string): Promise<VaultEntry> => {
-  const entry: VaultEntry | undefined = await RuntimeServer.runPromise(getVaultEntry(slug))
+export const getRequiredGardenEntry = async (slug: string): Promise<NoteEntry> => {
+  const entry: NoteEntry | undefined = await RuntimeServer.runPromise(getGardenEntry(slug))
   if (entry === undefined) {
     notFound()
   }
@@ -33,25 +37,25 @@ export const getRequiredVaultEntry = async (slug: string): Promise<VaultEntry> =
   return entry
 }
 
-type VaultEntryPageProps = {
-  readonly entry: VaultEntry
-  readonly showBackToVault?: boolean
+type GardenEntryPageProps = {
+  readonly entry: NoteEntry
+  readonly showBackTo?: boolean
 }
 
-export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEntryPageProps) {
+export async function GardenEntryPage({ entry, showBackTo = false }: GardenEntryPageProps) {
   const [{ snapshot }, selectedNodeId] = await Promise.all([
-    getVaultGraphModel(),
-    getSelectedVaultNodeId(entry.slug),
+    getGardenGraphModel(),
+    getSelectedGardenNodeId(entry.slug),
   ])
-  const backlinks = getVaultBacklinks(snapshot, selectedNodeId)
+  const backlinks = getGardenBacklinks(snapshot, selectedNodeId)
 
   return (
     <>
       <PageNavigationAnimation />
       <Container>
-        {showBackToVault ? (
+        {showBackTo ? (
           <div className="animate">
-            <BackToPrev href="/vault">Back to vault</BackToPrev>
+            <BackToPrev href="/garden">Back to The Garden</BackToPrev>
           </div>
         ) : null}
         <div className="my-10 flex flex-col gap-10">
@@ -71,7 +75,7 @@ export async function VaultEntryPage({ entry, showBackToVault = false }: VaultEn
             </article>
           </div>
           <div className="animate">
-            <VaultGraphHost
+            <GraphHost
               snapshot={snapshot}
               selectedNodeId={selectedNodeId}
               scrollZoomEnabled={false}

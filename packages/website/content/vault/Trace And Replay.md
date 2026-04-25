@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - trace replay
-published: true
+published: false
 ---
 
 Capture structured events for each loop step:

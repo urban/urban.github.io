@@ -18,11 +18,11 @@ import { glob } from "tinyglobby"
 import { VFile } from "vfile"
 import { Essay, CollectionEntry, CompiledVFileData, Project, Work } from "../schemas"
 import {
-  buildPublishedVaultWikiLinkLookup,
-  finalizeVaultData,
-  preprocessVaultMarkdownSource,
-} from "../vault"
-import type { VaultData, VaultMetadataSeed } from "../vault"
+  buildPublishedWikiLinkLookup,
+  finalizeData,
+  preprocessVaultMarkdownSource as preprocessNoteMarkdownSource,
+} from "../note"
+import type { NoteData, NoteMetadataSeed } from "../note"
 import { Mdx } from "./Mdx"
 import { Metadata } from "./Metadata"
 
@@ -44,19 +44,19 @@ type CompiledCollectionEntry<TData> = {
   readonly Content: MdxContentComponent
 }
 
-export type VaultEntry = CompiledCollectionEntry<VaultData> & {
+export type NoteEntry = CompiledCollectionEntry<NoteData> & {
   readonly rawSource: string
 }
 
-type VaultSourceEntry = {
+type NoteSourceEntry = {
   readonly rawSource: string
   readonly source: string
   readonly data: unknown
   readonly filepath: string
 }
 
-type PreparedVaultEntry = VaultSourceEntry & {
-  readonly metadata: VaultMetadataSeed
+type PreparedNoteEntry = NoteSourceEntry & {
+  readonly metadata: NoteMetadataSeed
 }
 
 export type ContentService = {
@@ -75,11 +75,11 @@ export type ContentService = {
     ReadonlyArray<CompiledCollectionEntry<typeof Work.Type>>,
     ContentError
   >
-  readonly getVault: () => Effect.Effect<ReadonlyArray<VaultEntry>, ContentError>
-  readonly getPublishedVault: () => Effect.Effect<ReadonlyArray<VaultEntry>, ContentError, Content>
-  readonly findPublishedVaultBySlug: (
+  readonly getNotes: () => Effect.Effect<ReadonlyArray<NoteEntry>, ContentError>
+  readonly getPublishedNotes: () => Effect.Effect<ReadonlyArray<NoteEntry>, ContentError, Content>
+  readonly findPublishedNotesBySlug: (
     pathSlug: string,
-  ) => Effect.Effect<VaultEntry | undefined, ContentError, Content>
+  ) => Effect.Effect<NoteEntry | undefined, ContentError, Content>
 }
 export class Content extends ServiceMap.Service<Content>()("service/Content", {
   make: Effect.gen(function* () {
@@ -201,14 +201,14 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
             ),
           ),
         ),
-      getVault: (): Effect.Effect<ReadonlyArray<VaultEntry>, ContentError> =>
+      getNotes: (): Effect.Effect<ReadonlyArray<NoteEntry>, ContentError> =>
         Effect.gen(function* () {
           const filepaths = yield* Effect.tryPromise({
             try: () => glob([path.join(contentDir, "vault", "*.md")]),
             catch: (error) => new FileGlobError({ error }),
           }).pipe(Effect.tapError((error) => Console.log(error)))
 
-          const sourceEntries: ReadonlyArray<VaultSourceEntry> = yield* Effect.all(
+          const sourceEntries: ReadonlyArray<NoteSourceEntry> = yield* Effect.all(
             filepaths.map((filepath) =>
               fs.readFileString(filepath, "utf-8").pipe(
                 Effect.map((rawSource) => {
@@ -224,18 +224,18 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
             ),
           )
 
-          const preparedEntries: ReadonlyArray<PreparedVaultEntry> = yield* Effect.all(
+          const preparedEntries: ReadonlyArray<PreparedNoteEntry> = yield* Effect.all(
             sourceEntries.map((entry) =>
-              metadata.vaultSeed(entry.data).pipe(
-                Effect.map((vaultMetadata) => ({
+              metadata.seed(entry.data).pipe(
+                Effect.map((noteMetadata) => ({
                   ...entry,
-                  metadata: vaultMetadata,
+                  metadata: noteMetadata,
                 })),
               ),
             ),
           )
 
-          const publishedLookup = buildPublishedVaultWikiLinkLookup(
+          const publishedLookup = buildPublishedWikiLinkLookup(
             preparedEntries
               .filter(({ metadata }) => metadata.published)
               .map(({ metadata }) => ({
@@ -247,10 +247,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
 
           return yield* Effect.all(
             preparedEntries.map((entry) => {
-              const preprocessedSource = preprocessVaultMarkdownSource(
-                entry.source,
-                publishedLookup,
-              )
+              const preprocessedSource = preprocessNoteMarkdownSource(entry.source, publishedLookup)
 
               return mdx
                 .compile(
@@ -263,7 +260,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
                   Effect.flatMap((compiled) =>
                     mdx.run(compiled).pipe(
                       Effect.map(({ default: MdxContent }) => {
-                        const data = finalizeVaultData(
+                        const data = finalizeData(
                           entry.metadata,
                           Schema.decodeUnknownSync(CompiledVFileData)(compiled.data)
                             .descriptionExcerpt,
@@ -289,22 +286,22 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           Effect.mapError((error) => new ContentError({ error })),
           Effect.map(Array.sortBy(Order.mapInput(Order.String, ({ slug }) => slug))),
         ),
-      getPublishedVault: (): Effect.Effect<ReadonlyArray<VaultEntry>, ContentError, Content> =>
+      getPublishedNotes: (): Effect.Effect<ReadonlyArray<NoteEntry>, ContentError, Content> =>
         Effect.gen(function* () {
           const content: ContentService = yield* Content
-          const vaultEntries = yield* content.getVault()
-          return vaultEntries.filter(({ data }) => data.published)
+          const entries = yield* content.getNotes()
+          return entries.filter(({ data }) => data.published)
         }).pipe(
           Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
-      findPublishedVaultBySlug: (
+      findPublishedNotesBySlug: (
         pathSlug: string,
-      ): Effect.Effect<VaultEntry | undefined, ContentError, Content> =>
+      ): Effect.Effect<NoteEntry | undefined, ContentError, Content> =>
         Effect.gen(function* () {
           const content: ContentService = yield* Content
-          const vaultEntries = yield* content.getPublishedVault()
-          return vaultEntries.find(({ slug }) => slug === pathSlug)
+          const entries = yield* content.getPublishedNotes()
+          return entries.find(({ slug }) => slug === pathSlug)
         }).pipe(
           Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),

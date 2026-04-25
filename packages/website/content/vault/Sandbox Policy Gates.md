@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - policy gates
-published: true
+published: false
 ---
 
 A harness should model permissions as explicit gates:

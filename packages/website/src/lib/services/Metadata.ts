@@ -1,7 +1,7 @@
 import { Effect, Layer, Schema, ServiceMap } from "effect"
-import { Essay, CollectionEntry, Project, VaultFrontmatter, Work } from "../schemas"
-import { finalizeVaultData, humanizeVaultSlug, normalizeVaultSlug } from "../vault"
-import type { VaultMetadataSeed } from "../vault"
+import { Essay, CollectionEntry, Project, NoteFrontmatter, Work } from "../schemas"
+import { finalizeData, humanizeSlug, normalizeSlug } from "../note"
+import type { NoteMetadataSeed } from "../note"
 
 export class MetadataError extends Schema.TaggedErrorClass<MetadataError>()("MetadataError", {
   error: Schema.Unknown,
@@ -19,22 +19,22 @@ export class Metadata extends ServiceMap.Service<Metadata>()("service/Metadata",
           }),
         )
 
-    const decodeVault = (data: unknown) =>
-      Schema.decodeUnknownEffect(VaultFrontmatter)(data).pipe(
+    const decodeNote = (data: unknown) =>
+      Schema.decodeUnknownEffect(NoteFrontmatter)(data).pipe(
         Effect.flatMap((frontmatter) => {
-          const slug = normalizeVaultSlug(frontmatter.permalink)
+          const slug = normalizeSlug(frontmatter.permalink)
           if (slug === undefined) {
             return Effect.fail(
               new MetadataError({
-                error: `Invalid vault permalink: ${frontmatter.permalink}`,
+                error: `Invalid permalink: ${frontmatter.permalink}`,
               }),
             )
           }
 
-          const metadata: VaultMetadataSeed = {
+          const metadata: NoteMetadataSeed = {
             slug,
             permalink: frontmatter.permalink,
-            title: frontmatter.title ?? humanizeVaultSlug(slug),
+            title: frontmatter.title ?? humanizeSlug(slug),
             explicitDescription: frontmatter.description,
             createdAt: frontmatter.createdAt,
             updatedAt: frontmatter.updatedAt,
@@ -60,9 +60,9 @@ export class Metadata extends ServiceMap.Service<Metadata>()("service/Metadata",
       essay: decode(Essay),
       project: decode(Project),
       work: decode(Work),
-      vaultSeed: (data: unknown) => decodeVault(data),
-      vault: (data: unknown, excerpt: string | undefined) =>
-        decodeVault(data).pipe(Effect.map((metadata) => finalizeVaultData(metadata, excerpt))),
+      seed: (data: unknown) => decodeNote(data),
+      note: (data: unknown, excerpt: string | undefined) =>
+        decodeNote(data).pipe(Effect.map((metadata) => finalizeData(metadata, excerpt))),
     }
   }),
 }) {

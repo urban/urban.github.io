@@ -18,7 +18,7 @@ const Header = ({ siteName }: { siteName: string }) => {
           <nav className="flex gap-6">
             {/*<Link href="/essays">Essays</Link>*/}
             <Link href="/projects">Projects</Link>
-            {/*<Link href="/vault">Vault</Link>*/}
+            <Link href="/garden">The Garden</Link>
             {/*<Link href="/about">About</Link>*/}
           </nav>
         </div>

@@ -5,7 +5,7 @@ createdAt: 2026-02-27
 updatedAt: 2026-02-27
 aliases:
   - vault index
-published: true
+published: false
 ---
 
 I am interested in building AI harnesses that are reliable under real tool and
