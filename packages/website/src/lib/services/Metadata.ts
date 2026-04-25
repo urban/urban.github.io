@@ -13,10 +13,7 @@ export class Metadata extends ServiceMap.Service<Metadata>()("service/Metadata",
       <S extends Schema.Top & { readonly DecodingServices: never }>(schema: S) =>
       (data: (typeof CollectionEntry.Type)["data"]) =>
         Schema.decodeEffect(schema)(data).pipe(
-          Effect.mapError((error) => {
-            console.log(error)
-            return new MetadataError({ error: error.message })
-          }),
+          Effect.mapError((error) => new MetadataError({ error: error.message })),
         )
 
     const decodeNote = (data: unknown) =>
@@ -45,7 +42,6 @@ export class Metadata extends ServiceMap.Service<Metadata>()("service/Metadata",
           return Effect.succeed(metadata)
         }),
         Effect.mapError((error) => {
-          console.log(error)
           if (error instanceof MetadataError) {
             return error
           }

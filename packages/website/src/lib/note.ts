@@ -30,6 +30,13 @@ export type PublishedWikiLinkEntry = {
   readonly slug: string
   readonly title: string
   readonly aliases: ReadonlyArray<string>
+  readonly relativePath: string
+}
+
+export type PublishedWikiLinkLookup = {
+  readonly byPath: ReadonlyMap<string, PublishedWikiLinkEntry>
+  readonly byFilename: ReadonlyMap<string, PublishedWikiLinkEntry>
+  readonly byAlias: ReadonlyMap<string, PublishedWikiLinkEntry>
 }
 
 type WikiLinkLabel =
@@ -70,37 +77,55 @@ type WikiLinkResolution =
       readonly link: ParsedWikiLink
     }
 
-type WikiLinkLookupSource =
-  | {
-      readonly _tag: "CanonicalWikiLinkLookupSource"
-      readonly entry: PublishedWikiLinkEntry
-    }
-  | {
-      readonly _tag: "AliasWikiLinkLookupSource"
-      readonly entry: PublishedWikiLinkEntry
-    }
+type LookupCollision = {
+  readonly token: string
+  readonly first: PublishedWikiLinkEntry
+  readonly second: PublishedWikiLinkEntry
+}
 
-export class WikiLinkAliasCollisionError extends Error {
-  readonly alias: string
+class WikiLinkLookupCollisionError extends Error {
+  readonly token: string
   readonly first: PublishedWikiLinkEntry
   readonly second: PublishedWikiLinkEntry
 
-  constructor({
-    alias,
-    first,
-    second,
-  }: {
-    readonly alias: string
-    readonly first: PublishedWikiLinkEntry
-    readonly second: PublishedWikiLinkEntry
-  }) {
-    super(
-      `Duplicate alias "${alias}" for "${first.slug}" (${first.title}) and "${second.slug}" (${second.title})`,
-    )
-    this.name = "WikiLinkAliasCollisionError"
-    this.alias = alias
+  constructor(message: string, { token, first, second }: LookupCollision) {
+    super(message)
+    this.token = token
     this.first = first
     this.second = second
+  }
+}
+
+export class WikiLinkPathCollisionError extends WikiLinkLookupCollisionError {
+  constructor({ token, first, second }: LookupCollision) {
+    super(
+      `Duplicate path token "${token}" for "${first.slug}" (${first.title}) and "${second.slug}" (${second.title})`,
+      { token, first, second },
+    )
+    this.name = "WikiLinkPathCollisionError"
+  }
+}
+
+export class WikiLinkFilenameCollisionError extends WikiLinkLookupCollisionError {
+  constructor({ token, first, second }: LookupCollision) {
+    super(
+      `Duplicate filename token "${token}" for "${first.slug}" (${first.title}) and "${second.slug}" (${second.title})`,
+      { token, first, second },
+    )
+    this.name = "WikiLinkFilenameCollisionError"
+  }
+}
+
+export class WikiLinkAliasCollisionError extends WikiLinkLookupCollisionError {
+  readonly alias: string
+
+  constructor({ token, first, second }: LookupCollision) {
+    super(
+      `Duplicate alias "${token}" for "${first.slug}" (${first.title}) and "${second.slug}" (${second.title})`,
+      { token, first, second },
+    )
+    this.name = "WikiLinkAliasCollisionError"
+    this.alias = token
   }
 }
 
@@ -113,6 +138,9 @@ export const normalizeSlug = (permalink: string): string | undefined => {
   return SLUG_SEGMENT.test(slug) ? slug : undefined
 }
 
+export const toRoutePath = (slug: string): string =>
+  slug === "index" ? "/garden" : `/garden/${slug}`
+
 const escapeHtml = (value: string): string =>
   value
     .replaceAll("&", "&amp;")
@@ -124,9 +152,49 @@ const escapeHtml = (value: string): string =>
 const escapeMarkdownLinkLabel = (value: string): string =>
   value.replaceAll("\\", "\\\\").replaceAll("[", "\\[").replaceAll("]", "\\]")
 
-const normalizeWikiLookupToken = (value: string): string | undefined => {
-  const token = value.trim().replace(/\s+/g, " ").toLowerCase()
+const normalizeWikiPathToken = (value: string): string | undefined => {
+  const token = value
+    .trim()
+    .replaceAll("\\", "/")
+    .split("/")
+    .filter((segment) => segment.length > 0)
+    .join("/")
+    .toLowerCase()
+
   return token.length === 0 ? undefined : token
+}
+
+const normalizeWikiAliasToken = (value: string): string | undefined => {
+  const token = value.trim().toLowerCase()
+  return token.length === 0 ? undefined : token
+}
+
+const getBasename = (normalizedPath: string): string => {
+  const segments = normalizedPath.split("/")
+  return segments[segments.length - 1] ?? ""
+}
+
+const removeMarkdownExtension = (value: string): string =>
+  value.toLowerCase().endsWith(".md") ? value.slice(0, -".md".length) : value
+
+const setLookupEntry = (
+  lookup: Map<string, PublishedWikiLinkEntry>,
+  token: string,
+  entry: PublishedWikiLinkEntry,
+  onCollision: (collision: LookupCollision) => Error,
+): void => {
+  const existing = lookup.get(token)
+
+  if (existing === undefined || existing.slug === entry.slug) {
+    lookup.set(token, entry)
+    return
+  }
+
+  throw onCollision({
+    token,
+    first: existing,
+    second: entry,
+  })
 }
 
 const parseWikiLink = (raw: string, rawReference: string): ParsedWikiLink => {
@@ -200,96 +268,129 @@ const parseWikiLinkSegments = (source: string): ReadonlyArray<WikiLinkSegment> =
 
 export const buildPublishedWikiLinkLookup = (
   entries: ReadonlyArray<PublishedWikiLinkEntry>,
-): ReadonlyMap<string, PublishedWikiLinkEntry> => {
-  const lookup = new Map<string, WikiLinkLookupSource>()
+): PublishedWikiLinkLookup => {
+  const byPath = new Map<string, PublishedWikiLinkEntry>()
+  const byFilename = new Map<string, PublishedWikiLinkEntry>()
+  const byAlias = new Map<string, PublishedWikiLinkEntry>()
 
   for (const entry of entries) {
-    const canonicalToken = normalizeWikiLookupToken(entry.slug)
+    const pathTokens = new Set<string>()
+    const relativePathToken = normalizeWikiPathToken(entry.relativePath)
 
-    if (canonicalToken !== undefined) {
-      lookup.set(canonicalToken, {
-        _tag: "CanonicalWikiLinkLookupSource",
-        entry,
-      })
+    if (relativePathToken !== undefined) {
+      pathTokens.add(relativePathToken)
+
+      const relativePathWithoutExtension = removeMarkdownExtension(relativePathToken)
+      if (relativePathWithoutExtension !== relativePathToken) {
+        pathTokens.add(relativePathWithoutExtension)
+      }
+
+      const filenameToken = getBasename(relativePathToken)
+      if (filenameToken.length > 0) {
+        const filenameTokens = new Set<string>([filenameToken])
+        const filenameWithoutExtension = removeMarkdownExtension(filenameToken)
+        if (filenameWithoutExtension !== filenameToken) {
+          filenameTokens.add(filenameWithoutExtension)
+        }
+
+        for (const token of filenameTokens) {
+          setLookupEntry(
+            byFilename,
+            token,
+            entry,
+            (collision) => new WikiLinkFilenameCollisionError(collision),
+          )
+        }
+      }
     }
-  }
 
-  for (const entry of entries) {
+    const slugToken = normalizeWikiPathToken(entry.slug)
+    if (slugToken !== undefined) {
+      pathTokens.add(slugToken)
+    }
+
+    const routePathToken = normalizeWikiPathToken(toRoutePath(entry.slug))
+    if (routePathToken !== undefined) {
+      pathTokens.add(routePathToken)
+    }
+
+    for (const token of pathTokens) {
+      setLookupEntry(byPath, token, entry, (collision) => new WikiLinkPathCollisionError(collision))
+    }
+
+    const aliasTokens = new Set<string>()
     for (const alias of entry.aliases) {
-      const aliasToken = normalizeWikiLookupToken(alias)
+      const aliasToken = normalizeWikiAliasToken(alias)
 
-      if (aliasToken === undefined) {
+      if (aliasToken === undefined || aliasTokens.has(aliasToken)) {
         continue
       }
 
-      const existing = lookup.get(aliasToken)
-
-      if (existing === undefined) {
-        lookup.set(aliasToken, {
-          _tag: "AliasWikiLinkLookupSource",
-          entry,
-        })
-        continue
-      }
-
-      if (existing.entry.slug === entry.slug) {
-        continue
-      }
-
-      if (existing._tag === "CanonicalWikiLinkLookupSource") {
-        continue
-      }
-
-      throw new WikiLinkAliasCollisionError({
-        alias,
-        first: existing.entry,
-        second: entry,
-      })
-    }
-  }
-
-  const resolvedLookup = new Map<string, PublishedWikiLinkEntry>()
-
-  for (const [token, source] of lookup) {
-    resolvedLookup.set(token, source.entry)
-  }
-
-  return resolvedLookup
-}
-
-const resolveWikiLink = (
-  link: ParsedWikiLink,
-  lookup: ReadonlyMap<string, PublishedWikiLinkEntry>,
-): WikiLinkResolution => {
-  const targetSlug = normalizeWikiLookupToken(link.target)
-
-  if (targetSlug === undefined) {
-    return {
-      _tag: "UnresolvedWikiLink",
-      link,
-    }
-  }
-
-  const entry = lookup.get(targetSlug)
-
-  if (entry === undefined) {
-    return {
-      _tag: "UnresolvedWikiLink",
-      link,
+      aliasTokens.add(aliasToken)
+      setLookupEntry(
+        byAlias,
+        aliasToken,
+        entry,
+        (collision) => new WikiLinkAliasCollisionError(collision),
+      )
     }
   }
 
   return {
-    _tag: "ResolvedWikiLink",
-    link,
-    entry,
+    byPath,
+    byFilename,
+    byAlias,
   }
 }
 
-export const rewriteWikiLinksToHtml = (
-  source: string,
-  lookup: ReadonlyMap<string, PublishedWikiLinkEntry>,
-): string =>
+const resolveWikiLink = (
+  link: ParsedWikiLink,
+  lookup: PublishedWikiLinkLookup,
+): WikiLinkResolution => {
+  const pathTarget = normalizeWikiPathToken(link.target)
+
+  if (pathTarget !== undefined) {
+    const pathEntry = lookup.byPath.get(pathTarget)
+    if (pathEntry !== undefined) {
+      return {
+        _tag: "ResolvedWikiLink",
+        link,
+        entry: pathEntry,
+      }
+    }
+
+    const filenameTarget = getBasename(pathTarget)
+    if (filenameTarget.length > 0) {
+      const filenameEntry = lookup.byFilename.get(filenameTarget)
+      if (filenameEntry !== undefined) {
+        return {
+          _tag: "ResolvedWikiLink",
+          link,
+          entry: filenameEntry,
+        }
+      }
+    }
+  }
+
+  const aliasTarget = normalizeWikiAliasToken(link.target)
+  if (aliasTarget !== undefined) {
+    const aliasEntry = lookup.byAlias.get(aliasTarget)
+    if (aliasEntry !== undefined) {
+      return {
+        _tag: "ResolvedWikiLink",
+        link,
+        entry: aliasEntry,
+      }
+    }
+  }
+
+  return {
+    _tag: "UnresolvedWikiLink",
+    link,
+  }
+}
+
+export const rewriteWikiLinksToHtml = (source: string, lookup: PublishedWikiLinkLookup): string =>
   parseWikiLinkSegments(source)
     .map((segment) => {
       if (segment._tag === "TextSegment") {
@@ -313,7 +414,7 @@ export const rewriteWikiLinksToHtml = (
 
 export const preprocessVaultMarkdownSource = (
   source: string,
-  lookup: ReadonlyMap<string, PublishedWikiLinkEntry>,
+  lookup: PublishedWikiLinkLookup,
 ): string =>
   parseWikiLinkSegments(source)
     .map((segment) => {
@@ -335,9 +436,6 @@ export const preprocessVaultMarkdownSource = (
       return `[${escapeMarkdownLinkLabel(visibleText)}](${toRoutePath(resolution.entry.slug)})`
     })
     .join("")
-
-export const toRoutePath = (slug: string): string =>
-  slug === "index" ? "/garden" : `/garden/${slug}`
 
 export const humanizeSlug = (slug: string): string =>
   slug

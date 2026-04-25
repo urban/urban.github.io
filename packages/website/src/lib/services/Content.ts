@@ -1,6 +1,5 @@
 import {
   Array,
-  Console,
   DateTime,
   Effect,
   FileSystem,
@@ -53,6 +52,7 @@ type NoteSourceEntry = {
   readonly source: string
   readonly data: unknown
   readonly filepath: string
+  readonly relativePath: string
 }
 
 type PreparedNoteEntry = NoteSourceEntry & {
@@ -86,6 +86,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
     const contentDir = "./content"
+    const vaultDir = path.join(contentDir, "vault")
     const mdx = yield* Mdx
     const metadata = yield* Metadata
     const currentDate = pipe(yield* DateTime.now, DateTime.toDate)
@@ -97,7 +98,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
         const filepaths = yield* Effect.tryPromise({
           try: () => glob([path.join(contentDir, collection, pattern)]),
           catch: (error) => new FileGlobError({ error }),
-        }).pipe(Effect.tapError((error) => Console.log(error)))
+        })
 
         return yield* Effect.all(
           filepaths.map((filepath) =>
@@ -143,10 +144,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
       getCollection: (
         collection: "essays" | "projects" | "work",
       ): Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError> =>
-        getCollection(collection).pipe(
-          Effect.tapError((error) => Console.log(error)),
-          Effect.mapError((error) => new ContentError({ error })),
-        ),
+        getCollection(collection).pipe(Effect.mapError((error) => new ContentError({ error }))),
       getEssays: (): Effect.Effect<
         ReadonlyArray<CompiledCollectionEntry<typeof Essay.Type>>,
         ContentError
@@ -159,7 +157,6 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
               ),
             ),
           ),
-          Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
       getProjects: (): Effect.Effect<
@@ -174,7 +171,6 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
               ),
             ),
           ),
-          Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
         ),
       getWork: (): Effect.Effect<
@@ -189,7 +185,6 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
               ),
             ),
           ),
-          Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
           Effect.map(
             Array.sortBy(
@@ -204,9 +199,9 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
       getNotes: (): Effect.Effect<ReadonlyArray<NoteEntry>, ContentError> =>
         Effect.gen(function* () {
           const filepaths = yield* Effect.tryPromise({
-            try: () => glob([path.join(contentDir, "vault", "*.md")]),
+            try: () => glob([path.join(vaultDir, "*.md")]),
             catch: (error) => new FileGlobError({ error }),
-          }).pipe(Effect.tapError((error) => Console.log(error)))
+          })
 
           const sourceEntries: ReadonlyArray<NoteSourceEntry> = yield* Effect.all(
             filepaths.map((filepath) =>
@@ -218,6 +213,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
                     source,
                     data,
                     filepath,
+                    relativePath: path.relative(vaultDir, filepath),
                   }
                 }),
               ),
@@ -238,10 +234,11 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           const publishedLookup = buildPublishedWikiLinkLookup(
             preparedEntries
               .filter(({ metadata }) => metadata.published)
-              .map(({ metadata }) => ({
+              .map(({ metadata, relativePath }) => ({
                 slug: metadata.slug,
                 title: metadata.title,
                 aliases: metadata.aliases,
+                relativePath,
               })),
           )
 
@@ -282,7 +279,6 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
             }),
           )
         }).pipe(
-          Effect.tapError((error) => Console.log(error)),
           Effect.mapError((error) => new ContentError({ error })),
           Effect.map(Array.sortBy(Order.mapInput(Order.String, ({ slug }) => slug))),
         ),
@@ -291,10 +287,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           const content: ContentService = yield* Content
           const entries = yield* content.getNotes()
           return entries.filter(({ data }) => data.published)
-        }).pipe(
-          Effect.tapError((error) => Console.log(error)),
-          Effect.mapError((error) => new ContentError({ error })),
-        ),
+        }).pipe(Effect.mapError((error) => new ContentError({ error }))),
       findPublishedNotesBySlug: (
         pathSlug: string,
       ): Effect.Effect<NoteEntry | undefined, ContentError, Content> =>
@@ -302,10 +295,7 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           const content: ContentService = yield* Content
           const entries = yield* content.getPublishedNotes()
           return entries.find(({ slug }) => slug === pathSlug)
-        }).pipe(
-          Effect.tapError((error) => Console.log(error)),
-          Effect.mapError((error) => new ContentError({ error })),
-        ),
+        }).pipe(Effect.mapError((error) => new ContentError({ error }))),
     }
   }),
 }) {

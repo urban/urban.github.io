@@ -43,6 +43,23 @@ const writeEssayFixture = async (slug: string, source: string): Promise<void> =>
   createdPaths.push(dirpath)
 }
 
+const createPublishedWikiLinkEntry = ({
+  slug,
+  title,
+  aliases,
+  relativePath = `${title}.md`,
+}: {
+  readonly slug: string
+  readonly title: string
+  readonly aliases: ReadonlyArray<string>
+  readonly relativePath?: string
+}) => ({
+  slug,
+  title,
+  aliases,
+  relativePath,
+})
+
 test("normalizes canonical vault slugs and rejects blank-root permalinks", () => {
   expect(normalizeSlug("/harness-loop/")).toBe("harness-loop")
   expect(normalizeSlug("/")).toBeUndefined()
@@ -60,11 +77,11 @@ test("maps the garden index slug to the garden root route", () => {
 
 test("rewrites canonical vault wiki-links to canonical vault route anchors", () => {
   const lookup = buildPublishedWikiLinkLookup([
-    {
+    createPublishedWikiLinkEntry({
       slug: "harness-loop",
       title: "Harness Loop",
       aliases: ["harness loop"],
-    },
+    }),
   ])
 
   expect(rewriteWikiLinksToHtml("See [[harness-loop]] next.", lookup)).toBe(
@@ -74,11 +91,11 @@ test("rewrites canonical vault wiki-links to canonical vault route anchors", () 
 
 test("resolves published vault aliases to canonical vault routes", () => {
   const lookup = buildPublishedWikiLinkLookup([
-    {
+    createPublishedWikiLinkEntry({
       slug: "ai-harness-learning",
       title: "AI Harness Learning",
       aliases: ["vault index"],
-    },
+    }),
   ])
 
   expect(rewriteWikiLinksToHtml("Start at [[vault index]].", lookup)).toBe(
@@ -88,15 +105,30 @@ test("resolves published vault aliases to canonical vault routes", () => {
 
 test("uses custom labels while keeping canonical vault hrefs", () => {
   const lookup = buildPublishedWikiLinkLookup([
-    {
+    createPublishedWikiLinkEntry({
       slug: "trace-and-replay",
       title: "Trace And Replay",
       aliases: ["trace replay"],
-    },
+    }),
   ])
 
   expect(rewriteWikiLinksToHtml("Read [[trace replay|Replay Traces]].", lookup)).toBe(
     'Read <a href="/garden/trace-and-replay">Replay Traces</a>.',
+  )
+})
+
+test("resolves published vault filenames to canonical vault routes", () => {
+  const lookup = buildPublishedWikiLinkLookup([
+    createPublishedWikiLinkEntry({
+      slug: "what-is-a-digital-garden",
+      title: "What is a digital garden?",
+      aliases: [],
+      relativePath: "What is a digital garden?.md",
+    }),
+  ])
+
+  expect(rewriteWikiLinksToHtml("Start at [[What is a digital garden?]].", lookup)).toBe(
+    'Start at <a href="/garden/what-is-a-digital-garden">What is a digital garden?</a>.',
   )
 })
 
@@ -118,16 +150,16 @@ test("renders unresolved custom labels as muted spans", () => {
 
 test("rewrites multiple vault wiki-links in one block independently", () => {
   const lookup = buildPublishedWikiLinkLookup([
-    {
+    createPublishedWikiLinkEntry({
       slug: "harness-loop",
       title: "Harness Loop",
       aliases: ["harness loop"],
-    },
-    {
+    }),
+    createPublishedWikiLinkEntry({
       slug: "trace-and-replay",
       title: "Trace And Replay",
       aliases: ["trace replay"],
-    },
+    }),
   ])
 
   expect(
@@ -140,18 +172,18 @@ test("rewrites multiple vault wiki-links in one block independently", () => {
   )
 })
 
-test("prefers canonical slugs over alias matches for the same token", () => {
+test("prefers canonical path matches over alias matches for the same token", () => {
   const lookup = buildPublishedWikiLinkLookup([
-    {
+    createPublishedWikiLinkEntry({
       slug: "harness-loop",
       title: "Harness Loop",
       aliases: [],
-    },
-    {
+    }),
+    createPublishedWikiLinkEntry({
       slug: "other-entry",
       title: "Other Entry",
       aliases: ["harness-loop"],
-    },
+    }),
   ])
 
   expect(rewriteWikiLinksToHtml("See [[harness-loop]].", lookup)).toBe(
@@ -159,33 +191,54 @@ test("prefers canonical slugs over alias matches for the same token", () => {
   )
 })
 
+test("prefers filename matches before alias matches when no path match exists", () => {
+  const lookup = buildPublishedWikiLinkLookup([
+    createPublishedWikiLinkEntry({
+      slug: "filename-target",
+      title: "Filename Target",
+      aliases: [],
+      relativePath: "Guide.md",
+    }),
+    createPublishedWikiLinkEntry({
+      slug: "alias-target",
+      title: "Alias Target",
+      aliases: ["guide"],
+      relativePath: "Alias Target.md",
+    }),
+  ])
+
+  expect(rewriteWikiLinksToHtml("See [[guide]].", lookup)).toBe(
+    'See <a href="/garden/filename-target">Filename Target</a>.',
+  )
+})
+
 test("fails fast on published vault alias collisions and names both entries", () => {
   expect(() =>
     buildPublishedWikiLinkLookup([
-      {
+      createPublishedWikiLinkEntry({
         slug: "alpha",
         title: "Alpha",
         aliases: ["shared alias"],
-      },
-      {
+      }),
+      createPublishedWikiLinkEntry({
         slug: "beta",
         title: "Beta",
         aliases: ["shared alias"],
-      },
+      }),
     ]),
   ).toThrow(
     new WikiLinkAliasCollisionError({
-      alias: "shared alias",
-      first: {
+      token: "shared alias",
+      first: createPublishedWikiLinkEntry({
         slug: "alpha",
         title: "Alpha",
         aliases: ["shared alias"],
-      },
-      second: {
+      }),
+      second: createPublishedWikiLinkEntry({
         slug: "beta",
         title: "Beta",
         aliases: ["shared alias"],
-      },
+      }),
     }).message,
   )
 })
@@ -326,7 +379,7 @@ updatedAt: 2026-03-01
 published: true
 ---
 
-See [[fixture-target]].
+See [[Fixture Target]].
 `,
   )
 
@@ -342,7 +395,7 @@ See [[fixture-target]].
     throw new Error("Missing fixture-source vault entry")
   }
 
-  expect(entry.source).toContain("[[fixture-target]]")
+  expect(entry.source).toContain("[[Fixture Target]]")
 
   const markup = renderToStaticMarkup(createElement(entry.Content))
   expect(markup).toContain(
