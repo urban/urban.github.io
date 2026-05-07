@@ -7,5 +7,5 @@ dateStart: "07/01/2018"
 dateEnd: "09/01/2018"
 ---
 
-- Consulted on UX research and internal tooling.
-- Built an application to showcase design research initiatives across Google Cloud teams.
+- Contributed to UX research and internal tooling initiatives supporting product and platform teams across Google Cloud.
+- Built internal applications that helped operationalize and communicate design research insights across distributed engineering and product organizations.

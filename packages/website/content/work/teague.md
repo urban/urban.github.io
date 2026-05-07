@@ -7,4 +7,4 @@ dateStart: "02/01/2017"
 dateEnd: "03/01/2017"
 ---
 
-- Developed mobile and in-car UI’s for testing an autonomous vehicle service.
+- Developed mobile and in-vehicle interaction systems supporting autonomous vehicle service prototyping and emerging mobility initiatives.

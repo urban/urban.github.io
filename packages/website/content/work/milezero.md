@@ -7,5 +7,5 @@ dateStart: "03/01/2016"
 dateEnd: "12/01/2016"
 ---
 
-- I led the design and UI development of a real-time logistics platform.
-- Managed design and frontend engineering team for faster iteration and delivery.
+- Led the design and product development of a real-time logistics platform focused on operational visibility, workflow coordination, and rapid iteration within a startup environment.
+- Unified design and engineering workflows to improve delivery speed, product consistency, and cross-functional collaboration across our SaaS platform.

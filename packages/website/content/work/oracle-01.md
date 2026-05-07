@@ -7,7 +7,8 @@ dateStart: "10/01/2018"
 dateEnd: "11/01/2020"
 ---
 
-- Served as a senior individual contributor owning core frontend platform architecture for OCI’s enterprise design system and component library, with responsibility for long term technical direction and system integrity across multiple cloud services.
-- Designed and built core UI components and patterns used across OCI services, with a focus on accessibility, performance, and consistency.
-- Drove adoption of modern frontend practices and design-system thinking across teams with varying levels of maturity.
-- Worked directly with engineers and designers to solve complex UI and workflow problems in production environments.
+- Led core platform architecture initiatives for OCI’s enterprise design system and shared UI infrastructure, helping establish the technical foundation for scalable cloud platform development across multiple services.
+- Designed and built foundational component systems, interaction patterns, and shared platform infrastructure focused on scalability, consistency, maintainability, and long-term platform evolution.
+- Helped drive adoption of modern platform architecture patterns, component-based development, and design-system practices across distributed OCI engineering organizations.
+- Established engineering standards and shared implementation approaches that improved consistency, maintainability, and developer efficiency across product teams.
+- Worked closely with engineering, design, and product organizations to solve complex workflow and platform challenges within large-scale cloud environments.

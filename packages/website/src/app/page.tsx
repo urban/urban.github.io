@@ -61,31 +61,35 @@ export default async function Page() {
           <section className="border-b border-gray-300 dark:border-gray-500">
             <article className="py-4">
               <p className="animate">
-                Hello, my name is Urban. I am a Software Engineer and Engineering Manager with deep
-                experience owning and evolving platforms, design systems, and shared infrastructure
-                that helps product teams move faster while delivering higher-quality products at
-                scale. I take responsibility for ambiguous, high impact problems that sit at the
-                intersection of product, design, and engineering, and I turn them into durable
-                systems that scale. My work has included leading major platform migrations, defining
-                quality standards, and building shared infrastructure that improves consistency,
-                performance, and reliability.
+                Hello, my name is Urban. I’m a systems-oriented engineering leader focused on
+                modernizing software delivery, product platforms, and design systems across
+                startups, consulting environments, and large enterprise organizations. My work
+                centers on building scalable technical systems that improve engineering velocity,
+                maintainability, and delivery consistency, helping teams move faster and ship more
+                reliably.
               </p>
               <p className="animate">
-                I’ve led platform modernization efforts, shaped frontend architecture, established
-                quality and accessibility standards, and built shared foundations that help teams
-                move faster with more confidence. A big part of my work has been creating alignment
-                across functions by translating user and business needs into clear technical
-                direction and helping teams navigate tradeoffs in ambiguous environments.
+                I’ve helped organizations navigate major technology transitions spanning the early
+                web, mobile, cloud platforms, design systems, and now AI-assisted software
+                development. At Oracle, I led platform modernization initiatives across OCI and JET
+                while remaining deeply hands-on in architecture, implementation, developer
+                experience, and testing infrastructure. Earlier in my career at frog, I worked on
+                everything from early enterprise design systems at GE to operating system prototypes
+                and gesture-based interaction models for Nokia and Qualcomm during the early
+                capacitive touchscreen era, as well as in-field research and mobile communication
+                concepts for the Nike Foundation’s Girl Effect.
               </p>
               <p className="animate">
-                I’ve worked as both an IC and an engineering manager, but the work I value most is
-                hands-on technical leadership. I’m focused on roles where I can combine technical
-                depth, systems thinking, and cross-functional leadership while continuing to grow
-                into full-stack systems, AI tooling, and agent-oriented development.
+                My background spans engineering, architecture, design systems, and organizational
+                transformation, with a consistent focus on reducing friction, accelerating
+                iteration, and modernizing how teams build and ship software. More recently, I’ve
+                been integrating AI-assisted workflows into prototyping, architecture exploration,
+                development, and software delivery while maintaining high standards for technical
+                quality and system design.
               </p>
               <p className="animate">
-                <strong>Specialties</strong>: Engineering Management • Software Development •
-                Front-end Development • User Experience (UX) • Design Systems
+                <strong>Specialties</strong>: Product Platforms • Engineering Management • Software
+                Development • Design Systems • AI-Assisted Software Delivery
               </p>
             </article>
           </section>

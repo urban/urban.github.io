@@ -1,0 +1,33 @@
+.icon {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  transform: translateY(-50%);
+}
+
+.line {
+  transform: translateX(0.75rem) scaleX(0);
+  transition-duration: 300ms;
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
+
+.arrowHead {
+  transform: translateX(-0.25rem);
+  transition-duration: 300ms;
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+}
+
+:global(.group:hover) .line {
+  transform: translateX(0) scaleX(1);
+}
+
+:global(.group:hover) .arrowHead {
+  transform: translateX(0);
+}
