@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next"
 // import { Inter, Lora } from "next/font/google"
 import { Inter } from "next/font/google"
@@ -61,6 +62,7 @@ export default function RootLayout({
         <Header siteName={String(metadata.title)} />
         <main>{children}</main>
         <Footer siteName={String(metadata.title)} />
+        <Analytics />
       </body>
     </html>
   )
