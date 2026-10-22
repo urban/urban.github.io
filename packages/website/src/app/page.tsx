@@ -4,19 +4,20 @@ import {
   LinkedinLogoIcon,
   XLogoIcon,
 } from "@phosphor-icons/react/dist/ssr"
-import { Array, Effect, pipe, Record } from "effect"
+// import { Array, Effect, pipe, Record } from "effect"
 import type { Metadata } from "next"
 import { SITE, SOCIALS } from "@/lib/consts"
-import { RuntimeServer } from "@/lib/RuntimeServer"
-import { Content } from "@/lib/services/Content"
-import type { ContentService } from "@/lib/services/Content"
+// import { RuntimeServer } from "@/lib/RuntimeServer"
+// import { Content } from "@/lib/services/Content"
+// import type { ContentService } from "@/lib/services/Content"
 import { Container } from "@/ui/Container"
 import { Link } from "@/ui/NavLink"
 // import { ArrowCard } from "@/ui/ArrowCard";
 import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 import { PageTitle } from "@/ui/PageTitle"
-import { WorkList } from "@/ui/WorkList"
+// import { WorkList } from "@/ui/WorkList"
 
+/*
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
 
@@ -38,6 +39,7 @@ const main = Effect.gen(function* () {
   // return { essays, projects, work };
   return { work: groupedWork }
 })
+ */
 
 export const metadata: Metadata = {
   title: "Home",
@@ -46,7 +48,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   // const { essays, projects, work } = await RuntimeServer.runPromise(main);
-  const { work } = await RuntimeServer.runPromise(main)
+  // const { work } = await RuntimeServer.runPromise(main)
   return (
     <>
       <PageNavigationAnimation />
@@ -61,10 +63,13 @@ export default async function Page() {
           <section className="mb-8 border-b border-gray-300 dark:border-gray-500">
             <article className="py-4">
               <p className="animate">
-                <b>I’m Urban.</b> I build software, design systems, and tools that make developers’ lives easier.
+                <b>I’m Urban.</b> I build software, design systems, and tools that make developers’
+                lives easier.
               </p>
               <p className="animate">
-                I’ve spent my career connecting design and engineering, building platforms, and leading teams. These days, I’m exploring how AI can improve the way we build software.
+                I’ve spent my career connecting design and engineering, building platforms, and
+                leading teams. These days, I’m exploring how AI can improve the way we build
+                software.
               </p>
             </article>
           </section>
