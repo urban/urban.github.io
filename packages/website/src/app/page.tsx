@@ -56,40 +56,15 @@ export default async function Page() {
           <br />
           Faubion
         </PageTitle>*/}
-        <PageTitle>Welcome</PageTitle>
-        <div className="py-4">
-          <section className="border-b border-gray-300 dark:border-gray-500">
+        <PageTitle>Hello,</PageTitle>
+        <div>
+          <section className="mb-8 border-b border-gray-300 dark:border-gray-500">
             <article className="py-4">
               <p className="animate">
-                Hello, my name is Urban. I’m a systems-oriented engineering leader focused on
-                modernizing software delivery, product platforms, and design systems across
-                startups, consulting environments, and large enterprise organizations. My work
-                centers on building scalable technical systems that improve engineering velocity,
-                maintainability, and delivery consistency, helping teams move faster and ship more
-                reliably.
+                <b>I’m Urban.</b> I build software, design systems, and tools that make developers’ lives easier.
               </p>
               <p className="animate">
-                I’ve helped organizations navigate major technology transitions spanning the early
-                web, mobile, cloud platforms, design systems, and now AI-assisted software
-                development. At Oracle, I led platform modernization initiatives across OCI and JET
-                while remaining deeply hands-on in architecture, implementation, developer
-                experience, and testing infrastructure. Earlier in my career at frog, I worked on
-                everything from early enterprise design systems at GE to operating system prototypes
-                and gesture-based interaction models for Nokia and Qualcomm during the early
-                capacitive touchscreen era, as well as in-field research and mobile communication
-                concepts for the Nike Foundation’s Girl Effect.
-              </p>
-              <p className="animate">
-                My background spans engineering, architecture, design systems, and organizational
-                transformation, with a consistent focus on reducing friction, accelerating
-                iteration, and modernizing how teams build and ship software. More recently, I’ve
-                been integrating AI-assisted workflows into prototyping, architecture exploration,
-                development, and software delivery while maintaining high standards for technical
-                quality and system design.
-              </p>
-              <p className="animate">
-                <strong>Specialties</strong>: Product Platforms • Engineering Management • Software
-                Development • Design Systems • AI-Assisted Software Delivery
+                I’ve spent my career connecting design and engineering, building platforms, and leading teams. These days, I’m exploring how AI can improve the way we build software.
               </p>
             </article>
           </section>
@@ -114,6 +89,7 @@ export default async function Page() {
             </ul>
           </section>*/}
 
+          {/*
           <section className="animate py-6">
             <div className="flex flex-wrap gap-y-2 items-center justify-between">
               <h5 className="font-semibold text-black dark:text-white">Work Experience</h5>
@@ -121,6 +97,7 @@ export default async function Page() {
             </div>
             <WorkList work={work} />
           </section>
+           */}
 
           <section className="animate w-0y-4">
             <h5 className="font-semibold text-black dark:text-white">Let&apos;s Connect</h5>
