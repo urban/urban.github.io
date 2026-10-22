@@ -10,6 +10,17 @@
     "plugins": [
       {
         "name": "next"
+      },
+      {
+        "name": "@effect/language-service",
+        "diagnostics": false,
+        "allowedUnstableApis": [
+          "effect/FileSystem",
+          "effect/Path",
+          "effect/Graph",
+          "effect/cli",
+          "@effect/platform-node"
+        ]
       }
     ],
     "paths": {

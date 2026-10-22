@@ -4,9 +4,9 @@
   "private": true,
   "workspaces": {
     "catalog": {
-      "@effect/platform-node": "4.0.0-beta.40",
-      "effect": "4.0.0-beta.40",
-      "typescript": "^6.0.2"
+      "@effect/platform-node": "4.0.5",
+      "effect": "4.0.5",
+      "typescript": "^7.0.2"
     },
     "packages": [
       "scratchpad",
@@ -14,14 +14,15 @@
       "packages/*"
     ]
   },
+  "type": "module",
   "scripts": {
     "build": "turbo run build",
     "changeset": "changeset add",
     "check": "bun run lint && turbo run typecheck test",
     "clean": "bun --filter=scripts run clean",
     "dev": "turbo run dev",
-    "lint": "oxfmt && oxlint --fix",
-    "prepare": "husky && effect-language-service patch",
+    "lint": "oxfmt && oxlint",
+    "postinstall": "effect-tsgo patch --oxlint",
     "release": "echo \"No release script\" && exit 0",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
@@ -30,22 +31,12 @@
   "dependencies": {},
   "devDependencies": {
     "@changesets/cli": "2.30.0",
-    "@effect/language-service": "^0.84.0",
-    "husky": "9.1.7",
-    "lint-staged": "16.4.0",
+    "@effect/tsgo": "0.56.0",
     "oxfmt": "0.42.0",
-    "oxlint": "1.57.0",
+    "oxlint": "1.89.0",
+    "oxlint-tsgolint": "7.0.2004",
     "turbo": "2.8.20",
     "typescript": "catalog:"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "oxfmt",
-      "oxlint --fix"
-    ],
-    "*.{css,html,json,jsonc,md,mdx,yml,yaml}": [
-      "oxfmt"
-    ]
   },
   "engines": {
     "node": ">= 24.12.0"

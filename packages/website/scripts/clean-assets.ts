@@ -14,6 +14,7 @@ const program = Effect.gen(function* () {
 
 await program.pipe(
   Effect.tapError(Effect.logError),
+  // oxlint-disable-next-line effecttsgo/strict-effect-provide -- This script is the application entry point.
   Effect.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer)),
   Effect.runPromise,
 )

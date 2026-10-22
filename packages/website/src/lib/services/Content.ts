@@ -8,14 +8,14 @@ import {
   Path,
   pipe,
   Schema,
-  ServiceMap,
+  Context,
 } from "effect"
 import matter from "gray-matter"
 import { createElement } from "react"
 import type { JSX } from "react"
 import { glob } from "tinyglobby"
 import { VFile } from "vfile"
-import { Essay, CollectionEntry, CompiledVFileData, Project, Work } from "../schemas"
+import { type Essay, CollectionEntry, CompiledVFileData, type Project, type Work } from "../schemas"
 import {
   buildPublishedWikiLinkLookup,
   finalizeData,
@@ -25,13 +25,19 @@ import type { NoteData, NoteMetadataSeed } from "../note"
 import { Mdx } from "./Mdx"
 import { Metadata } from "./Metadata"
 
-export class ContentError extends Schema.TaggedErrorClass<ContentError>()("ContentError", {
+export class ContentError extends Schema.TaggedError<
+  ContentError,
+  { readonly brand: unique symbol }
+>()("ContentError", {
   error: Schema.Unknown,
 }) {}
 
-class FileGlobError extends Schema.TaggedErrorClass<FileGlobError>()("FileGlobError", {
-  error: Schema.Unknown,
-}) {}
+class FileGlobError extends Schema.TaggedError<FileGlobError, { readonly brand: unique symbol }>()(
+  "FileGlobError",
+  {
+    error: Schema.Unknown,
+  },
+) {}
 
 type MdxContentComponent = () => JSX.Element
 
@@ -63,26 +69,30 @@ export type ContentService = {
   readonly getCollection: (
     collection: "essays" | "projects" | "work",
   ) => Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError>
-  readonly getEssays: () => Effect.Effect<
+  readonly getEssays: Effect.Effect<
     ReadonlyArray<CompiledCollectionEntry<typeof Essay.Type>>,
     ContentError
   >
-  readonly getProjects: () => Effect.Effect<
+  readonly getProjects: Effect.Effect<
     ReadonlyArray<CompiledCollectionEntry<typeof Project.Type>>,
     ContentError
   >
-  readonly getWork: () => Effect.Effect<
+  readonly getWork: Effect.Effect<
     ReadonlyArray<CompiledCollectionEntry<typeof Work.Type>>,
     ContentError
   >
-  readonly getNotes: () => Effect.Effect<ReadonlyArray<NoteEntry>, ContentError>
-  readonly getPublishedNotes: () => Effect.Effect<ReadonlyArray<NoteEntry>, ContentError, Content>
+  readonly getNotes: Effect.Effect<ReadonlyArray<NoteEntry>, ContentError>
+  readonly getPublishedNotes: Effect.Effect<ReadonlyArray<NoteEntry>, ContentError, Content>
   readonly findPublishedNotesBySlug: (
     pathSlug: string,
   ) => Effect.Effect<NoteEntry | undefined, ContentError, Content>
 }
-export class Content extends ServiceMap.Service<Content>()("service/Content", {
-  make: Effect.gen(function* () {
+export class Content extends Context.Service<Content, ContentService>()("service/Content", {
+  make: Effect.gen(function* (): Effect.fn.Return<
+    ContentService,
+    never,
+    FileSystem.FileSystem | Path.Path | Mdx | Metadata
+  > {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
     const contentDir = "./content"
@@ -100,38 +110,36 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
           catch: (error) => new FileGlobError({ error }),
         })
 
-        return yield* Effect.all(
-          filepaths.map((filepath) =>
-            fs.readFileString(filepath, "utf-8").pipe(
-              // create slug and relative filepath
-              // extract content and parse fronmatter
-              Effect.map((rawSource) => {
-                const slug = isPathWithIndex
-                  ? filepath.split(path.sep).slice(-2, -1)[0]
-                  : filepath.split(path.sep).slice(-1)[0]
-                const { content: source, data } = matter(rawSource)
-                return {
-                  source,
-                  data,
-                  slug,
-                  filepath,
-                }
-              }),
-              //
-              Effect.flatMap(Schema.decodeUnknownEffect(CollectionEntry)),
-              // Compile MDX
-              Effect.flatMap((data) =>
-                mdx.compile(new VFile({ data: { filepath }, value: data.source })).pipe(
-                  Effect.flatMap((compiled) =>
-                    mdx.run(compiled).pipe(
-                      Effect.map(({ default: MdxContent }) => {
-                        const RenderContent: MdxContentComponent = () => createElement(MdxContent)
-                        return {
-                          ...data,
-                          Content: RenderContent,
-                        }
-                      }),
-                    ),
+        return yield* Effect.forEach(filepaths, (filepath) =>
+          fs.readFileString(filepath, "utf-8").pipe(
+            // create slug and relative filepath
+            // extract content and parse fronmatter
+            Effect.map((rawSource) => {
+              const slug = isPathWithIndex
+                ? filepath.split(path.sep).slice(-2, -1)[0]
+                : filepath.split(path.sep).slice(-1)[0]
+              const { content: source, data } = matter(rawSource)
+              return {
+                source,
+                data,
+                slug,
+                filepath,
+              }
+            }),
+            //
+            Effect.flatMap(Schema.decodeUnknownEffect(CollectionEntry)),
+            // Compile MDX
+            Effect.flatMap((data) =>
+              mdx.compile(new VFile({ data: { filepath }, value: data.source })).pipe(
+                Effect.flatMap((compiled) =>
+                  mdx.run(compiled).pipe(
+                    Effect.map(({ default: MdxContent }) => {
+                      const RenderContent: MdxContentComponent = () => createElement(MdxContent)
+                      return {
+                        ...data,
+                        Content: RenderContent,
+                      }
+                    }),
                   ),
                 ),
               ),
@@ -145,155 +153,132 @@ export class Content extends ServiceMap.Service<Content>()("service/Content", {
         collection: "essays" | "projects" | "work",
       ): Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError> =>
         getCollection(collection).pipe(Effect.mapError((error) => new ContentError({ error }))),
-      getEssays: (): Effect.Effect<
-        ReadonlyArray<CompiledCollectionEntry<typeof Essay.Type>>,
-        ContentError
-      > =>
-        getCollection("essays").pipe(
-          Effect.flatMap((entries) =>
-            Effect.all(
-              entries.map((entry) =>
-                metadata.essay(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
-              ),
-            ),
+      getEssays: getCollection("essays").pipe(
+        Effect.flatMap((entries) =>
+          Effect.forEach(entries, (entry) =>
+            metadata.essay(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
           ),
-          Effect.mapError((error) => new ContentError({ error })),
         ),
-      getProjects: (): Effect.Effect<
-        ReadonlyArray<CompiledCollectionEntry<typeof Project.Type>>,
-        ContentError
-      > =>
-        getCollection("projects").pipe(
-          Effect.flatMap((entries) =>
-            Effect.all(
-              entries.map((entry) =>
-                metadata.project(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
-              ),
-            ),
+        Effect.mapError((error) => new ContentError({ error })),
+      ),
+      getProjects: getCollection("projects").pipe(
+        Effect.flatMap((entries) =>
+          Effect.forEach(entries, (entry) =>
+            metadata.project(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
           ),
-          Effect.mapError((error) => new ContentError({ error })),
         ),
-      getWork: (): Effect.Effect<
-        ReadonlyArray<CompiledCollectionEntry<typeof Work.Type>>,
-        ContentError
-      > =>
-        getCollection("work").pipe(
-          Effect.flatMap((entries) =>
-            Effect.all(
-              entries.map((entry) =>
-                metadata.work(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
+        Effect.mapError((error) => new ContentError({ error })),
+      ),
+      getWork: getCollection("work").pipe(
+        Effect.flatMap((entries) =>
+          Effect.forEach(entries, (entry) =>
+            metadata.work(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
+          ),
+        ),
+        Effect.mapError((error) => new ContentError({ error })),
+        Effect.map(
+          Array.sortBy(
+            Order.flip(
+              Order.mapInput(Order.Date, ({ data }) =>
+                data.dateEnd === "Present" ? currentDate : data.dateEnd,
               ),
             ),
           ),
-          Effect.mapError((error) => new ContentError({ error })),
-          Effect.map(
-            Array.sortBy(
-              Order.flip(
-                Order.mapInput(Order.Date, ({ data }) =>
-                  data.dateEnd === "Present" ? currentDate : data.dateEnd,
+        ),
+      ),
+      getNotes: Effect.gen(function* () {
+        const filepaths = yield* Effect.tryPromise({
+          try: () => glob([path.join(vaultDir, "*.md")]),
+          catch: (error) => new FileGlobError({ error }),
+        })
+
+        const sourceEntries: ReadonlyArray<NoteSourceEntry> = yield* Effect.forEach(
+          filepaths,
+          (filepath) =>
+            fs.readFileString(filepath, "utf-8").pipe(
+              Effect.map((rawSource) => {
+                const { content: source, data } = matter(rawSource)
+                return {
+                  rawSource,
+                  source,
+                  data,
+                  filepath,
+                  relativePath: path.relative(vaultDir, filepath),
+                }
+              }),
+            ),
+        )
+
+        const preparedEntries: ReadonlyArray<PreparedNoteEntry> = yield* Effect.forEach(
+          sourceEntries,
+          (entry) =>
+            metadata.seed(entry.data).pipe(
+              Effect.map((noteMetadata) => ({
+                ...entry,
+                metadata: noteMetadata,
+              })),
+            ),
+        )
+
+        const publishedLookup = buildPublishedWikiLinkLookup(
+          preparedEntries
+            .filter(({ metadata: noteMetadata }) => noteMetadata.published)
+            .map(({ metadata: noteMetadata, relativePath }) => ({
+              slug: noteMetadata.slug,
+              title: noteMetadata.title,
+              aliases: noteMetadata.aliases,
+              relativePath,
+            })),
+        )
+
+        return yield* Effect.forEach(preparedEntries, (entry) => {
+          const preprocessedSource = preprocessNoteMarkdownSource(entry.source, publishedLookup)
+
+          return mdx
+            .compile(
+              new VFile({
+                data: { filepath: entry.filepath },
+                value: preprocessedSource,
+              }),
+            )
+            .pipe(
+              Effect.flatMap((compiled) =>
+                mdx.run(compiled).pipe(
+                  Effect.map(({ default: MdxContent }) => {
+                    const data = finalizeData(
+                      entry.metadata,
+                      Schema.decodeUnknownSync(CompiledVFileData)(compiled.data).descriptionExcerpt,
+                    )
+                    const RenderContent: MdxContentComponent = () => createElement(MdxContent)
+
+                    return {
+                      rawSource: entry.rawSource,
+                      source: entry.source,
+                      filepath: entry.filepath,
+                      slug: data.slug,
+                      data,
+                      Content: RenderContent,
+                    }
+                  }),
                 ),
               ),
-            ),
-          ),
-        ),
-      getNotes: (): Effect.Effect<ReadonlyArray<NoteEntry>, ContentError> =>
-        Effect.gen(function* () {
-          const filepaths = yield* Effect.tryPromise({
-            try: () => glob([path.join(vaultDir, "*.md")]),
-            catch: (error) => new FileGlobError({ error }),
-          })
-
-          const sourceEntries: ReadonlyArray<NoteSourceEntry> = yield* Effect.all(
-            filepaths.map((filepath) =>
-              fs.readFileString(filepath, "utf-8").pipe(
-                Effect.map((rawSource) => {
-                  const { content: source, data } = matter(rawSource)
-                  return {
-                    rawSource,
-                    source,
-                    data,
-                    filepath,
-                    relativePath: path.relative(vaultDir, filepath),
-                  }
-                }),
-              ),
-            ),
-          )
-
-          const preparedEntries: ReadonlyArray<PreparedNoteEntry> = yield* Effect.all(
-            sourceEntries.map((entry) =>
-              metadata.seed(entry.data).pipe(
-                Effect.map((noteMetadata) => ({
-                  ...entry,
-                  metadata: noteMetadata,
-                })),
-              ),
-            ),
-          )
-
-          const publishedLookup = buildPublishedWikiLinkLookup(
-            preparedEntries
-              .filter(({ metadata }) => metadata.published)
-              .map(({ metadata, relativePath }) => ({
-                slug: metadata.slug,
-                title: metadata.title,
-                aliases: metadata.aliases,
-                relativePath,
-              })),
-          )
-
-          return yield* Effect.all(
-            preparedEntries.map((entry) => {
-              const preprocessedSource = preprocessNoteMarkdownSource(entry.source, publishedLookup)
-
-              return mdx
-                .compile(
-                  new VFile({
-                    data: { filepath: entry.filepath },
-                    value: preprocessedSource,
-                  }),
-                )
-                .pipe(
-                  Effect.flatMap((compiled) =>
-                    mdx.run(compiled).pipe(
-                      Effect.map(({ default: MdxContent }) => {
-                        const data = finalizeData(
-                          entry.metadata,
-                          Schema.decodeUnknownSync(CompiledVFileData)(compiled.data)
-                            .descriptionExcerpt,
-                        )
-                        const RenderContent: MdxContentComponent = () => createElement(MdxContent)
-
-                        return {
-                          rawSource: entry.rawSource,
-                          source: entry.source,
-                          filepath: entry.filepath,
-                          slug: data.slug,
-                          data,
-                          Content: RenderContent,
-                        }
-                      }),
-                    ),
-                  ),
-                )
-            }),
-          )
-        }).pipe(
-          Effect.mapError((error) => new ContentError({ error })),
-          Effect.map(Array.sortBy(Order.mapInput(Order.String, ({ slug }) => slug))),
-        ),
-      getPublishedNotes: (): Effect.Effect<ReadonlyArray<NoteEntry>, ContentError, Content> =>
-        Effect.gen(function* () {
-          const content: ContentService = yield* Content
-          const entries = yield* content.getNotes()
-          return entries.filter(({ data }) => data.published)
-        }).pipe(Effect.mapError((error) => new ContentError({ error }))),
+            )
+        })
+      }).pipe(
+        Effect.mapError((error) => new ContentError({ error })),
+        Effect.map(Array.sortBy(Order.mapInput(Order.String, ({ slug }) => slug))),
+      ),
+      getPublishedNotes: Effect.gen(function* () {
+        const content: ContentService = yield* Content
+        const entries = yield* content.getNotes
+        return entries.filter(({ data }) => data.published)
+      }).pipe(Effect.mapError((error) => new ContentError({ error }))),
       findPublishedNotesBySlug: (
         pathSlug: string,
       ): Effect.Effect<NoteEntry | undefined, ContentError, Content> =>
         Effect.gen(function* () {
           const content: ContentService = yield* Content
-          const entries = yield* content.getPublishedNotes()
+          const entries = yield* content.getPublishedNotes
           return entries.find(({ slug }) => slug === pathSlug)
         }).pipe(Effect.mapError((error) => new ContentError({ error }))),
     }

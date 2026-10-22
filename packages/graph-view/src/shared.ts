@@ -1,5 +1,5 @@
-import * as d3 from "d3-force"
-import * as PIXI from "pixi.js"
+import type * as d3 from "d3-force"
+import type * as PIXI from "pixi.js"
 import type { GraphSnapshotNode } from "@urban/build-graph/schema"
 
 export type NodeId = string
@@ -7,7 +7,7 @@ export type NodeState = "default" | "selected" | "muted"
 export type EdgeState = "default" | "muted"
 export type Point = { x: number; y: number }
 export type Size = { width: number; height: number }
-export type RenderDepth = 1 | 2 | 3 | typeof Infinity
+export type RenderDepth = number
 export type Disposer = () => void
 
 export type GraphTheme = {

@@ -1,12 +1,12 @@
 import { NodeServices } from "@effect/platform-node"
-import { Effect, Layer, Path, Schema, ServiceMap } from "effect"
+import { Effect, Layer, Path, Schema, Context } from "effect"
 import type { Root } from "hast"
 import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
 import { VFileData } from "../schemas"
 import { WebsiteConfig } from "./WebsiteConfig"
 
-export class LocalImagePlugin extends ServiceMap.Service<
+export class LocalImagePlugin extends Context.Service<
   LocalImagePlugin,
   () => (tree: Root, file: VFile) => void
 >()("LocalImagePlugin", {
@@ -34,7 +34,9 @@ export class LocalImagePlugin extends ServiceMap.Service<
         }
       })
     }
-  }).pipe(Effect.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer))),
+  }),
 }) {
-  static readonly layer = Layer.effect(this)(this.make)
+  static readonly layer = Layer.effect(this)(this.make).pipe(
+    Layer.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer)),
+  )
 }

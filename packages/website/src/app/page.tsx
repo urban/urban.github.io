@@ -20,7 +20,7 @@ import { WorkList } from "@/ui/WorkList"
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
 
-  // const essays = yield* content.getEssays().pipe(
+  // const essays = yield* content.getEssays.pipe(
   //   Effect.map((essays) => essays.filter(({ data }) => !data.draft)),
   //   Effect.map(Array.take(SITE.numOfEssays)),
   // );
@@ -28,7 +28,7 @@ const main = Effect.gen(function* () {
   //   .getProjects()
   //   .pipe(Effect.map(Array.take(SITE.numOfProjects)));
 
-  const work = yield* content.getWork().pipe(Effect.map(Array.take(SITE.numOfWork)))
+  const work = yield* content.getWork.pipe(Effect.map(Array.take(SITE.numOfWork)))
   const groupedWork = pipe(
     work,
     Array.groupBy((x) => x.data.company),

@@ -1,4 +1,4 @@
-import { DateTime } from "effect"
+import type { DateTime } from "effect"
 
 const SLUG_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const WIKI_LINK_PATTERN = /\[\[([^[\]]+)\]\]/g

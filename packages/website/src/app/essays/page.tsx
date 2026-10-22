@@ -10,7 +10,7 @@ import { ComingSoon } from "@/ui/ComingSoon"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const allEssays = yield* content.getEssays()
+  const allEssays = yield* content.getEssays
   const essaysMetadata = allEssays.map(({ data, slug }) => ({
     metadata: data,
     slug,

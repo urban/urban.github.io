@@ -1,4 +1,4 @@
-import { Effect, Layer, Schema, ServiceMap } from "effect"
+import { Effect, Layer, Schema, Context } from "effect"
 import { compile, run } from "@mdx-js/mdx"
 import * as runtime from "react/jsx-runtime"
 import rehypeUnwrapImages from "rehype-unwrap-images"
@@ -7,17 +7,19 @@ import remarkGfm from "remark-gfm"
 import { DescriptionExcerptPlugin } from "./DescriptionExcerptPlugin"
 import { HeadingsPlugin } from "./HeadingsPlugin"
 import { LocalImagePlugin } from "./LocalImagePlugin"
-import type { MDXModule } from "mdx/types"
 import type { VFile } from "vfile"
 import rehypeShiki from "@shikijs/rehype"
 import { MdxComponents } from "../../ui/MdxComponents"
 
-export class MdxError extends Schema.TaggedErrorClass<MdxError>()("MdxError", {
-  error: Schema.Unknown,
-  type: Schema.Literals(["compile", "run"]),
-}) {}
+export class MdxError extends Schema.TaggedError<MdxError, { readonly brand: unique symbol }>()(
+  "MdxError",
+  {
+    error: Schema.Unknown,
+    type: Schema.Literals(["compile", "run"]),
+  },
+) {}
 
-export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
+export class Mdx extends Context.Service<Mdx>()("Mdx", {
   make: Effect.gen(function* () {
     const headings = yield* HeadingsPlugin
     const descriptionExcerptPlugin = yield* DescriptionExcerptPlugin
@@ -60,15 +62,15 @@ export class Mdx extends ServiceMap.Service<Mdx>()("Mdx", {
               ...runtime,
               baseUrl: import.meta.url,
               useMDXComponents: () => MdxComponents,
-            }) as Promise<MDXModule>,
+            }),
           catch: (error) => new MdxError({ error, type: "run" }),
         }).pipe(Effect.tapError(Effect.logError)),
     }
-  }).pipe(
-    Effect.provide(
+  }),
+}) {
+  static readonly layer = Layer.effect(this)(this.make).pipe(
+    Layer.provide(
       Layer.mergeAll(DescriptionExcerptPlugin.layer, HeadingsPlugin.layer, LocalImagePlugin.layer),
     ),
-  ),
-}) {
-  static readonly layer = Layer.effect(this)(this.make)
+  )
 }

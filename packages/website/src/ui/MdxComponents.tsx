@@ -1,7 +1,6 @@
-import type { JSX as ReactJSX } from "react"
+import type { JSX as ReactJSX, ComponentProps } from "react"
 import type { MDXComponents } from "mdx/types"
 import NextLink from "next/link"
-import type { ComponentProps } from "react"
 import { clsx, cn } from "../lib/utils"
 
 type HrefKind = "internal" | "external-web" | "other"

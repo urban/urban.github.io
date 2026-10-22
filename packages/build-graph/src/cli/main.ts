@@ -1,6 +1,6 @@
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Console, Effect, FileSystem, Path, Schema } from "effect"
-import { Argument, Command } from "effect/unstable/cli"
+import { Argument, Command } from "effect/cli"
 import { discoverMarkdownFiles } from "./discover"
 import { buildGraphSnapshot } from "../core/build"
 import { parseWikilinks } from "../core/parse"
@@ -16,12 +16,12 @@ export type BuildGraphInput = {
   readonly to: string
 }
 
-export class BuildGraphCliValidationError extends Schema.TaggedErrorClass<BuildGraphCliValidationError>()(
-  "BuildGraphCliValidationError",
-  {
-    message: Schema.String,
-  },
-) {}
+export class BuildGraphCliValidationError extends Schema.TaggedError<
+  BuildGraphCliValidationError,
+  { readonly brand: unique symbol }
+>()("BuildGraphCliValidationError", {
+  message: Schema.String,
+}) {}
 
 const ensureDirectory = Effect.fn("buildGraphCli.ensureDirectory")(function* (
   label: "from" | "to",
@@ -42,6 +42,7 @@ const ensureDirectory = Effect.fn("buildGraphCli.ensureDirectory")(function* (
       message: `Invalid ${label} directory: ${path} is not a directory`,
     })
   }
+  return undefined
 })
 
 const loadMarkdownSources = Effect.fn("buildGraphCli.loadMarkdownSources")(function* (
@@ -80,7 +81,9 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
   yield* Console.log(`Validated frontmatter for ${validatedNotes.length} Markdown file(s)`)
   const parsedWikilinks = validatedNotes.flatMap((note) =>
     parseWikilinks(note.body).map((wikilink) => ({
-      ...wikilink,
+      raw: wikilink.raw,
+      target: wikilink.target,
+      displayText: wikilink.displayText,
       sourceRelativePath: note.relativePath,
     })),
   )
@@ -111,22 +114,24 @@ export const runBuildGraph = Effect.fn("buildGraphCli.runBuildGraph")(function* 
 export const buildGraphCommand = Command.make(
   "build-graph",
   {
-    from: Argument.string("from").pipe(
+    from: Argument.String("from").pipe(
       Argument.withDescription("Path to the source Markdown directory"),
     ),
-    to: Argument.string("to").pipe(Argument.withDescription("Path to the destination directory")),
+    to: Argument.String("to").pipe(Argument.withDescription("Path to the destination directory")),
   },
   runBuildGraph,
 ).pipe(Command.withDescription("Build graph-snapshot.json from a Markdown source directory"))
 
 export const runWithArgs = (args: ReadonlyArray<string>) =>
   Command.runWith(buildGraphCommand, { version: CLI_VERSION })(args).pipe(
+    // oxlint-disable-next-line effecttsgo/strict-effect-provide -- Each CLI invocation owns the platform layer.
     Effect.provide(NodeServices.layer),
   )
 
 if (import.meta.main) {
   buildGraphCommand.pipe(
     Command.run({ version: CLI_VERSION }),
+    // oxlint-disable-next-line effecttsgo/strict-effect-provide -- CLI process entry point.
     Effect.provide(NodeServices.layer),
     NodeRuntime.runMain,
   )

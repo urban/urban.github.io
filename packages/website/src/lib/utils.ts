@@ -21,9 +21,9 @@ const readingTime = (html: string) => {
 }
 
 const dateTenure = (startDate: Date, endDate?: Date | string) => {
-  const _endDate = endDate === undefined || typeof endDate == "string" ? new Date() : endDate
-  let years = _endDate.getFullYear() - startDate.getFullYear()
-  let months = _endDate.getMonth() - startDate.getMonth()
+  const finalDate = endDate === undefined || typeof endDate === "string" ? new Date() : endDate
+  let years = finalDate.getFullYear() - startDate.getFullYear()
+  let months = finalDate.getMonth() - startDate.getMonth()
 
   if (months < 0) {
     years--

@@ -9,7 +9,7 @@ import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  return yield* content.getProjects().pipe(
+  return yield* content.getProjects.pipe(
     Effect.map(
       flow(
         Array.filter(({ data }) => data.published ?? true),

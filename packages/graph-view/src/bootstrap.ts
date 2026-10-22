@@ -97,29 +97,29 @@ const GraphThemeNameSchema = Schema.Union([Schema.Literal("light"), Schema.Liter
 
 type GraphThemeName = Schema.Schema.Type<typeof GraphThemeNameSchema>
 
-export class GraphThemeJsonParseError extends Schema.TaggedErrorClass<GraphThemeJsonParseError>()(
-  "GraphThemeJsonParseError",
-  {
-    themeName: GraphThemeNameSchema,
-    input: Schema.String,
-    message: Schema.String,
-  },
-) {}
+export class GraphThemeJsonParseError extends Schema.TaggedError<
+  GraphThemeJsonParseError,
+  { readonly brand: unique symbol }
+>()("GraphThemeJsonParseError", {
+  themeName: GraphThemeNameSchema,
+  input: Schema.String,
+  message: Schema.String,
+}) {}
 
-export class GraphThemeDecodeError extends Schema.TaggedErrorClass<GraphThemeDecodeError>()(
-  "GraphThemeDecodeError",
-  {
-    themeName: GraphThemeNameSchema,
-    message: Schema.String,
-  },
-) {}
+export class GraphThemeDecodeError extends Schema.TaggedError<
+  GraphThemeDecodeError,
+  { readonly brand: unique symbol }
+>()("GraphThemeDecodeError", {
+  themeName: GraphThemeNameSchema,
+  message: Schema.String,
+}) {}
 
-export class GraphVisualizerBootstrapError extends Schema.TaggedErrorClass<GraphVisualizerBootstrapError>()(
-  "GraphVisualizerBootstrapError",
-  {
-    message: Schema.String,
-  },
-) {}
+export class GraphVisualizerBootstrapError extends Schema.TaggedError<
+  GraphVisualizerBootstrapError,
+  { readonly brand: unique symbol }
+>()("GraphVisualizerBootstrapError", {
+  message: Schema.String,
+}) {}
 
 export type GraphVisualizerBootstrapFailure =
   | GraphThemeJsonParseError
@@ -199,6 +199,7 @@ export function resolveGraphSnapshotSourceFromHtmlConfig({
         `Invalid graph snapshot JSON in HTML: ${
           error instanceof Error ? error.message : "unknown parse error"
         }`,
+        { cause: error },
       )
     }
   }
@@ -243,20 +244,20 @@ const FontWeightSchema = Schema.Union([
 ])
 
 const GraphThemeNodeVariantSchema = Schema.Struct({
-  fill: Schema.Number,
-  stroke: Schema.Number,
-  strokeWidth: Schema.Number,
-  alpha: Schema.Number,
+  fill: Schema.Finite,
+  stroke: Schema.Finite,
+  strokeWidth: Schema.Finite,
+  alpha: Schema.Finite,
 })
 
 const GraphThemeLabelVariantSchema = Schema.Struct({
-  fill: Schema.Number,
-  alpha: Schema.Number,
+  fill: Schema.Finite,
+  alpha: Schema.Finite,
 })
 
 const GraphThemeSchema = Schema.Struct({
   view: Schema.Struct({
-    backgroundColor: Schema.Number,
+    backgroundColor: Schema.Finite,
   }),
   node: Schema.Struct({
     variants: Schema.Struct({
@@ -265,22 +266,22 @@ const GraphThemeSchema = Schema.Struct({
       muted: GraphThemeNodeVariantSchema,
     }),
     scales: Schema.Struct({
-      default: Schema.Number,
-      selected: Schema.Number,
-      muted: Schema.Number,
+      default: Schema.Finite,
+      selected: Schema.Finite,
+      muted: Schema.Finite,
     }),
   }),
   edge: Schema.Struct({
     variants: Schema.Struct({
       default: Schema.Struct({
-        width: Schema.Number,
-        color: Schema.Number,
-        alpha: Schema.Number,
+        width: Schema.Finite,
+        color: Schema.Finite,
+        alpha: Schema.Finite,
       }),
       muted: Schema.Struct({
-        width: Schema.Number,
-        color: Schema.Number,
-        alpha: Schema.Number,
+        width: Schema.Finite,
+        color: Schema.Finite,
+        alpha: Schema.Finite,
       }),
     }),
   }),
@@ -292,7 +293,7 @@ const GraphThemeSchema = Schema.Struct({
     }),
     style: Schema.Struct({
       fontFamily: Schema.optional(Schema.String),
-      fontSize: Schema.optional(Schema.Number),
+      fontSize: Schema.optional(Schema.Finite),
       fontWeight: Schema.optional(FontWeightSchema),
     }),
   }),
@@ -325,7 +326,7 @@ const parseGraphThemeJson = Effect.fn("parseGraphThemeJson")(function* (
   themeName: GraphThemeName,
 ): Effect.fn.Return<unknown, GraphThemeJsonParseError> {
   return yield* Effect.try({
-    try: () => JSON.parse(themeJson) as unknown,
+    try: (): unknown => JSON.parse(themeJson),
     catch: (error: unknown) =>
       new GraphThemeJsonParseError({
         themeName,
@@ -396,7 +397,9 @@ export function resolveGraphThemeSetFromHtmlConfig({
     )
   } catch (error: unknown) {
     if (error instanceof GraphThemeJsonParseError || error instanceof GraphThemeDecodeError) {
-      throw new Error(`Invalid ${error.themeName} graph theme JSON: ${error.message}`)
+      throw new Error(`Invalid ${error.themeName} graph theme JSON: ${error.message}`, {
+        cause: error,
+      })
     }
 
     throw error
@@ -903,6 +906,10 @@ export function toGraphVisualizerBootstrapUserMessage(
       return `The ${error.themeName} graph theme could not be loaded because it does not match the expected shape.`
     case "GraphVisualizerBootstrapError":
       return `The graph could not be loaded. ${error.message}`
+    default: {
+      const unreachable: never = error
+      return unreachable
+    }
   }
 }
 

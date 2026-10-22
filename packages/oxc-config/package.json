@@ -9,10 +9,14 @@
   ],
   "license": "MIT",
   "author": "Urban Faubion <urban.faubion@gmail.com> (http://urbanfaubion.com/)",
+  "type": "module",
   "sideEffects": [],
   "exports": {
     "./package.json": "./package.json",
-    "./oxlintrc.json": "./oxlintrc.json"
+    "./oxlint.config.ts": "./oxlint.config.ts"
+  },
+  "peerDependencies": {
+    "oxlint": "1.89.0"
   },
   "tags": [
     "linting",

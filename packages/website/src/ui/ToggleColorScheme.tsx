@@ -24,8 +24,8 @@ const disableCSSTransitions = () => {
   document.head.appendChild(css)
 
   return () => {
-    // @ts-expect-error _opacity is declared but it's value is never read.
-    const _opacity = window.getComputedStyle(css).opacity
+    // Force a style flush before restoring transitions.
+    void window.getComputedStyle(css).opacity
     document.head.removeChild(css)
   }
 }

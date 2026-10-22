@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { buildGraphSnapshot } from "../src/core/build"
-import { type ParsedWikilinkWithSource } from "../src/core/resolve"
+import type { ParsedWikilinkWithSource } from "../src/core/resolve"
 import type {
   GraphSnapshot,
   GraphSnapshotEdge,
@@ -27,16 +27,14 @@ const createValidatedNote = (
     permalink
       .replace(/^\/+|\/+$/g, "")
       .split("/")
-      .filter(Boolean)
-      .pop() ?? permalink,
+      .findLast(Boolean) ?? permalink,
   routePath: permalink,
   nodeId: relativePath,
   label:
     permalink
       .replace(/^\/+|\/+$/g, "")
       .split("/")
-      .filter(Boolean)
-      .pop() ?? permalink,
+      .findLast(Boolean) ?? permalink,
   frontmatter: {
     permalink,
     created: "2026-02-01",

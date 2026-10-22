@@ -30,7 +30,7 @@ const decodeGraphSnapshotArrays = Schema.decodeUnknownSync(GraphSnapshotArraysSc
 const toSortedRecord = <T>(
   entries: ReadonlyArray<readonly [key: string, value: T]>,
 ): Record<string, T> =>
-  Object.fromEntries([...entries].sort((left, right) => compareStrings(left[0], right[0])))
+  Object.fromEntries([...entries].toSorted((left, right) => compareStrings(left[0], right[0])))
 
 const groupEdgesByNodeId = (
   edges: ReadonlyArray<GraphSnapshotEdge>,
@@ -90,7 +90,7 @@ const assertEdgesReferenceExistingNodes = (
 }
 
 export const normalizeGraphSnapshot = (snapshot: GraphSnapshotArrays): GraphSnapshot => {
-  const nodes = [...snapshot.nodes].sort((left, right) => {
+  const nodes = [...snapshot.nodes].toSorted((left, right) => {
     const idComparison = compareStrings(left.id, right.id)
     if (idComparison !== 0) {
       return idComparison
@@ -99,7 +99,7 @@ export const normalizeGraphSnapshot = (snapshot: GraphSnapshotArrays): GraphSnap
     return compareStrings(left.kind, right.kind)
   })
 
-  const edges = [...snapshot.edges].sort((left, right) => {
+  const edges = [...snapshot.edges].toSorted((left, right) => {
     const sourceNodeComparison = compareStrings(left.sourceNodeId, right.sourceNodeId)
     if (sourceNodeComparison !== 0) {
       return sourceNodeComparison
@@ -133,7 +133,7 @@ export const normalizeGraphSnapshot = (snapshot: GraphSnapshotArrays): GraphSnap
     return compareStrings(left.displayText ?? "", right.displayText ?? "")
   })
 
-  const diagnostics = [...snapshot.diagnostics].sort((left, right) => {
+  const diagnostics = [...snapshot.diagnostics].toSorted((left, right) => {
     const sourceComparison = compareStrings(left.sourceRelativePath, right.sourceRelativePath)
     if (sourceComparison !== 0) {
       return sourceComparison

@@ -14,16 +14,14 @@ const createValidatedNote = (relativePath: string, permalink: string): Validated
     permalink
       .replace(/^\/+|\/+$/g, "")
       .split("/")
-      .filter(Boolean)
-      .pop() ?? permalink,
+      .findLast(Boolean) ?? permalink,
   routePath: permalink,
   nodeId: relativePath,
   label:
     permalink
       .replace(/^\/+|\/+$/g, "")
       .split("/")
-      .filter(Boolean)
-      .pop() ?? permalink,
+      .findLast(Boolean) ?? permalink,
   frontmatter: {
     permalink,
     created: "2026-02-01",

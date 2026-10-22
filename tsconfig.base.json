@@ -7,8 +7,8 @@
     // Use incremental builds with project references.
     "incremental": true,
     "composite": true,
-    // Target modern JavaScript (ES2022+) whilst staying closely compatible with the Node.js module system.
-    "target": "ES2022",
+    // Target modern JavaScript whilst staying compatible with the Node.js module system.
+    "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "moduleDetection": "force", // Treat every non-declaration file as a module.
@@ -30,6 +30,20 @@
     "noErrorTruncation": true, // Do not truncate error messages.
     "types": [], // Disable automatic loading of `@types/*` packages.
     "jsx": "react-jsx",
-    "plugins": [{ "name": "@effect/language-service" }]
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        "diagnostics": false,
+        // These platform and graph APIs are intentional dependencies of this application.
+        "allowedUnstableApis": [
+          "effect/FileSystem",
+          "effect/Path",
+          "effect/Graph",
+          "effect/PlatformError",
+          "effect/cli",
+          "@effect/platform-node"
+        ]
+      }
+    ]
   }
 }

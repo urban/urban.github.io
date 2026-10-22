@@ -21,7 +21,9 @@ const parseWikilinksWithSource = (
 ): ReadonlyArray<ParsedWikilinkWithSource> =>
   validatedNotes.flatMap((note) =>
     parseWikilinks(note.body).map((wikilink) => ({
-      ...wikilink,
+      raw: wikilink.raw,
+      target: wikilink.target,
+      displayText: wikilink.displayText,
       sourceRelativePath: note.sourceRelativePath,
     })),
   )

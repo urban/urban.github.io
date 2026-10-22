@@ -3,7 +3,7 @@ import type { Content } from "../lib/services/Content"
 import { dateRange, dateTenure } from "../lib/utils"
 import { Text } from "./Text"
 
-type Work = Effect.Success<ReturnType<typeof Content.Service.getWork>>[0]
+type Work = Effect.Success<Content["Service"]["getWork"]>[number]
 
 const WorkTransferOrPromotion = ({ children }: { children: React.ReactNode }) => (
   <div className="before:content-[' '] before:absolute before:-left-[calc(--spacing(6.8))] before:top-8 before:w-px before:h-[calc(100%_-_1.5rem)] before:bg-gray-300 dark:before:bg-gray-500">

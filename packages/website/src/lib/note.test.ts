@@ -1,4 +1,5 @@
 import { afterEach, expect, test } from "bun:test"
+import { rejects } from "node:assert/strict"
 import { mkdir, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 import { DateTime, Effect } from "effect"
@@ -279,8 +280,8 @@ First paragraph for the unpublished fixture.
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    const vault = yield* content.getNotes()
-    const publishedVault = yield* content.getPublishedNotes()
+    const vault = yield* content.getNotes
+    const publishedVault = yield* content.getPublishedNotes
     return { vault, publishedVault }
   })
   const { vault, publishedVault } = await RuntimeServer.runPromise(program)
@@ -484,7 +485,7 @@ See [[fixture-target]].
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.getEssays()
+    return yield* content.getEssays
   })
   const essays = await RuntimeServer.runPromise(program)
   const entry = essays.find(({ slug }) => slug === "fixture-article-wiki-link")
@@ -499,6 +500,33 @@ See [[fixture-target]].
   expect(renderToStaticMarkup(createElement(entry.Content))).toContain(
     "<p>See [[fixture-target]].</p>",
   )
+})
+
+test("reusing the notes effect reads newly created content instead of caching its result", async () => {
+  const program = Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    return yield* content.getNotes
+  })
+  const slug = "fixture-reused-notes-effect"
+  const before = await RuntimeServer.runPromise(program)
+  expect(before.some((entry) => entry.slug === slug)).toBeFalse()
+
+  await writeFixture(
+    "__fixture-reused-notes-effect.md",
+    `---
+title: Reusable Notes Effect
+permalink: /${slug}/
+createdAt: 2026-03-01
+updatedAt: 2026-03-01
+published: true
+---
+
+New content is visible on the next execution.
+`,
+  )
+
+  const after = await RuntimeServer.runPromise(program)
+  expect(after.some((entry) => entry.slug === slug)).toBeTrue()
 })
 
 test("content service fails on invalid vault frontmatter", async () => {
@@ -520,8 +548,8 @@ Broken permalink fixture.
 
   const program = Effect.gen(function* () {
     const content: ContentService = yield* Content
-    return yield* content.getNotes()
+    return yield* content.getNotes
   })
 
-  await expect(RuntimeServer.runPromise(program)).rejects.toBeDefined()
+  await rejects(RuntimeServer.runPromise(program))
 })

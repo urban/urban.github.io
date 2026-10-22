@@ -1,3 +1,4 @@
+// oxlint-disable effecttsgo/strict-effect-provide -- Each test owns its platform layer at the program boundary.
 import { NodeServices } from "@effect/platform-node"
 import { afterEach, expect, test } from "bun:test"
 import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises"
@@ -15,9 +16,9 @@ const makeTempDirectory = async () => {
 }
 
 afterEach(async () => {
-  for (const directory of tempDirectories) {
-    await rm(directory, { recursive: true, force: true })
-  }
+  await Promise.all(
+    [...tempDirectories].map((directory) => rm(directory, { recursive: true, force: true })),
+  )
   tempDirectories.clear()
 })
 

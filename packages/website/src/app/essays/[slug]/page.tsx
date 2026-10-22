@@ -1,4 +1,4 @@
-import { Array, Effect, flow } from "effect"
+import { Array, Effect, Option, flow } from "effect"
 import type { Metadata, ResolvingMetadata } from "next"
 import { notFound } from "next/navigation"
 import { RuntimeServer } from "@/lib/RuntimeServer"
@@ -13,14 +13,13 @@ import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 const main = (pathSlug: string) =>
   Effect.gen(function* () {
     const content: ContentService = yield* Content
-    const essays = yield* content.getEssays()
-    return yield* Array.findFirst(essays, ({ slug }) => slug === pathSlug)
-    // return pipe(Effect.flatMap(Array.findFirst(({ slug }) => slug === pathSlug)))
+    const essays = yield* content.getEssays
+    return Option.getOrUndefined(Array.findFirst(essays, ({ slug }) => slug === pathSlug))
   })
 
 const mainAll = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  return yield* content.getEssays().pipe(
+  return yield* content.getEssays.pipe(
     Effect.map(
       flow(
         Array.filter(({ data }) => data.published ?? true),
@@ -53,7 +52,7 @@ export async function generateMetadata(
     }
   }
 
-  const essay = await RuntimeServer.runPromise(main(slug))
+  const essay = (await RuntimeServer.runPromise(main(slug))) ?? notFound()
 
   return {
     title: essay.data.title,
@@ -67,7 +66,7 @@ export default async function Page({ params }: PageProps) {
     notFound()
   }
 
-  const essay = await RuntimeServer.runPromise(main(slug))
+  const essay = (await RuntimeServer.runPromise(main(slug))) ?? notFound()
 
   return (
     <>

@@ -9,8 +9,7 @@ import {
 } from "@urban/build-graph"
 import { RuntimeServer } from "./RuntimeServer"
 import { Content } from "./services/Content"
-import type { ContentService } from "./services/Content"
-import type { NoteEntry } from "./services/Content"
+import type { ContentService, NoteEntry } from "./services/Content"
 import { toRoutePath } from "./note"
 
 export type GraphModel = {
@@ -36,7 +35,7 @@ const normalizeGraphFrontmatter = (source: string): string =>
 
 const buildGraphModelEffect = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const entries: ReadonlyArray<NoteEntry> = yield* content.getPublishedNotes()
+  const entries: ReadonlyArray<NoteEntry> = yield* content.getPublishedNotes
   const markdownSources = entries.map(
     (entry): MarkdownSourceFile => ({
       absolutePath: entry.filepath,
@@ -50,7 +49,7 @@ const buildGraphModelEffect = Effect.gen(function* () {
   })
 
   return {
-    snapshot: Schema.decodeUnknownSync(GraphSnapshotSchema)(result.snapshot),
+    snapshot: yield* Schema.decodeEffect(GraphSnapshotSchema)(result.snapshot),
   }
 })
 
@@ -114,7 +113,7 @@ export const getBacklinks = (
     })
   }
 
-  return [...backlinksBySourceNodeId.values()].sort((left, right) => {
+  return [...backlinksBySourceNodeId.values()].toSorted((left, right) => {
     if (right.count !== left.count) {
       return right.count - left.count
     }

@@ -94,7 +94,7 @@ export const GraphBoot = ({ themeSet, scrollZoomEnabled }: GraphBootProps) => {
             return
           }
 
-          console.error(error)
+          Effect.runSync(Effect.logError(error))
         }
       },
     )

@@ -1,4 +1,5 @@
 import { afterEach, expect, test } from "bun:test"
+import { rejects } from "node:assert/strict"
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -21,9 +22,9 @@ const makeTempDirectory = async () => {
 }
 
 afterEach(async () => {
-  for (const directory of tempDirectories) {
-    await rm(directory, { recursive: true, force: true })
-  }
+  await Promise.all(
+    [...tempDirectories].map((directory) => rm(directory, { recursive: true, force: true })),
+  )
   tempDirectories.clear()
 })
 
@@ -359,7 +360,7 @@ test("validates that from is an existing directory", async () => {
   expect(Exit.isFailure(result)).toBeTrue()
 
   const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
-  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+  await rejects(readFile(snapshotPath, "utf8"))
 })
 
 test("validates that to is a directory when it already exists", async () => {
@@ -373,7 +374,7 @@ test("validates that to is a directory when it already exists", async () => {
   expect(Exit.isFailure(result)).toBeTrue()
 
   const snapshotPath = join(toFile, GRAPH_SNAPSHOT_FILE_NAME)
-  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+  await rejects(readFile(snapshotPath, "utf8"))
 })
 
 test("fails fast on invalid to directory before frontmatter validation", async () => {
@@ -402,7 +403,7 @@ test("fails fast on invalid to directory before frontmatter validation", async (
   expect(firstError.message).toContain("Invalid to directory")
 
   const snapshotPath = join(toFile, GRAPH_SNAPSHOT_FILE_NAME)
-  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+  await rejects(readFile(snapshotPath, "utf8"))
 })
 
 test("fails before writing snapshot when frontmatter is invalid", async () => {
@@ -418,7 +419,7 @@ test("fails before writing snapshot when frontmatter is invalid", async () => {
   expect(Exit.isFailure(result)).toBeTrue()
 
   const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
-  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+  await rejects(readFile(snapshotPath, "utf8"))
 })
 
 test("fails before writing snapshot when duplicate permalinks exist", async () => {
@@ -438,7 +439,7 @@ test("fails before writing snapshot when duplicate permalinks exist", async () =
   expect(Exit.isFailure(result)).toBeTrue()
 
   const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
-  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+  await rejects(readFile(snapshotPath, "utf8"))
 })
 
 test("fails before writing snapshot when wikilink resolution is ambiguous", async () => {
@@ -465,7 +466,7 @@ test("fails before writing snapshot when wikilink resolution is ambiguous", asyn
   expect(Exit.isFailure(result)).toBeTrue()
 
   const snapshotPath = join(to, GRAPH_SNAPSHOT_FILE_NAME)
-  await expect(readFile(snapshotPath, "utf8")).rejects.toThrow()
+  await rejects(readFile(snapshotPath, "utf8"))
 })
 
 test("writes placeholder nodes and unresolved diagnostics for unresolved wikilinks", async () => {

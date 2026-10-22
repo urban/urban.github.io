@@ -3,8 +3,8 @@ import * as Path from "node:path"
 import { fileURLToPath } from "node:url"
 import * as Fs from "node:fs"
 
-const __dirname = Path.dirname(fileURLToPath(import.meta.url))
-const workspaceRoot = Path.resolve(__dirname, "..")
+const directory = Path.dirname(fileURLToPath(import.meta.url))
+const workspaceRoot = Path.resolve(directory, "..")
 const filesToClean = [".next", ".turbo", ".tsbuildinfo", "out", "coverage"]
 
 async function main() {
@@ -23,11 +23,11 @@ async function main() {
     filesToClean.forEach((file) => {
       const filePath = Path.join(dir, file)
       if (Fs.existsSync(filePath)) {
-        console.log(`Cleaning ${filePath}`)
-        Fs.rmSync(`${filePath}`, { recursive: true, force: true })
+        process.stdout.write(`Cleaning ${filePath}\n`)
+        Fs.rmSync(filePath, { recursive: true, force: true })
       }
     })
   })
 }
 
-main()
+await main()

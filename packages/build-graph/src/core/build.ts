@@ -70,7 +70,7 @@ export const buildGraphSnapshot = (
   >()
 
   const graph = Graph.directed<GraphSnapshotNode, GraphSnapshotEdge>((mutable) => {
-    for (const note of [...notes].sort(compareByRelativePath)) {
+    for (const note of [...notes].toSorted(compareByRelativePath)) {
       const nodeIndex = Graph.addNode(mutable, {
         id: note.nodeId,
         kind: "note",
@@ -179,8 +179,8 @@ export const buildGraphSnapshot = (
   })
 
   return normalizeGraphSnapshot({
-    nodes: [...graph.nodes.values()],
-    edges: [...graph.edges.values()].map((edge) => edge.data),
+    nodes: [...Graph.values(Graph.nodes(graph))],
+    edges: [...Graph.values(Graph.edges(graph))].map((edge) => edge.data),
     diagnostics,
   })
 }

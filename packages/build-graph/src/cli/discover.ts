@@ -1,4 +1,4 @@
-import { Effect, FileSystem, Path } from "effect"
+import { Effect, FileSystem, Path, type PlatformError } from "effect"
 import { compareByRelativePath, compareStrings } from "../core/helpers"
 
 export type DiscoveredMarkdownFile = {
@@ -31,7 +31,7 @@ const collectMarkdownFiles = (
   directory: string,
   visitedDirectories: Set<string>,
   discoveredAbsolutePaths: Set<string>,
-): Effect.Effect<Array<DiscoveredMarkdownFile>, unknown> =>
+): Effect.Effect<Array<DiscoveredMarkdownFile>, PlatformError.PlatformError> =>
   Effect.gen(function* () {
     const resolvedDirectory = normalizeAbsolutePath(path, yield* fs.realPath(directory))
     if (
@@ -44,7 +44,7 @@ const collectMarkdownFiles = (
     visitedDirectories.add(resolvedDirectory)
 
     const entries = yield* fs.readDirectory(resolvedDirectory)
-    const sortedEntries = [...entries].sort(compareStrings)
+    const sortedEntries = [...entries].toSorted(compareStrings)
     const discoveredFiles: Array<DiscoveredMarkdownFile> = []
 
     for (const entry of sortedEntries) {
@@ -99,5 +99,5 @@ export const discoverMarkdownFiles = (rootDirectory: string) =>
       new Set<string>(),
     )
 
-    return [...discoveredFiles].sort(compareByRelativePath)
+    return [...discoveredFiles].toSorted(compareByRelativePath)
   })

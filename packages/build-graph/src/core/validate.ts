@@ -1,4 +1,4 @@
-import { Effect, Option, Result, Schema } from "effect"
+import { Effect, Option, Predicate, Result, Schema } from "effect"
 import matter from "gray-matter"
 import {
   type BuildGraphOptions,
@@ -55,29 +55,29 @@ type FrontmatterParseOutcome =
       readonly validatedFile: ValidatedMarkdownFile
     }
 
-export class BuildGraphFrontmatterValidationError extends Schema.TaggedErrorClass<BuildGraphFrontmatterValidationError>()(
-  "BuildGraphFrontmatterValidationError",
-  {
-    message: Schema.String,
-    diagnostics: Schema.Array(FrontmatterValidationDiagnosticSchema),
-  },
-) {}
+export class BuildGraphFrontmatterValidationError extends Schema.TaggedError<
+  BuildGraphFrontmatterValidationError,
+  { readonly brand: unique symbol }
+>()("BuildGraphFrontmatterValidationError", {
+  message: Schema.String,
+  diagnostics: Schema.Array(FrontmatterValidationDiagnosticSchema),
+}) {}
 
-export class BuildGraphDuplicatePermalinkError extends Schema.TaggedErrorClass<BuildGraphDuplicatePermalinkError>()(
-  "BuildGraphDuplicatePermalinkError",
-  {
-    message: Schema.String,
-    diagnostics: Schema.Array(DuplicatePermalinkDiagnosticSchema),
-  },
-) {}
+export class BuildGraphDuplicatePermalinkError extends Schema.TaggedError<
+  BuildGraphDuplicatePermalinkError,
+  { readonly brand: unique symbol }
+>()("BuildGraphDuplicatePermalinkError", {
+  message: Schema.String,
+  diagnostics: Schema.Array(DuplicatePermalinkDiagnosticSchema),
+}) {}
 
-export class BuildGraphInvalidCanonicalPermalinkError extends Schema.TaggedErrorClass<BuildGraphInvalidCanonicalPermalinkError>()(
-  "BuildGraphInvalidCanonicalPermalinkError",
-  {
-    message: Schema.String,
-    diagnostics: Schema.Array(FrontmatterValidationDiagnosticSchema),
-  },
-) {}
+export class BuildGraphInvalidCanonicalPermalinkError extends Schema.TaggedError<
+  BuildGraphInvalidCanonicalPermalinkError,
+  { readonly brand: unique symbol }
+>()("BuildGraphInvalidCanonicalPermalinkError", {
+  message: Schema.String,
+  diagnostics: Schema.Array(FrontmatterValidationDiagnosticSchema),
+}) {}
 
 const decodeRawFrontmatter = Schema.decodeUnknownSync(RawNoteFrontmatterSchema)
 const decodeNoteFrontmatter = Schema.decodeUnknownSync(NoteFrontmatterSchema)
@@ -157,17 +157,16 @@ const normalizeDateValue = (value: unknown, literal: string | undefined): unknow
 }
 
 const normalizeDateFields = (frontmatter: unknown, rawFrontmatter?: string): unknown => {
-  if (frontmatter === null || typeof frontmatter !== "object" || Array.isArray(frontmatter)) {
+  if (!Predicate.isObject(frontmatter)) {
     return frontmatter
   }
 
   const createdLiteral = extractFrontmatterDateLiteral(rawFrontmatter, "created")
   const updatedLiteral = extractFrontmatterDateLiteral(rawFrontmatter, "updated")
-  const value = frontmatter as Record<string, unknown>
   return {
-    ...value,
-    created: normalizeDateValue(value.created, createdLiteral),
-    updated: normalizeDateValue(value.updated, updatedLiteral),
+    ...frontmatter,
+    created: normalizeDateValue(frontmatter.created, createdLiteral),
+    updated: normalizeDateValue(frontmatter.updated, updatedLiteral),
   }
 }
 
@@ -205,9 +204,9 @@ const collectDuplicatePermalinkDiagnostics = (
     .filter(([, relativePaths]) => relativePaths.length > 1)
     .map(([permalink, relativePaths]) => ({
       permalink,
-      relativePaths: [...relativePaths].sort(compareStrings),
+      relativePaths: [...relativePaths].toSorted(compareStrings),
     }))
-    .sort((left, right) => compareStrings(left.permalink, right.permalink))
+    .toSorted((left, right) => compareStrings(left.permalink, right.permalink))
 }
 
 const formatDuplicatePermalinkDiagnostics = (
@@ -321,8 +320,7 @@ const validateMarkdownSource = Effect.fn("buildGraph.validateMarkdownSource")(fu
       : (frontmatter.permalink
           .replace(/^\/+|\/+$/g, "")
           .split("/")
-          .filter(Boolean)
-          .pop() ?? frontmatter.permalink)
+          .findLast(Boolean) ?? frontmatter.permalink)
   const routePath =
     options.identityStrategy === "canonical-route"
       ? joinRoutePath(options.routePrefix, slug)

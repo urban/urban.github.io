@@ -444,6 +444,18 @@ describe("resolveGraphThemeSetFromHtmlConfig", () => {
     })
   })
 
+  test.each(["1e309", "-1e309"])("rejects a non-finite theme value %s", (value) => {
+    const lightThemeJson = JSON.stringify(LIGHT_GRAPH_THEME).replace(
+      /"backgroundColor":\d+/,
+      `"backgroundColor":${value}`,
+    )
+
+    expect(lightThemeJson).toContain(`"backgroundColor":${value}`)
+    expect(() =>
+      resolveGraphThemeSetFromHtmlConfig({ lightThemeJson, darkThemeJson: null }),
+    ).toThrow("Invalid light graph theme JSON")
+  })
+
   test("throws when a configured theme is invalid", () => {
     expect(() =>
       resolveGraphThemeSetFromHtmlConfig({
@@ -465,7 +477,7 @@ describe("resolveGraphThemeSetFromHtmlConfig", () => {
     } catch (error: unknown) {
       expect(error).toBeInstanceOf(GraphThemeDecodeError)
       if (!(error instanceof GraphThemeDecodeError)) {
-        throw new Error("expected GraphThemeDecodeError")
+        throw new Error("expected GraphThemeDecodeError", { cause: error })
       }
       expect(error.themeName).toBe("light")
     }
@@ -546,7 +558,7 @@ describe("reduceGraphState", () => {
 
     expect(next.selection.type).toBe("selected")
     if (next.selection.type !== "selected") throw new Error("expected selected state")
-    expect([...next.selection.unmutedNodeIds].sort()).toEqual(["a", "b", "c"])
+    expect([...next.selection.unmutedNodeIds].toSorted()).toEqual(["a", "b", "c"])
     const nodeVisualById = new Map(next.renderModel.nodes.map((node) => [node.id, node.visual]))
     expect(nodeVisualById.get("b")).toBe("selected")
     expect(nodeVisualById.has("d")).toBeFalse()

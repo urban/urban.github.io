@@ -36,13 +36,13 @@ export type AmbiguousWikilinkResolutionDiagnostic = Schema.Schema.Type<
   typeof AmbiguousWikilinkResolutionDiagnosticSchema
 >
 
-export class BuildGraphAmbiguousWikilinkResolutionError extends Schema.TaggedErrorClass<BuildGraphAmbiguousWikilinkResolutionError>()(
-  "BuildGraphAmbiguousWikilinkResolutionError",
-  {
-    message: Schema.String,
-    diagnostics: Schema.Array(AmbiguousWikilinkResolutionDiagnosticSchema),
-  },
-) {}
+export class BuildGraphAmbiguousWikilinkResolutionError extends Schema.TaggedError<
+  BuildGraphAmbiguousWikilinkResolutionError,
+  { readonly brand: unique symbol }
+>()("BuildGraphAmbiguousWikilinkResolutionError", {
+  message: Schema.String,
+  diagnostics: Schema.Array(AmbiguousWikilinkResolutionDiagnosticSchema),
+}) {}
 
 export type ParsedWikilinkWithSource = ParsedWikilink & {
   readonly sourceRelativePath: string
@@ -81,14 +81,14 @@ const sortCandidateMap = (
   new Map(
     [...index.entries()].map(([key, candidates]) => [
       key,
-      [...candidates].sort(compareByRelativePath),
+      [...candidates].toSorted(compareByRelativePath),
     ]),
   )
 
 export const buildWikilinkResolverIndex = (
   notes: ReadonlyArray<ValidatedMarkdownFile>,
 ): WikilinkResolverIndex => {
-  const sortedNotes = [...notes].sort(compareByRelativePath)
+  const sortedNotes = [...notes].toSorted(compareByRelativePath)
   const byPath = new Map<string, Array<ValidatedMarkdownFile>>()
   const byFilename = new Map<string, Array<ValidatedMarkdownFile>>()
   const byAlias = new Map<string, Array<ValidatedMarkdownFile>>()

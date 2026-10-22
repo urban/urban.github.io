@@ -1,19 +1,20 @@
-{
-  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "import", "oxc", "eslint", "unicorn", "node"],
-  "categories": {
-    "correctness": "error",
-    "suspicious": "error",
-    "perf": "error"
+import { defineConfig } from "oxlint"
+
+export default defineConfig({
+  plugins: ["typescript", "import", "oxc", "eslint", "unicorn", "node"],
+  categories: {
+    correctness: "error",
+    suspicious: "error",
+    perf: "error",
   },
-  "rules": {
+  rules: {
     // Tune native rules
     // Import rules
     "typescript/consistent-type-imports": [
       "error",
       {
-        "fixStyle": "inline-type-imports"
-      }
+        fixStyle: "inline-type-imports",
+      },
     ],
     "typescript/no-import-type-side-effects": "error",
     "import/no-duplicates": "error",
@@ -24,6 +25,8 @@
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unnecessary-type-constraint": "error",
     "typescript/no-useless-empty-export": "error",
+    // Effect uses _tag as its discriminant across errors and domain values.
+    "eslint/no-underscore-dangle": ["error", { allow: ["_tag"] }],
     // Code quality
     "eslint/no-console": "error",
     "eslint/no-var": "error",
@@ -38,9 +41,9 @@
     "typescript/no-unused-vars": [
       "error",
       {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_"
-      }
-    ]
-  }
-}
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+      },
+    ],
+  },
+})

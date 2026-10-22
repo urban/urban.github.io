@@ -24,7 +24,7 @@ export const getGardenEntry = (slug: string) =>
 
 export const getGardenStaticParams = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const entries: ReadonlyArray<NoteEntry> = yield* content.getPublishedNotes()
+  const entries: ReadonlyArray<NoteEntry> = yield* content.getPublishedNotes
   return entries.filter((entry) => entry.slug !== "index").map((entry) => ({ slug: entry.slug }))
 })
 

@@ -1,4 +1,4 @@
-import { Essay, Project } from "../lib/schemas"
+import type { Essay, Project } from "../lib/schemas"
 import NextLink from "next/link"
 import { ArrowCardIcon } from "./ArrowCardIcon"
 

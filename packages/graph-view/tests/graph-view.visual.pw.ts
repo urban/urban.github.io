@@ -24,6 +24,12 @@ type GraphHarness = {
   getSelectionChanges: () => ReadonlyArray<SelectionChange>
 }
 
+declare global {
+  interface Window {
+    __graphViewHarness?: GraphHarness
+  }
+}
+
 async function gotoHarness(page: Page, harnessPath = "/playwright-harness.html") {
   await page.goto(harnessPath)
   await page.waitForFunction(() => "__graphViewHarness" in window)
@@ -32,43 +38,49 @@ async function gotoHarness(page: Page, harnessPath = "/playwright-harness.html")
 
 async function settleLayout(page: Page, tickCount = 400) {
   await page.evaluate(async (nextTickCount: number) => {
-    const graphWindow = window as typeof window & { __graphViewHarness: GraphHarness }
-    await graphWindow.__graphViewHarness.settleLayout(nextTickCount)
+    const harness = window["__graphViewHarness"]
+    if (harness === undefined) throw new Error("Graph harness is not ready")
+    await harness.settleLayout(nextTickCount)
   }, tickCount)
 }
 
 async function setTheme(page: Page, theme: HarnessTheme) {
   await page.evaluate(async (nextTheme: HarnessTheme) => {
-    const graphWindow = window as typeof window & { __graphViewHarness: GraphHarness }
-    await graphWindow.__graphViewHarness.setTheme(nextTheme)
+    const harness = window["__graphViewHarness"]
+    if (harness === undefined) throw new Error("Graph harness is not ready")
+    await harness.setTheme(nextTheme)
   }, theme)
 }
 
 async function hoverNode(page: Page, nodeId: string | null) {
   await page.evaluate(async (nextNodeId: string | null) => {
-    const graphWindow = window as typeof window & { __graphViewHarness: GraphHarness }
-    await graphWindow.__graphViewHarness.hoverNode(nextNodeId)
+    const harness = window["__graphViewHarness"]
+    if (harness === undefined) throw new Error("Graph harness is not ready")
+    await harness.hoverNode(nextNodeId)
   }, nodeId)
 }
 
 async function selectNode(page: Page, nodeId: string) {
   await page.evaluate(async (nextNodeId: string) => {
-    const graphWindow = window as typeof window & { __graphViewHarness: GraphHarness }
-    await graphWindow.__graphViewHarness.selectNode(nextNodeId)
+    const harness = window["__graphViewHarness"]
+    if (harness === undefined) throw new Error("Graph harness is not ready")
+    await harness.selectNode(nextNodeId)
   }, nodeId)
 }
 
 async function clearSelectionChanges(page: Page) {
   await page.evaluate(() => {
-    const graphWindow = window as typeof window & { __graphViewHarness: GraphHarness }
-    graphWindow.__graphViewHarness.clearSelectionChanges()
+    const harness = window["__graphViewHarness"]
+    if (harness === undefined) throw new Error("Graph harness is not ready")
+    harness.clearSelectionChanges()
   })
 }
 
 async function getSelectionChanges(page: Page) {
   return page.evaluate(() => {
-    const graphWindow = window as typeof window & { __graphViewHarness: GraphHarness }
-    return graphWindow.__graphViewHarness.getSelectionChanges()
+    const harness = window["__graphViewHarness"]
+    if (harness === undefined) throw new Error("Graph harness is not ready")
+    return harness.getSelectionChanges()
   })
 }
 

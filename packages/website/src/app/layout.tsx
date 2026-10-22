@@ -5,6 +5,7 @@ import { Inter } from "next/font/google"
 import Script from "next/script"
 import pkg from "../../package.json"
 import { cn } from "@/lib/utils"
+// oxlint-disable-next-line import/no-unassigned-import -- Next.js loads global styles for their CSS side effects.
 import "@/styles/globals.css"
 import { Footer } from "@/ui/Footer"
 import { Header } from "@/ui/Header"
@@ -21,8 +22,10 @@ const inter = Inter({
 //   variable: "--font-lora",
 // })
 
+const SITE_NAME = "Urban Faubion"
+
 export const metadata: Metadata = {
-  title: "Urban Faubion",
+  title: SITE_NAME,
   description: "Urban Faubion's personal website",
 }
 
@@ -59,9 +62,9 @@ export default function RootLayout({
         <Script src="/preload-color-scheme.js" />
       </head>
       <body>
-        <Header siteName={String(metadata.title)} />
+        <Header siteName={SITE_NAME} />
         <main>{children}</main>
-        <Footer siteName={String(metadata.title)} />
+        <Footer siteName={SITE_NAME} />
         <Analytics />
       </body>
     </html>

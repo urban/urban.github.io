@@ -24,19 +24,18 @@ const program = Effect.gen(function* () {
     catch: (error) => new GlobError({ error }),
   }).pipe(Effect.tapError((error) => Console.log(error)))
 
-  yield* Effect.all(
-    filepaths.map((fromPath) =>
-      Effect.gen(function* () {
-        const toPath = path.join(assetDir, path.relative(contentDir, fromPath))
-        yield* fs.makeDirectory(path.dirname(toPath), { recursive: true })
-        yield* fs.copyFile(fromPath, toPath)
-      }),
-    ),
+  yield* Effect.forEach(filepaths, (fromPath) =>
+    Effect.gen(function* () {
+      const toPath = path.join(assetDir, path.relative(contentDir, fromPath))
+      yield* fs.makeDirectory(path.dirname(toPath), { recursive: true })
+      yield* fs.copyFile(fromPath, toPath)
+    }),
   )
 })
 
 await program.pipe(
   Effect.tapError(Effect.logError),
+  // oxlint-disable-next-line effecttsgo/strict-effect-provide -- This script is the application entry point.
   Effect.provide(Layer.mergeAll(NodeServices.layer, WebsiteConfig.layer)),
   Effect.runPromise,
 )

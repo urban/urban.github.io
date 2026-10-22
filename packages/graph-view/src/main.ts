@@ -89,15 +89,15 @@ if (isBrowserRuntime) {
               documentObject: document,
               error,
             })
-            console.error(toGraphVisualizerBootstrapUserMessage(error))
+            Effect.runSync(Effect.logError(toGraphVisualizerBootstrapUserMessage(error)))
             return
           }
 
-          console.error(error)
+          Effect.runSync(Effect.logError(error))
         }
       },
     )
     .catch((error: unknown) => {
-      console.error(error)
+      Effect.runSync(Effect.logError(error))
     })
 }

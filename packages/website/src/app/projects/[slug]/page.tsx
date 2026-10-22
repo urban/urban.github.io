@@ -1,5 +1,6 @@
-import { Array, Effect } from "effect"
+import { Array, Effect, Option } from "effect"
 import type { Metadata, ResolvingMetadata } from "next"
+import { notFound } from "next/navigation"
 import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
 import type { ContentService } from "@/lib/services/Content"
@@ -13,8 +14,8 @@ import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
 const main = (pathSlug: string) =>
   Effect.gen(function* () {
     const content: ContentService = yield* Content
-    const projects = yield* content.getProjects()
-    return yield* Array.findFirst(projects, ({ slug }) => slug === pathSlug)
+    const projects = yield* content.getProjects
+    return Option.getOrUndefined(Array.findFirst(projects, ({ slug }) => slug === pathSlug))
   })
 
 const mainAll = Effect.gen(function* () {
@@ -38,7 +39,7 @@ export async function generateMetadata(
   _parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { slug } = await params
-  const project = await RuntimeServer.runPromise(main(slug))
+  const project = (await RuntimeServer.runPromise(main(slug))) ?? notFound()
 
   return {
     title: project.data.title,
@@ -48,7 +49,7 @@ export async function generateMetadata(
 
 export default async function Page({ params }: PageProps) {
   const { slug } = await params
-  const project = await RuntimeServer.runPromise(main(slug))
+  const project = (await RuntimeServer.runPromise(main(slug))) ?? notFound()
 
   return (
     <>

@@ -10,7 +10,7 @@ import { WorkList } from "@/ui/WorkList"
 
 const main = Effect.gen(function* () {
   const content: ContentService = yield* Content
-  const work = yield* content.getWork()
+  const work = yield* content.getWork
   const groupedWork = pipe(
     work,
     Array.groupBy((x) => x.data.company),

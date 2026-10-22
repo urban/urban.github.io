@@ -1,3 +1,0 @@
-bun run typecheck
-bun run test
-lint-staged

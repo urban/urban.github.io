@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js"
+import type * as PIXI from "pixi.js"
 import {
   GRAPH_CONFIG,
   POINTER_DOWN_EVENT,

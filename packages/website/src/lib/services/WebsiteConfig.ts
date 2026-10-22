@@ -1,6 +1,6 @@
-import { ServiceMap, Layer } from "effect"
+import { Context, Layer } from "effect"
 
-export class WebsiteConfig extends ServiceMap.Service<
+export class WebsiteConfig extends Context.Service<
   WebsiteConfig,
   {
     readonly assetDir: string

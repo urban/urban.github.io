@@ -1,4 +1,4 @@
-import { Layer, ServiceMap } from "effect"
+import { Layer, Context } from "effect"
 import { visit } from "unist-util-visit"
 import type { VFile } from "vfile"
 
@@ -30,12 +30,12 @@ const paragraphTextFromNode = (node: MarkdownNode): string => {
   }
 }
 
-export class DescriptionExcerptPlugin extends ServiceMap.Service<
+export class DescriptionExcerptPlugin extends Context.Service<
   DescriptionExcerptPlugin,
   () => (tree: MarkdownRoot, file: VFile) => void
 >()("DescriptionExcerptPlugin") {
   static readonly layer = Layer.sync(DescriptionExcerptPlugin, () => {
-    const program = () => (tree: MarkdownRoot, file: VFile) => {
+    return DescriptionExcerptPlugin.of(() => (tree: MarkdownRoot, file: VFile) => {
       let excerpt: string | undefined
 
       visit(tree, "paragraph", (node: MarkdownNode) => {
@@ -49,8 +49,6 @@ export class DescriptionExcerptPlugin extends ServiceMap.Service<
           file.data.descriptionExcerpt = excerpt
         }
       })
-    }
-
-    return DescriptionExcerptPlugin.of(program)
+    })
   })
 }

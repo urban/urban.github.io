@@ -247,5 +247,9 @@ export function reduceAppStateWithCommands(
     }
     case "pointer/release":
       return reduceRelease(state, context)
+    default: {
+      const unreachable: never = action
+      return unreachable
+    }
   }
 }
