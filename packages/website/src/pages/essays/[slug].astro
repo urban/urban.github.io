@@ -19,6 +19,6 @@ const ContentComponent = essay.Content
 ---
 <SiteLayout title={essay.data.title} description={essay.data.description}><Container>
   <BackToPrev href="/essays/">Back to essays</BackToPrev>
-  <header className="my-10"><h1 className="text-2xl font-semibold">{essay.data.title}</h1><div className="flex items-center gap-1.5 text-sm"><FormattedDate date={essay.data.createdAt} /><span>•</span>{readingTime(essay.source)}</div></header>
+  <header class="my-10"><h1 class="text-2xl font-semibold">{essay.data.title}</h1><div class="flex items-center gap-1.5 text-sm"><FormattedDate date={essay.data.createdAt} /><span>•</span>{readingTime(essay.source)}</div></header>
   <article><ContentComponent /></article>
 </Container></SiteLayout>

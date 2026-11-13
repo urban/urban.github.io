@@ -2,14 +2,16 @@ import type { Essay, Project } from "../lib/schemas"
 import { ArrowCardIcon } from "./ArrowCardIcon"
 
 type Props = {
-  collection: "essays" | "projects"
+  href: string
+  isExternal?: boolean
   metadata: typeof Essay.Type | typeof Project.Type
-  slug: string
 }
 
-const ArrowCard = ({ collection, metadata, slug }: Props) => (
+const ArrowCard = ({ metadata, isExternal, href }: Props) => (
   <a
-    href={`/${collection}/${slug}/`}
+    href={href}
+    target={isExternal ? "_blank" : undefined}
+    rel={isExternal ? 'noopener noreferrer' : undefined}
     className="relative group flex flex-nowrap py-3 px-4 pr-10 rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
   >
     <div className="flex flex-col flex-1 truncate">

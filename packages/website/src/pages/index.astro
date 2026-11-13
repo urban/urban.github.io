@@ -2,6 +2,7 @@
 import SiteLayout from "@/layouts/SiteLayout.astro"
 import { Container } from "@/ui/Container"
 import { PageTitle } from "@/ui/PageTitle"
+import { Link } from "@/ui/NavLink"
 import { SITE, SOCIALS } from "@/lib/consts"
 import { EnvelopeSimpleIcon, GithubLogoIcon, LinkedinLogoIcon, XLogoIcon } from "@phosphor-icons/react/dist/ssr"
 ---
@@ -9,16 +10,18 @@ import { EnvelopeSimpleIcon, GithubLogoIcon, LinkedinLogoIcon, XLogoIcon } from 
   <Container>
     <PageTitle>Hello,</PageTitle>
     <div>
-      <section className="mb-8 border-b border-gray-300 dark:border-gray-500"><article className="py-4">
-        <p className="animate"><b>I’m Urban.</b> I build software, design systems, and tools that make developers’ lives easier.</p>
-        <p className="animate">I’ve spent my career connecting design and engineering, building platforms, and leading teams. These days, I’m exploring how AI can improve the way we build software.</p>
+      <section class="mb-8 border-b border-gray-300 dark:border-gray-500"><article class="py-4">
+        <p class="animate"><b>I’m Urban.</b> I build software, design systems, and tools that make developers’ lives easier.</p>
+        <p class="animate">I’ve spent my career connecting design and engineering, building platforms, and leading teams. These days, I’m exploring how AI can improve the way we build software.</p>
       </article></section>
-      <section className="animate py-4">
-        <h2 className="font-semibold text-black dark:text-white">Let’s Connect</h2>
-        <p>If you want to get in touch with me about something or just to say hi, reach out on social media or send me an email.</p>
-        <ul className="flex flex-wrap gap-2">
-          {SOCIALS.map((social) => <li className="flex gap-x-2 text-nowrap items-center"><a href={social.href} aria-label={`${SITE.name} on ${social.name}`}>{social.name === "github" ? <GithubLogoIcon size={21} /> : social.name === "linkedin" ? <LinkedinLogoIcon size={21} /> : <XLogoIcon size={21} />}</a>/</li>)}
-          <li><a href={`mailto:${SITE.email}`} aria-label={`Email ${SITE.name}`}><EnvelopeSimpleIcon size={21} /></a></li>
+      <section class="animate">
+        <h2 class="font-semibold text-black dark:text-white">Let’s Connect</h2>
+        <article>
+          <p>If you want to get in touch with me about something or just to say hi, reach out on social media or send me an email.</p>
+        </article>
+        <ul class="flex flex-wrap gap-2">
+          {SOCIALS.map((social) => <li class="flex gap-x-2 text-nowrap items-center"><Link href={social.href} aria-label={`${SITE.name} on ${social.name}`}>{social.name === "github" ? <GithubLogoIcon size={21} /> : social.name === "linkedin" ? <LinkedinLogoIcon size={21} /> : <XLogoIcon size={21} />}</Link>/</li>)}
+          <li class="flex gap-x-2 text-nowrap items-center"><Link href={`mailto:${SITE.email}`} aria-label={`Email ${SITE.name}`}><EnvelopeSimpleIcon size={21} /></Link></li>
         </ul>
       </section>
     </div>

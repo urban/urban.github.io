@@ -36,7 +36,7 @@ export const Project = Schema.Struct({
   createdAt: DateTimeFromFrontmatter,
   updatedAt: DateTimeFromFrontmatter,
   demoURL: Schema.optional(Schema.String),
-  repoURL: Schema.optional(Schema.String),
+  repoURL: Schema.String,
   published: Schema.optional(Schema.Boolean),
 })
 

@@ -14,11 +14,11 @@ const work = await RuntimeServer.runPromise(Effect.gen(function* () {
 }))
 ---
 <SiteLayout title="About"><Container><PageTitle>Urban<br />Faubion</PageTitle>
-  <section className="border-b border-gray-300 dark:border-gray-500 py-4">
+  <section class="border-b border-gray-300 dark:border-gray-500 py-4">
     <p>Hello, my name is Urban. I am a Software Engineer and Engineering Manager with deep experience owning and evolving platforms, design systems, and shared infrastructure that helps product teams move faster while delivering higher-quality products at scale.</p>
     <p>I’ve led platform modernization efforts, shaped frontend architecture, established quality and accessibility standards, and built shared foundations that help teams move faster with more confidence.</p>
     <p>I’ve worked as both an IC and an engineering manager, with a focus on technical leadership, systems thinking, and cross-functional collaboration.</p>
   </section>
-  <section className="py-6"><h2 className="font-semibold">Work Experience</h2><WorkList work={work} /></section>
-  <section className="py-4"><h2 className="font-semibold">Let’s Connect</h2>{SOCIALS.map((social) => <a className="mr-3" href={social.href}>{social.name}</a>)}<a href={`mailto:${SITE.email}`}>Email</a></section>
+  <section class="py-6"><h2 class="font-semibold">Work Experience</h2><WorkList work={work} /></section>
+  <section class="py-4"><h2 class="font-semibold">Let’s Connect</h2>{SOCIALS.map((social) => <a class="mr-3" href={social.href}>{social.name}</a>)}<a href={`mailto:${SITE.email}`}>Email</a></section>
 </Container></SiteLayout>

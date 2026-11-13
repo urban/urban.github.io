@@ -12,4 +12,4 @@ if (!entry) throw new Error("Published garden index is missing")
 const [{ snapshot }, selectedNodeId] = await Promise.all([getGraphModel(), getSelectedNodeId(entry.slug)])
 const ContentComponent = entry.Content
 ---
-<SiteLayout title={entry.data.title} description={entry.data.description}><Container><div className="my-10 flex flex-col gap-10"><article><h1 className="my-2 text-2xl font-semibold">{entry.data.title}</h1><ContentComponent /></article><GraphHost snapshot={snapshot} selectedNodeId={selectedNodeId} client:load /></div></Container></SiteLayout>
+<SiteLayout title={entry.data.title} description={entry.data.description}><Container><div class="my-10 flex flex-col gap-10"><article><h1 class="my-2 text-2xl font-semibold">{entry.data.title}</h1><ContentComponent /></article><GraphHost snapshot={snapshot} selectedNodeId={selectedNodeId} client:load /></div></Container></SiteLayout>

@@ -28,9 +28,9 @@ const ContentComponent = project.Content
 <SiteLayout title={project.data.title} description={project.data.description}>
   <Container>
     <div><BackToPrev href="/projects/">Back to projects</BackToPrev></div>
-    <div className="my-10"><h1 className="text-2xl font-semibold">{project.data.title}</h1>
-      <div className="flex items-center gap-1.5 text-sm"><FormattedDate date={project.data.createdAt} /><span>•</span>{readingTime(project.source)}</div>
-      {(project.data.demoURL || project.data.repoURL) && <nav className="flex gap-1">{project.data.demoURL && <Link href={project.data.demoURL}>demo</Link>}{project.data.demoURL && project.data.repoURL && <span>/</span>}{project.data.repoURL && <Link href={project.data.repoURL}>repo</Link>}</nav>}
+    <div class="my-10"><h1 class="text-2xl font-semibold">{project.data.title}</h1>
+      <div class="flex items-center gap-1.5 text-sm"><FormattedDate date={project.data.createdAt} /><span>•</span>{readingTime(project.source)}</div>
+      {(project.data.demoURL || project.data.repoURL) && <nav class="flex gap-1">{project.data.demoURL && <Link href={project.data.demoURL}>demo</Link>}{project.data.demoURL && project.data.repoURL && <span>/</span>}{project.data.repoURL && <Link href={project.data.repoURL}>repo</Link>}</nav>}
     </div><article><ContentComponent /></article>
   </Container>
 </SiteLayout>

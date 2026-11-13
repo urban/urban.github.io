@@ -21,7 +21,7 @@ const ContentComponent = entry.Content
 ---
 <SiteLayout title={entry.data.title} description={entry.data.description}><Container>
   <a href="/garden/">Back to The Garden</a>
-  <div className="my-10 flex flex-col gap-10"><div className="max-w-3xl"><h1 className="mb-8 text-2xl font-semibold">{entry.data.title}</h1><article><ContentComponent /></article></div>
+  <div class="my-10 flex flex-col gap-10"><div class="max-w-3xl"><h1 class="mb-8 text-2xl font-semibold">{entry.data.title}</h1><article><ContentComponent /></article></div>
     <GraphHost snapshot={snapshot} selectedNodeId={selectedNodeId} scrollZoomEnabled={false} client:load />
     <section><Backlinks backlinks={backlinks} /></section>
   </div>
