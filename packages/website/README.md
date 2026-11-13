@@ -1,21 +1,23 @@
-## Getting Started
+## Getting started
 
-First, run the development server:
+Run the development server from this package:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Or run it from the monorepo root:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm --filter @apps/personal-website dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Open [http://localhost:3000](http://localhost:3000) to view the site. Edit files in `src/app` to make changes.
 
-## Dependencies
+## Tech stack
 
-- [NextJS](https://nextjs.org/): [React](https://react.dev/) framework for static site generation.
-- [Effect](https://effect.website/): Library for synchronous, and asynchronous data processing (articles).
-- [MDX](https://mdxjs.com/): Markup language for formatting content.
-- [Shikiji](https://shikiji.netlify.app/): Code syntax highlighter.
-- [rehype plugins](https://github.com/rehypejs/rehype/blob/main/doc/plugins.md): HTML transforms for processing MDX.
+- [Next.js](https://nextjs.org/) 16 and [React](https://react.dev/) 19 for the website.
+- [TypeScript](https://www.typescriptlang.org/) for type-safe application code.
+- [Tailwind CSS](https://tailwindcss.com/) 4 for styling.
+- [MDX](https://mdxjs.com/) for content, compiled with [Shiki](https://shiki.style/) for code highlighting and rehype plugins for HTML transforms.
+- [Effect](https://effect.website/) for content processing and application services.
