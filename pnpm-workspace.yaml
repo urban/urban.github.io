@@ -4,6 +4,6 @@ packages:
   - packages/*
 
 catalog:
-  "@effect/platform-node": 4.0.5
-  effect: 4.0.5
+  "@effect/platform-node": 4.1.4
+  effect: 4.1.4
   typescript: ^7.0.2

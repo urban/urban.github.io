@@ -16,7 +16,7 @@
     "./oxlint.config.ts": "./oxlint.config.ts"
   },
   "peerDependencies": {
-    "oxlint": "1.89.0"
+    "oxlint": "1.93.0"
   },
   "tags": [
     "linting",
