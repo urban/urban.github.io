@@ -82,8 +82,8 @@ So this is not just a brochure site — it has a small internal knowledge graph 
 
 Main stack:
 
-- Bun for package management / scripts
-- Turbo for monorepo orchestration
+- PNPM for package management and workspace task orchestration
+- Bun for TypeScript scripts and tests
 - Next.js app router
 - React 19
 - Effect for typed services/effects/schemas

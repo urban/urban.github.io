@@ -9,8 +9,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "test": "bun test src && bunx playwright test",
-    "test:visual": "bunx playwright test",
+    "test": "bun test src && pnpm exec playwright test",
+    "test:visual": "pnpm exec playwright test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

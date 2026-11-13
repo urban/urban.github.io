@@ -17,7 +17,7 @@
         default = pkgs.mkShell {
           packages = with pkgs; [
             bun
-            corepack
+            pnpm
             nodejs_24
             git
           ];
@@ -29,6 +29,7 @@
 
             echo "Node: $(node --version)"
             echo "Bun: $(bun --version)"
+            echo "PNPM: $(pnpm --version)"
             echo "Git: $(git --version)"
             echo ""
           '';

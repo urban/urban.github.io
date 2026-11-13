@@ -5,7 +5,7 @@ import * as Fs from "node:fs"
 
 const directory = Path.dirname(fileURLToPath(import.meta.url))
 const workspaceRoot = Path.resolve(directory, "..")
-const filesToClean = [".next", ".turbo", ".tsbuildinfo", "out", "coverage"]
+const filesToClean = [".next", ".tsbuildinfo", "out", "coverage"]
 
 async function main() {
   const glob = new Glob("packages/*")

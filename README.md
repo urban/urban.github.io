@@ -1,3 +1,8 @@
+## Writing content
+
+See the [content authoring guide](docs/content-authoring-guide.md) for content
+classification, writing templates, and current publishing instructions.
+
 ## Prerequisites and Setup
 
 ### Using Nix
@@ -35,9 +40,9 @@ nix develop --command "$SHELL"
 
 ## Development
 
-Run `bun install` to install dependencies. The `postinstall` script patches
+Run `pnpm install` to install dependencies. The `postinstall` script patches
 TypeScript, Oxlint, and `oxlint-tsgolint` with `@effect/tsgo`. There is no `prepare`
-script or Git hook. If install scripts are disabled, run `bun run postinstall`
+script or Git hook. If install scripts are disabled, run `pnpm run postinstall`
 manually before using the compiler, editor, or linter.
 
 Keep `@effect/tsgo`, TypeScript, Oxlint, and `oxlint-tsgolint` on versions supported
@@ -46,8 +51,8 @@ The patch command validates compatibility.
 
 `oxlint.config.ts` extends the shared TypeScript config and Effect recommended
 preset, with type-aware linting enabled for both CLI and editor use. Run
-`bun run check` for full validation, or `bun run lint` for formatting and linting.
-Linting reports issues without applying code fixes; use `bunx oxlint --fix`
+`pnpm run check` for full validation, or `pnpm run lint` for formatting and linting.
+Linting reports issues without applying code fixes; use `pnpm exec oxlint --fix`
 explicitly when wanted.
 
 In VS Code, install the recommended TypeScript 7 and Oxc extensions and select the

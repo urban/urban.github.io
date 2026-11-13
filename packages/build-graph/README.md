@@ -16,28 +16,28 @@ Build a deterministic `graph-snapshot.json` from a directory of Markdown notes t
 Show help:
 
 ```bash
-bun run --cwd packages/build-graph cli -- --help
+pnpm --filter @urban/build-graph run cli -- --help
 ```
 
 Run from the monorepo root:
 
 ```bash
-bun run --cwd packages/build-graph cli -- <from> <to>
+pnpm --filter @urban/build-graph run cli -- <from> <to>
 ```
 
 Example:
 
 ```bash
-bun run --cwd packages/build-graph cli -- ./notes ./packages/graph-view/public
+pnpm --filter @urban/build-graph run cli -- ./notes ./packages/graph-view/public
 ```
 
 - `<from>`: existing directory containing Markdown notes.
 - `<to>`: destination directory for `graph-snapshot.json` (created if missing).
 
-If using Bun workspaces, this also works:
+The CLI uses Bun as its runtime and can also be run directly:
 
 ```bash
-bun --filter @urban/build-graph run cli -- <from> <to>
+bun ./packages/build-graph/src/cli/main.ts <from> <to>
 ```
 
 ## Markdown Frontmatter Contract
@@ -260,11 +260,11 @@ The output is normalized and sorted, so unchanged input produces byte-identical 
 Run package tests:
 
 ```bash
-bun run --cwd packages/build-graph test
+pnpm --filter @urban/build-graph run test
 ```
 
 Run typecheck:
 
 ```bash
-bun run --cwd packages/build-graph typecheck
+pnpm --filter @urban/build-graph run typecheck
 ```

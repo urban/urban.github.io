@@ -1,7 +1,7 @@
 #!/bin/bash
 
 direnv allow
-bun install
+pnpm install
 
 if [ -d .repos/effect ]; then
   git -C .repos/effect pull --ff-only

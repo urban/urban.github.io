@@ -5,7 +5,7 @@
 
 ### Mandatory Validation Steps
 
-After making changes, run `bun run check` to run all validations. This will check
+After making changes, run `pnpm run check` to run all validations. This will check
 for linting errors, formatting issues, type errors, and run test.
 
 # Changesets
@@ -35,13 +35,13 @@ Fight entropy. Leave the codebase better than you found it.
 Write tests that verify semantically correct behavior
 Failing tests are acceptable when they expose genuine bugs and test correct behavior
 Before a task is complete, run full monorepo verification from repo root
-Required completion gate: `bun run check`
+Required completion gate: `pnpm run check`
 Package-local checks fine during iteration, but never sufficient for task completion
 
 ## Information
 
 - The base branch for this repository is 'main'.
-- The package manager is Bun.
+- The package manager is PNPM.
 
 # Learning more about the "effect" & "@effect/\*" packages
 

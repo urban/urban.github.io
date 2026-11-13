@@ -2,19 +2,19 @@
 
 ## Build System & Commands
 
-This is a **Turborepo** monorepo using Bun workspaces. Common commands:
+This is a PNPM workspace monorepo. Common commands:
 
 ```bash
 # Install dependencies
-bun run install
+pnpm install
 
 # Development
-bun run dev          # Start all apps in dev mode
-bun run build        # Build all packages/apps
-bun run serve        # Serve built static files
+pnpm run dev          # Start all apps in dev mode
+pnpm run build        # Build all packages/apps
+pnpm --filter @apps/personal-website run serve        # Serve built static files
 
 # Testing & Linting
-bun run check        # Runs linter, formater, type checker, and tests.
+pnpm run check        # Runs linter, formater, type checker, and tests.
 ```
 
 ## Website Architecture

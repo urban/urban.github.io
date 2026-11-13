@@ -2,31 +2,19 @@
   "name": "@urban/personal-website-monorepo",
   "version": "0.1.0",
   "private": true,
-  "workspaces": {
-    "catalog": {
-      "@effect/platform-node": "4.0.5",
-      "effect": "4.0.5",
-      "typescript": "^7.0.2"
-    },
-    "packages": [
-      "scratchpad",
-      "scripts",
-      "packages/*"
-    ]
-  },
   "type": "module",
   "scripts": {
-    "build": "turbo run build",
+    "build": "pnpm --recursive --if-present run build",
     "changeset": "changeset add",
-    "check": "bun run lint && turbo run typecheck test",
-    "clean": "bun --filter=scripts run clean",
-    "dev": "turbo run dev",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test",
+    "clean": "pnpm --filter scripts run clean",
+    "dev": "pnpm --recursive --parallel --if-present run dev",
     "lint": "oxfmt && oxlint",
     "postinstall": "effect-tsgo patch --oxlint",
     "release": "echo \"No release script\" && exit 0",
-    "test": "turbo run test",
-    "typecheck": "turbo run typecheck",
-    "version": "changeset version && bun install"
+    "test": "pnpm --recursive --if-present run test",
+    "typecheck": "pnpm --recursive --if-present run typecheck",
+    "version": "changeset version && pnpm install"
   },
   "dependencies": {},
   "devDependencies": {
@@ -35,11 +23,15 @@
     "oxfmt": "0.42.0",
     "oxlint": "1.89.0",
     "oxlint-tsgolint": "7.0.2004",
-    "turbo": "2.8.20",
     "typescript": "catalog:"
   },
   "engines": {
     "node": ">= 24.12.0"
   },
-  "packageManager": "bun@1.3.5"
+  "packageManager": "pnpm@10.8.1",
+  "pnpm": {
+    "overrides": {
+      "@effect/platform-node-shared": "4.0.5"
+    }
+  }
 }

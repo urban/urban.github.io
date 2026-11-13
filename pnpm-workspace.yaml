@@ -1,0 +1,9 @@
+packages:
+  - scratchpad
+  - scripts
+  - packages/*
+
+catalog:
+  "@effect/platform-node": 4.0.5
+  effect: 4.0.5
+  typescript: ^7.0.2
