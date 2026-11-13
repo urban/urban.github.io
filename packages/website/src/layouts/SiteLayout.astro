@@ -1,0 +1,33 @@
+---
+// oxlint-disable-next-line import/no-unassigned-import -- Load global styles.
+import "@/styles/globals.css"
+import { Footer } from "@/ui/Footer"
+import { PageNavigationAnimation } from "@/ui/PageNavigationAnimation"
+const { title = "Urban Faubion", description = "Urban Faubion's personal website." } = Astro.props
+---
+<!doctype html>
+<html lang="en" class="antialiased optimize-legibility">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | Urban Faubion</title>
+    <script is:inline src="/preload-color-scheme.js"></script>
+  </head>
+  <body>
+    <header class="border-b border-black/10 dark:border-white/10">
+      <div class="container mx-auto max-w-3xl px-4 py-4 flex flex-wrap gap-y-2 justify-between">
+        <a href="/" class="font-semibold">Urban Faubion</a>
+        <nav class="flex gap-6">
+          <a href="/projects/">Projects</a>
+          <a href="/work/">Work</a>
+          <a href="/garden/">The Garden</a>
+        </nav>
+      </div>
+    </header>
+    <main><slot /></main>
+    <Footer siteName="Urban Faubion" client:load />
+    <PageNavigationAnimation client:load />
+  </body>
+</html>

@@ -1,0 +1,19 @@
+---
+import { Array, DateTime, Effect, Order, pipe, Record } from "effect"
+import SiteLayout from "@/layouts/SiteLayout.astro"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { Container } from "@/ui/Container"
+import { ArrowCard } from "@/ui/ArrowCard"
+import { ComingSoon } from "@/ui/ComingSoon"
+const essays = await RuntimeServer.runPromise(Effect.gen(function* () {
+ const content: ContentService = yield* Content
+ return yield* content.getEssays.pipe(Effect.map((entries) => pipe(entries.filter(({ data }) => data.published ?? true), Array.sortBy(Order.flip(Order.mapInput(DateTime.Order, ({ data }) => data.updatedAt))), Array.groupBy(({ data }) => DateTime.toDateUtc(data.updatedAt).getUTCFullYear().toString()))))
+}))
+const years = Object.keys(essays).toSorted((a, b) => Number(b) - Number(a))
+---
+<SiteLayout title="Essays" description="A collection of essays on topics I am passionate about."><Container><div className="py-10">
+  <h1 className="my-2 text-2xl font-semibold">Essays</h1>{years.length === 0 && <ComingSoon />}
+  {years.map((year) => <section className="py-4"><h2 className="font-semibold">{year}</h2><ul className="flex flex-col gap-4">{essays[year]?.map(({ data, slug }) => <li><ArrowCard metadata={data} slug={slug} collection="essays" /></li>)}</ul></section>)}
+</div></Container></SiteLayout>

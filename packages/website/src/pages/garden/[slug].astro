@@ -1,0 +1,28 @@
+---
+import { Effect } from "effect"
+import SiteLayout from "@/layouts/SiteLayout.astro"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService, NoteEntry } from "@/lib/services/Content"
+import { Container } from "@/ui/Container"
+import { GraphHost } from "@/ui/GraphHost"
+import { Backlinks } from "@/ui/Backlinks"
+import { getBacklinks, getSelectedNodeId, getGraphModel } from "@/lib/noteGraph"
+export async function getStaticPaths() {
+ const entries: ReadonlyArray<NoteEntry> = await RuntimeServer.runPromise(Effect.gen(function* () { const content: ContentService = yield* Content; return yield* content.getPublishedNotes }))
+ return entries.filter(({ slug }) => slug !== "index").map(({ slug }) => ({ params: { slug }, props: { slug } }))
+}
+const { slug } = Astro.props
+const entry = await RuntimeServer.runPromise(Effect.gen(function* () { const content: ContentService = yield* Content; return yield* content.findPublishedNotesBySlug(slug) }))
+if (!entry) return Astro.redirect("/garden/")
+const [{ snapshot }, selectedNodeId] = await Promise.all([getGraphModel(), getSelectedNodeId(entry.slug)])
+const backlinks = getBacklinks(snapshot, selectedNodeId)
+const ContentComponent = entry.Content
+---
+<SiteLayout title={entry.data.title} description={entry.data.description}><Container>
+  <a href="/garden/">Back to The Garden</a>
+  <div className="my-10 flex flex-col gap-10"><div className="max-w-3xl"><h1 className="mb-8 text-2xl font-semibold">{entry.data.title}</h1><article><ContentComponent /></article></div>
+    <GraphHost snapshot={snapshot} selectedNodeId={selectedNodeId} scrollZoomEnabled={false} client:load />
+    <section><Backlinks backlinks={backlinks} /></section>
+  </div>
+</Container></SiteLayout>

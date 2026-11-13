@@ -1,6 +1,5 @@
-import type { JSX as ReactJSX, ComponentProps } from "react"
+import type { JSX as ReactJSX } from "react"
 import type { MDXComponents } from "mdx/types"
-import NextLink from "next/link"
 import { clsx, cn } from "../lib/utils"
 
 type HrefKind = "internal" | "external-web" | "other"
@@ -17,7 +16,7 @@ const getHrefKind = (href: string): HrefKind => {
   return "other"
 }
 
-type Props = Omit<ComponentProps<typeof NextLink>, "href"> & {
+type Props = Omit<ReactJSX.IntrinsicElements["a"], "href"> & {
   href: string
 }
 
@@ -25,12 +24,12 @@ const MdxLink = ({ href, children, className, ...rest }: Props) => {
   const hrefKind = getHrefKind(href)
 
   return (
-    <NextLink className={clsx("styled-link", className)} href={href} {...rest}>
+    <a className={clsx("styled-link", className)} href={href} {...rest}>
       <span>
         {children}
         {hrefKind === "external-web" && <span className="external-link" />}
       </span>
-    </NextLink>
+    </a>
   )
 }
 

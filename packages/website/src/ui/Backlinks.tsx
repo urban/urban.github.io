@@ -1,4 +1,3 @@
-import Link from "next/link"
 import type { Backlink } from "@/lib/noteGraph"
 
 const Backlinks = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
@@ -14,12 +13,12 @@ const Backlinks = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
               key={backlink.nodeId}
               className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 px-4 py-3 dark:border-zinc-800"
             >
-              <Link
+              <a
                 href={backlink.routePath}
                 className="font-medium text-black/50 hover:text-black/80 underline-offset-4 hover:underline dark:text-white/50 dark:hover:text-white"
               >
                 {backlink.title}
-              </Link>
+              </a>
               <span className="shrink-0 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
                 {backlink.count}
               </span>
@@ -41,9 +40,9 @@ const BacklinksAlt = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
           {backlinks.map((backlink) => (
             <li key={backlink.nodeId}>
               <div className="flex items-center justify-between gap-4">
-                <Link className="styled-link" href={backlink.routePath}>
+                <a className="styled-link" href={backlink.routePath}>
                   <span>{backlink.title}</span>
-                </Link>
+                </a>
                 <span className="shrink-0 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
                   {backlink.count}
                 </span>

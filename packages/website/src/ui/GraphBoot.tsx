@@ -1,7 +1,6 @@
 "use client"
 
 import { Effect } from "effect"
-import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import type { GraphThemeSet } from "@urban/graph-view"
 import type { GraphVisualizerSelectionChange } from "@urban/graph-view/bootstrap"
@@ -46,10 +45,8 @@ type GraphBootProps = {
 }
 
 export const GraphBoot = ({ themeSet, scrollZoomEnabled }: GraphBootProps) => {
-  const router = useRouter()
-  const pathname = usePathname()
-
   useEffect(() => {
+    const pathname = window.location.pathname
     let disposed = false
     let dispose: (() => void) | undefined
 
@@ -73,7 +70,7 @@ export const GraphBoot = ({ themeSet, scrollZoomEnabled }: GraphBootProps) => {
                 pathname,
               })
               if (nextHref !== null) {
-                router.push(nextHref)
+                window.location.assign(nextHref)
               }
             },
             ...(themeSet === undefined ? {} : { themeSet }),
@@ -103,7 +100,7 @@ export const GraphBoot = ({ themeSet, scrollZoomEnabled }: GraphBootProps) => {
       disposed = true
       dispose?.()
     }
-  }, [pathname, router, scrollZoomEnabled, themeSet])
+  }, [scrollZoomEnabled, themeSet])
 
   return null
 }

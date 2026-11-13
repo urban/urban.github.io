@@ -1,0 +1,24 @@
+---
+import { Effect } from "effect"
+import SiteLayout from "@/layouts/SiteLayout.astro"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { Container } from "@/ui/Container"
+import { readingTime } from "@/lib/utils"
+import { FormattedDate } from "@/ui/FormattedDate"
+import { BackToPrev } from "@/ui/BackToPrev"
+export async function getStaticPaths() {
+ const entries = await RuntimeServer.runPromise(Effect.gen(function* () { const content: ContentService = yield* Content; return yield* content.getEssays }))
+ return entries.filter(({ data }) => data.published ?? true).map(({ slug }) => ({ params: { slug }, props: { slug } }))
+}
+const { slug } = Astro.props
+const essay = await RuntimeServer.runPromise(Effect.gen(function* () { const content: ContentService = yield* Content; const entries = yield* content.getEssays; return entries.find((entry) => entry.slug === slug) }))
+if (!essay) return Astro.redirect("/essays/")
+const ContentComponent = essay.Content
+---
+<SiteLayout title={essay.data.title} description={essay.data.description}><Container>
+  <BackToPrev href="/essays/">Back to essays</BackToPrev>
+  <header className="my-10"><h1 className="text-2xl font-semibold">{essay.data.title}</h1><div className="flex items-center gap-1.5 text-sm"><FormattedDate date={essay.data.createdAt} /><span>•</span>{readingTime(essay.source)}</div></header>
+  <article><ContentComponent /></article>
+</Container></SiteLayout>

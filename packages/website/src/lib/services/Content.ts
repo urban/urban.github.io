@@ -210,7 +210,7 @@ export class Content extends Context.Service<Content, ContentService>()("service
         )
 
         const preparedEntries: ReadonlyArray<PreparedNoteEntry> = yield* Effect.forEach(
-          sourceEntries,
+          sourceEntries.filter(({ rawSource }) => rawSource.trim() !== ""),
           (entry) =>
             metadata.seed(entry.data).pipe(
               Effect.map((noteMetadata) => ({

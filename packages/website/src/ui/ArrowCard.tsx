@@ -1,5 +1,4 @@
 import type { Essay, Project } from "../lib/schemas"
-import NextLink from "next/link"
 import { ArrowCardIcon } from "./ArrowCardIcon"
 
 type Props = {
@@ -9,8 +8,8 @@ type Props = {
 }
 
 const ArrowCard = ({ collection, metadata, slug }: Props) => (
-  <NextLink
-    href={`/${collection}/${slug}`}
+  <a
+    href={`/${collection}/${slug}/`}
     className="relative group flex flex-nowrap py-3 px-4 pr-10 rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
   >
     <div className="flex flex-col flex-1 truncate">
@@ -18,7 +17,7 @@ const ArrowCard = ({ collection, metadata, slug }: Props) => (
       <div className="text-sm">{metadata.description}</div>
     </div>
     <ArrowCardIcon />
-  </NextLink>
+  </a>
 )
 
 export { ArrowCard }

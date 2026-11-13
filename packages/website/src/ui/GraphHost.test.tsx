@@ -1,13 +1,6 @@
-import { expect, mock, test } from "bun:test"
+import { expect, test } from "bun:test"
 import { renderToStaticMarkup } from "react-dom/server"
 import type { GraphSnapshot } from "@urban/build-graph/schema"
-
-await mock.module("next/navigation", () => ({
-  usePathname: () => "/garden/alpha",
-  useRouter: () => ({
-    push: (_href: string) => undefined,
-  }),
-}))
 
 const { GraphHost } = await import("./GraphHost")
 

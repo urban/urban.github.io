@@ -9,9 +9,6 @@
     "resolveJsonModule": true,
     "plugins": [
       {
-        "name": "next"
-      },
-      {
         "name": "@effect/language-service",
         "diagnostics": false,
         "allowedUnstableApis": [
@@ -27,15 +24,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "src",
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts",
-    "package.json"
-  ],
+  "include": ["src", "**/*.ts", "**/*.tsx", "**/*.mts", "package.json"],
   "exclude": ["node_modules", "scripts", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }

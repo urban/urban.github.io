@@ -4,5 +4,6 @@
   "compilerOptions": {
     "types": ["bun", "node"]
   },
-  "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "next-env.d.ts"]
+  "include": ["src"],
+  "exclude": []
 }
