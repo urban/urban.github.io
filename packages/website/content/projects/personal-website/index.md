@@ -2,7 +2,7 @@
 title: "Personal Website"
 description:
   "This is my personal website monorepo that combines a traditional portfolio/resume site with a markdown-powered note vault and
-  interactive knowledge graph, built with Next.js, Effect, MDX, and Pixi."
+  interactive knowledge graph, built with Astro, Effect, MDX, and Pixi."
 createdAt: 2026-03-31
 updatedAt: 2026-03-31
 demoURL: "https://urbanfaubion.com"

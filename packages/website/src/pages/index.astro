@@ -1,19 +1,61 @@
 ---
+import { Array, DateTime, Effect, flow, Order } from "effect"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { ArrowCard } from "@/ui/ArrowCard"
 import SiteLayout from "@/layouts/SiteLayout.astro"
 import { Container } from "@/ui/Container"
-import { PageTitle } from "@/ui/PageTitle"
 import { Link } from "@/ui/NavLink"
 import { SITE, SOCIALS } from "@/lib/consts"
-import { EnvelopeSimpleIcon, GithubLogoIcon, LinkedinLogoIcon, XLogoIcon } from "@phosphor-icons/react/dist/ssr"
+import {
+  EnvelopeSimpleIcon,
+  GithubLogoIcon,
+  LinkedinLogoIcon,
+  XLogoIcon,
+} from "@phosphor-icons/react/dist/ssr"
+
+const projects = await RuntimeServer.runPromise(
+  Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    return yield* content.getProjects.pipe(
+      Effect.map(
+        flow(
+          Array.filter(({ data }) => data.published ?? true),
+          Array.sortBy(Order.flip(Order.mapInput(DateTime.Order, ({ data }) => data.updatedAt))),
+        ),
+      ),
+    )
+  }),
+)
 ---
 <SiteLayout title="Home">
   <Container>
-    <PageTitle>Hello,</PageTitle>
+    <p class="animate mb-4">Hello,</p>
     <div>
-      <section class="mb-8 border-b border-gray-300 dark:border-gray-500"><article class="py-4">
-        <p class="animate"><b>I’m Urban.</b> I build software, design systems, and tools that make developers’ lives easier.</p>
-        <p class="animate">I’ve spent my career connecting design and engineering, building platforms, and leading teams. These days, I’m exploring how AI can improve the way we build software.</p>
-      </article></section>
+      <section class="mb-8 border-b border-gray-300 dark:border-gray-500" aria-labelledby="intro-title">
+        <h1
+          id="intro-title"
+          class="animate text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-black dark:text-white"
+        >
+          I’m Urban. I build software, design systems, and tools that make developers’ lives easier.
+        </h1>
+        <article class="py-4">
+          <p class="animate">I’ve spent my career connecting design and engineering, building platforms, and leading teams. These days, I’m exploring how AI can improve the way we build software.</p>
+        </article>
+      </section>
+      <section class="animate mb-8 pb-8 border-b border-gray-300 dark:border-gray-500" aria-labelledby="projects-title">
+        <div class="mb-4 flex flex-wrap gap-2 items-center justify-between">
+          <h2 id="projects-title" class="font-semibold text-black dark:text-white">Projects</h2>
+          <Link href="/projects/">See all projects</Link>
+        </div>
+        <ul class="flex flex-col gap-4">
+          {projects.length === 0 && <li>Projects coming soon.</li>}
+          {projects.map(({ data }) => (
+            <li><ArrowCard href={data.repoURL} isExternal={true} metadata={data} /></li>
+          ))}
+        </ul>
+      </section>
       <section class="animate">
         <h2 class="font-semibold text-black dark:text-white">Let’s Connect</h2>
         <article>

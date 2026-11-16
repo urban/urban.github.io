@@ -11,10 +11,10 @@ const ArrowCard = ({ metadata, isExternal, href }: Props) => (
   <a
     href={href}
     target={isExternal ? "_blank" : undefined}
-    rel={isExternal ? 'noopener noreferrer' : undefined}
+    rel={isExternal ? "noopener noreferrer" : undefined}
     className="relative group flex flex-nowrap py-3 px-4 pr-10 rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out"
   >
-    <div className="flex flex-col flex-1 truncate">
+    <div className="flex min-w-0 flex-col flex-1 break-words">
       <div className="font-semibold">{metadata.title}</div>
       <div className="text-sm">{metadata.description}</div>
     </div>

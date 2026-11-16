@@ -64,7 +64,7 @@ header {
 }
 
 main {
-  @apply flex-1 py-24;
+  @apply flex-1 pt-32 pb-24 sm:pt-24;
 }
 
 footer {
