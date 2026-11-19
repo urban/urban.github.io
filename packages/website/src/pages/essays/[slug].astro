@@ -8,6 +8,7 @@ import { Container } from "@/ui/Container"
 import { readingTime } from "@/lib/utils"
 import { FormattedDate } from "@/ui/FormattedDate"
 import { BackToPrev } from "@/ui/BackToPrev"
+import { Heading } from "@/ui/Heading"
 export async function getStaticPaths() {
  const entries = await RuntimeServer.runPromise(Effect.gen(function* () { const content: ContentService = yield* Content; return yield* content.getEssays }))
  return entries.filter(({ data }) => data.published ?? true).map(({ slug }) => ({ params: { slug }, props: { slug } }))
@@ -17,8 +18,10 @@ const essay = await RuntimeServer.runPromise(Effect.gen(function* () { const con
 if (!essay) return Astro.redirect("/essays/")
 const ContentComponent = essay.Content
 ---
-<SiteLayout title={essay.data.title} description={essay.data.description}><Container>
-  <BackToPrev href="/essays/">Back to essays</BackToPrev>
-  <header class="my-10"><h1 class="text-2xl font-semibold">{essay.data.title}</h1><div class="flex items-center gap-1.5 text-sm"><FormattedDate date={essay.data.createdAt} /><span>•</span>{readingTime(essay.source)}</div></header>
-  <article><ContentComponent /></article>
+<SiteLayout title={essay.data.title} description={essay.data.description}><Container width="reading">
+  <div class="page-stack">
+    <BackToPrev href="/essays/">Back to essays</BackToPrev>
+    <header><Heading level={1} variant="page">{essay.data.title}</Heading><div class="page-meta"><FormattedDate date={essay.data.createdAt} /><span aria-hidden="true">·</span>{readingTime(essay.source)}</div></header>
+    <article class="prose"><ContentComponent /></article>
+  </div>
 </Container></SiteLayout>

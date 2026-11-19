@@ -1,11 +1,12 @@
 ---
-import { Array, DateTime, Effect, Order, pipe, Record } from "effect";
+import { Array, DateTime, Effect, Order, pipe } from "effect";
 import SiteLayout from "@/layouts/SiteLayout.astro";
 import { RuntimeServer } from "@/lib/RuntimeServer";
 import { Content } from "@/lib/services/Content";
 import type { ContentService } from "@/lib/services/Content";
 import { Container } from "@/ui/Container";
-import { ArrowCard } from "@/ui/ArrowCard";
+import { ContentCard } from "@/ui/ContentCard";
+import { Heading } from "@/ui/Heading";
 import { ComingSoon } from "@/ui/ComingSoon";
 const essays = await RuntimeServer.runPromise(
     Effect.gen(function* () {
@@ -39,18 +40,20 @@ const years = Object.keys(essays).toSorted((a, b) => Number(b) - Number(a));
     title="Essays"
     description="A collection of essays on topics I am passionate about."
 >
-    <Container>
-        <div class="py-10">
-            <h1 class="my-2 text-2xl font-semibold">Essays</h1>
+    <Container width="reading">
+            <Heading level={1} variant="page">Essays</Heading>
             {years.length === 0 && <ComingSoon />}
             {years.map((year) => (
-                <section class="py-4">
-                    <h2 class="font-semibold">{year}</h2>
-                    <ul class="flex flex-col gap-4">
+                <section class="essay-year" aria-label={year}>
+                    <Heading level={2} variant="section">{year}</Heading>
+                    <ul class="essay-list">
                         {essays[year]?.map(({ data, slug }) => (
                             <li>
-                                <ArrowCard
-                                    metadata={data}
+                                <ContentCard
+                                    variant="essay"
+                                    title={data.title}
+                                    description={data.description}
+                                    date={data.updatedAt}
                                     href={`/essays/${slug}/`}
                                 />
                             </li>
@@ -58,6 +61,5 @@ const years = Object.keys(essays).toSorted((a, b) => Number(b) - Number(a));
                     </ul>
                 </section>
             ))}
-        </div>
     </Container>
 </SiteLayout>

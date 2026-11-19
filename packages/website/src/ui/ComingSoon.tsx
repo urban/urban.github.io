@@ -1,7 +1,5 @@
-const ComingSoon = () => (
-  <section className="animate py-4">
-    <div>Comming soon.</div>
-  </section>
-)
+import { Text } from "./Text"
+
+const ComingSoon = () => <Text className="mt-4">Coming soon.</Text>
 
 export { ComingSoon }

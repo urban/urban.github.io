@@ -5,7 +5,8 @@ import { defineConfig } from "astro/config"
 export default defineConfig({
   integrations: [react()],
   output: "static",
-  trailingSlash: "always",
+  // Garden links and graph routes use extensionless URLs; accept both directory forms.
+  trailingSlash: "ignore",
   build: { format: "directory" },
   vite: {
     plugins: [tailwind()],

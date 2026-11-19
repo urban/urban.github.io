@@ -1,6 +1,6 @@
 import type { JSX as ReactJSX } from "react"
 import type { MDXComponents } from "mdx/types"
-import { clsx, cn } from "../lib/utils"
+import { clsx } from "../lib/utils"
 
 type HrefKind = "internal" | "external-web" | "other"
 
@@ -27,7 +27,7 @@ const MdxLink = ({ href, children, className, ...rest }: Props) => {
     <a className={clsx("styled-link", className)} href={href} {...rest}>
       <span>
         {children}
-        {hrefKind === "external-web" && <span className="external-link" />}
+        {hrefKind === "external-web" && <span className="external-link" aria-hidden="true" />}
       </span>
     </a>
   )
@@ -35,17 +35,10 @@ const MdxLink = ({ href, children, className, ...rest }: Props) => {
 
 const MdxPre = ({ className, children, style, ...rest }: ReactJSX.IntrinsicElements["pre"]) => {
   return (
-    <div className="my-6">
-      <div
-        className="rounded-lg overflow-hidden border border-black/10 dark:border-white/25 bg-white dark:!bg-(--shiki-dark-bg)"
-        style={style}
-      >
-        <div className="text-sm leading-relaxed w-full max-h-96 overflow-y-auto m-0 overflow-x-auto">
-          <pre className={cn(className, "!my-0")} style={style} {...rest}>
-            {children}
-          </pre>
-        </div>
-      </div>
+    <div className="mdx-code-block">
+      <pre className={className} style={style} {...rest}>
+        {children}
+      </pre>
     </div>
   )
 }

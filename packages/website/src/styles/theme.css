@@ -1,14 +1,33 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --site-paper: #f7f7f3;
+  --site-surface: #f1f1ed;
+  --site-ink: #202020;
+  --site-muted: #646464;
+  --site-rule: #d6d6d2;
+  --site-accent: #a85220;
+  --site-link: #2a68a6;
+  --site-link-hover: #1c4d7f;
+  --site-grid: #20202012;
+}
+
+html.dark {
+  --site-paper: #1c222a;
+  --site-surface: #232c36;
+  --site-ink: #efeee8;
+  --site-muted: #b9bdc3;
+  --site-rule: #424b56;
+  --site-accent: #edab78;
+  --site-link: #92bfec;
+  --site-link-hover: #bedbfa;
+  --site-grid: #efeee814;
+}
+
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", sans-serif;
-  --font-serif: var(--font-lora), serif;
-
-  --color-bright-crimson: #960462;
-  --color-crimson: #5f023e;
-
-  --color-link: oklch(0.56 0.2 255);
-  --color-link-visited: var(--color-crimson);
-  --color-link-bright-visited: var(--color-bright-crimson);
-  --color-link-hover: oklch(0.48, 0.2, 255);
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --color-link: var(--site-link);
+  --color-link-hover: var(--site-link-hover);
 }

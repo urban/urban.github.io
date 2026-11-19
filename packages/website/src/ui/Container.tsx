@@ -1,7 +1,14 @@
-import type { ReactNode } from "react"
+import type { HTMLAttributes } from "react"
+import { clsx } from "../lib/utils"
 
-const Container = ({ children }: { children: ReactNode }) => (
-  <div className="mx-auto max-w-4xl px-5">{children}</div>
+type Props = HTMLAttributes<HTMLDivElement> & {
+  width?: "site" | "reading"
+}
+
+const Container = ({ children, width = "site", className, ...rest }: Props) => (
+  <div className={clsx("site-container", className)} data-width={width} {...rest}>
+    {children}
+  </div>
 )
 
 export { Container }

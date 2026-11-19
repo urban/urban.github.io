@@ -1,23 +1,21 @@
-import React from "react"
-import { clsx } from "clsx"
+import type { ReactNode } from "react"
+import { clsx } from "../lib/utils"
 
 type Props = {
-  children: React.ReactNode
-  variant: "label" | "muted"
-  as?: React.ElementType
+  children: ReactNode
+  variant?: "body" | "label" | "muted" | "eyebrow" | "lede"
+  as?: "p" | "span" | "div"
+  className?: string
 }
 
-const Text = ({ as = "p", children, variant }: Props) => {
+const Text = ({ as = "p", children, variant = "body", className }: Props) => {
   const Tag = as
 
-  const variantClasses = {
-    label: "font-semibold text-black dark:text-white",
-    muted: "text-sm opacity-75",
-  }
-
-  const combinedClasses = clsx(variantClasses[variant])
-
-  return <Tag className={combinedClasses}>{children}</Tag>
+  return (
+    <Tag className={clsx("site-text", className)} data-variant={variant}>
+      {children}
+    </Tag>
+  )
 }
 
 export { Text }

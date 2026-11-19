@@ -1,26 +1,30 @@
-"use client"
-
 import { Container } from "./Container"
 import { Link } from "./NavLink"
+import { isLinkSelected } from "./NavLink/linkSelection"
 
-const Header = ({ siteName }: { siteName: string }) => {
+const Header = ({ siteName, pathname }: { siteName: string; pathname: string }) => {
   return (
-    <header className="border-b border-black/10 dark:border-white/10">
+    <header className="site-header">
       <Container>
-        <div className="flex flex-wrap gap-y-2 justify-between">
-          <a href="/" target={"_self"}>
-            <div className="font-semibold">{siteName}</div>
+        <div className="site-header-content">
+          <a className="site-wordmark" href="/">
+            {siteName}
           </a>
-          <nav
-            aria-label="Primary"
-            className="flex flex-wrap gap-x-2 gap-y-2 text-sm sm:gap-x-6 sm:text-base"
-          >
-            {/*<Link href="/essays">Essays</Link>*/}
-            <Link href="/projects/">Projects</Link>
-            <Link href="/work/">Work</Link>
-            <Link href="/garden/">The Garden</Link>
-            <Link href="/now/">Now</Link>
-            <Link href="/about/">About</Link>
+          <nav aria-label="Primary" className="site-navigation">
+            <Link
+              href="/now/"
+              variant="navigation"
+              aria-current={isLinkSelected(pathname, "/now/") ? "page" : undefined}
+            >
+              Now
+            </Link>
+            <Link
+              href="/garden/"
+              variant="navigation"
+              aria-current={isLinkSelected(pathname, "/garden/") ? "page" : undefined}
+            >
+              The Garden
+            </Link>
           </nav>
         </div>
       </Container>

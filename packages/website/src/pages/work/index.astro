@@ -5,7 +5,7 @@ import { RuntimeServer } from "@/lib/RuntimeServer"
 import { Content } from "@/lib/services/Content"
 import type { ContentService } from "@/lib/services/Content"
 import { Container } from "@/ui/Container"
-import { PageTitle } from "@/ui/PageTitle"
+import { Heading } from "@/ui/Heading"
 import { WorkList } from "@/ui/WorkList"
 const work = await RuntimeServer.runPromise(Effect.gen(function* () {
   const content: ContentService = yield* Content
@@ -13,5 +13,5 @@ const work = await RuntimeServer.runPromise(Effect.gen(function* () {
 }))
 ---
 <SiteLayout title="Work" description="Where I have worked and what I have done.">
-  <Container><div class="py-10"><PageTitle>Work</PageTitle><WorkList work={work} /></div></Container>
+  <Container width="reading"><Heading level={1} variant="page">Work</Heading><WorkList work={work} /></Container>
 </SiteLayout>

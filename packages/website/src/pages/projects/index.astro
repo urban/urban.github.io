@@ -1,56 +1,16 @@
 ---
-import { Array, DateTime, Effect, flow, Order } from "effect";
-import SiteLayout from "@/layouts/SiteLayout.astro";
-import { RuntimeServer } from "@/lib/RuntimeServer";
-import { Content } from "@/lib/services/Content";
-import type { ContentService } from "@/lib/services/Content";
-import { Container } from "@/ui/Container";
-import { ArrowCard } from "@/ui/ArrowCard";
-import { ComingSoon } from "@/ui/ComingSoon";
+import SiteLayout from "@/layouts/SiteLayout.astro"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { publishedProjects } from "@/lib/projects"
+import { Container } from "@/ui/Container"
+import { Heading } from "@/ui/Heading"
+import { ProjectList } from "@/ui/ProjectList"
 
-const projects = await RuntimeServer.runPromise(
-    Effect.gen(function* () {
-        const content: ContentService = yield* Content;
-        return yield* content.getProjects.pipe(
-            Effect.map(
-                flow(
-                    Array.filter(({ data }) => data.published ?? true),
-                    Array.sortBy(
-                        Order.flip(
-                            Order.mapInput(
-                                DateTime.Order,
-                                ({ data }) => data.updatedAt,
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
-    }),
-);
+const projects = await RuntimeServer.runPromise(publishedProjects)
 ---
-
-<SiteLayout
-    title="Projects"
-    description="A collection of my projects, with links to repositories and demos."
->
-    <Container>
-        <div class="py-10">
-            <h1 class="my-2 text-2xl font-semibold text-black dark:text-white">
-                Projects
-            </h1>
-            <ul class="flex flex-col gap-4">
-                {projects.length === 0 && <ComingSoon />}
-                {projects.map(({ data, slug }) => (
-                    <li>
-                        <ArrowCard
-                            href={data.repoURL}
-                            isExternal={true}
-                            metadata={data}
-                        />
-                    </li>
-                ))}
-            </ul>
-        </div>
-    </Container>
+<SiteLayout title="Projects" description="A collection of my projects, with links to repositories and demos.">
+  <Container>
+    <Heading level={1} variant="page">Projects</Heading>
+    <ProjectList projects={projects} headingLevel={2} />
+  </Container>
 </SiteLayout>

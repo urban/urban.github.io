@@ -1,11 +1,11 @@
 import type { GraphTheme, GraphThemeSet } from "@urban/graph-view"
 
 export const LIGHT_GRAPH_THEME: GraphTheme = {
-  view: { backgroundColor: 0xfafaf9 },
+  view: { backgroundColor: 0xf1f1ed },
   node: {
     variants: {
       default: { fill: 0x57534e, stroke: 0xf5f5f4, strokeWidth: 1, alpha: 1 },
-      selected: { fill: 0x57534e, stroke: 0xf5f5f4, strokeWidth: 2, alpha: 1 },
+      selected: { fill: 0x2a68a6, stroke: 0xf7f7f3, strokeWidth: 2, alpha: 1 },
       muted: { fill: 0xd6d3d1, stroke: 0xf5f5f4, strokeWidth: 1, alpha: 0.4 },
     },
     scales: {
@@ -23,7 +23,7 @@ export const LIGHT_GRAPH_THEME: GraphTheme = {
   label: {
     variants: {
       default: { fill: 0x1c1917, alpha: 1 },
-      selected: { fill: 0x9a3412, alpha: 1 },
+      selected: { fill: 0x2a68a6, alpha: 1 },
       muted: { fill: 0x78716c, alpha: 0.45 },
     },
     style: {
@@ -35,11 +35,11 @@ export const LIGHT_GRAPH_THEME: GraphTheme = {
 }
 
 export const DARK_GRAPH_THEME: GraphTheme = {
-  view: { backgroundColor: 0x0c0a09 },
+  view: { backgroundColor: 0x232c36 },
   node: {
     variants: {
       default: { fill: 0xd6d3d1, stroke: 0x1c1917, strokeWidth: 1, alpha: 1 },
-      selected: { fill: 0xd6d3d1, stroke: 0x1c1917, strokeWidth: 2, alpha: 1 },
+      selected: { fill: 0x92bfec, stroke: 0x1c222a, strokeWidth: 2, alpha: 1 },
       muted: { fill: 0x44403c, stroke: 0x1c1917, strokeWidth: 1, alpha: 0.4 },
     },
     scales: {

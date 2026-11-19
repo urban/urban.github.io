@@ -1,26 +1,38 @@
 import type { ReactNode, AnchorHTMLAttributes } from "react"
-import { clsx } from "@/lib/utils"
-import { isLinkSelected } from "./linkSelection"
+import { clsx } from "../../lib/utils"
 
-type Props = AnchorHTMLAttributes<HTMLAnchorElement> & { children: ReactNode; href: string }
+type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  children: ReactNode
+  href: string
+  variant?: "text" | "navigation" | "subtle"
+  showExternalIcon?: boolean
+}
 
-const Link = ({ children, href, ...rest }: Props) => {
+const Link = ({
+  children,
+  href,
+  variant = "text",
+  showExternalIcon = false,
+  className,
+  ...rest
+}: Props) => {
   const hrefKind =
     href.startsWith("http://") || href.startsWith("https://") ? "external" : "internal"
-  const selected =
-    hrefKind === "internal" &&
-    typeof window !== "undefined" &&
-    isLinkSelected(window.location.pathname, href)
   return (
     <a
       href={href}
       target={hrefKind === "external" ? "_blank" : undefined}
       rel={hrefKind === "external" ? "noreferrer noopener" : undefined}
-      aria-current={selected ? "page" : undefined}
-      className={clsx("nav-link", selected && "selected")}
+      className={clsx("site-link", className)}
+      data-variant={variant}
       {...rest}
     >
-      <span>{children}</span>
+      {children}
+      {showExternalIcon && (
+        <span className="site-link-icon" aria-hidden="true">
+          ↗
+        </span>
+      )}
     </a>
   )
 }

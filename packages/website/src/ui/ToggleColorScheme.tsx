@@ -1,7 +1,8 @@
 "use client"
 
 import { MonitorIcon, MoonIcon, SunIcon } from "@phosphor-icons/react/dist/ssr"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { Button } from "./Button"
 
 type ColorScheme = "light" | "dark" | "system"
 
@@ -43,23 +44,26 @@ const toggleColorScheme = (isDark: boolean) => {
 }
 
 const ToggleColorScheme = () => {
+  const [selected, setSelected] = useState<ColorScheme>("system")
   useEffect(() => {
+    const saved = localStorage.getItem("colorScheme")
+    setSelected(saved === "light" || saved === "dark" ? saved : "system")
+    const media = window.matchMedia("(prefers-color-scheme: dark)")
     const handleMediaChange = (event: MediaQueryListEvent) => {
       if (localStorage.colorScheme === "system" || !localStorage.colorScheme) {
         toggleColorScheme(event.matches)
       }
     }
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", handleMediaChange)
+    media.addEventListener("change", handleMediaChange)
 
     return () => {
-      window
-        .matchMedia("(prefers-color-scheme: dark)")
-        .removeEventListener("change", handleMediaChange)
+      media.removeEventListener("change", handleMediaChange)
     }
   }, [])
 
   const handleSelectColorScheme = useCallback((colorScheme: ColorScheme) => {
     localStorage.setItem("colorScheme", colorScheme)
+    setSelected(colorScheme)
     switch (colorScheme) {
       case "light":
         toggleColorScheme(false)
@@ -74,31 +78,34 @@ const ToggleColorScheme = () => {
   }, [])
 
   return (
-    <div className="flex flex-wrap gap-1 items-center">
-      <button
+    <div className="theme-switcher" role="group" aria-label="Color theme">
+      <Button
+        variant="ghost"
         id="light-theme-button"
         aria-label="Light theme"
-        className="group size-8 flex items-center justify-center rounded-full"
+        aria-pressed={selected === "light"}
         onClick={() => handleSelectColorScheme("light")}
       >
-        <SunIcon size={21} />
-      </button>
-      <button
+        <SunIcon size={21} aria-hidden="true" />
+      </Button>
+      <Button
+        variant="ghost"
         id="dark-theme-button"
         aria-label="Dark theme"
-        className="group size-8 flex items-center justify-center rounded-full"
+        aria-pressed={selected === "dark"}
         onClick={() => handleSelectColorScheme("dark")}
       >
-        <MoonIcon size={21} />
-      </button>
-      <button
+        <MoonIcon size={21} aria-hidden="true" />
+      </Button>
+      <Button
+        variant="ghost"
         id="system-theme-button"
         aria-label="System theme"
-        className="group size-8 flex items-center justify-center rounded-full"
+        aria-pressed={selected === "system"}
         onClick={() => handleSelectColorScheme("system")}
       >
-        <MonitorIcon size={21} />
-      </button>
+        <MonitorIcon size={21} aria-hidden="true" />
+      </Button>
     </div>
   )
 }

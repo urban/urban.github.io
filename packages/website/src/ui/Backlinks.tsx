@@ -1,58 +1,30 @@
 import type { Backlink } from "@/lib/noteGraph"
+import { Heading } from "./Heading"
+import { Link } from "./NavLink"
+import { Text } from "./Text"
 
-const Backlinks = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
-  return (
-    <>
-      <h2 className="text-lg font-semibold text-black dark:text-white">Backlinks</h2>
-      {backlinks.length === 0 ? (
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">No backlinks yet.</p>
-      ) : (
-        <ul className="mt-4 space-y-3">
-          {backlinks.map((backlink) => (
-            <li
-              key={backlink.nodeId}
-              className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 px-4 py-3 dark:border-zinc-800"
-            >
-              <a
-                href={backlink.routePath}
-                className="font-medium text-black/50 hover:text-black/80 underline-offset-4 hover:underline dark:text-white/50 dark:hover:text-white"
-              >
-                {backlink.title}
-              </a>
-              <span className="shrink-0 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-                {backlink.count}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
-  )
-}
-const BacklinksAlt = ({ backlinks }: { backlinks: readonly Backlink[] }) => {
-  return (
-    <>
-      <h2 className="text-lg font-semibold text-black dark:text-white">Backlinks</h2>
-      {backlinks.length === 0 ? (
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">No backlinks yet.</p>
-      ) : (
-        <ul>
-          {backlinks.map((backlink) => (
-            <li key={backlink.nodeId}>
-              <div className="flex items-center justify-between gap-4">
-                <a className="styled-link" href={backlink.routePath}>
-                  <span>{backlink.title}</span>
-                </a>
-                <span className="shrink-0 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-                  {backlink.count}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
-  )
-}
+const Backlinks = ({ backlinks }: { backlinks: readonly Backlink[] }) => (
+  <>
+    <Heading level={2} variant="section" id="backlinks-title">
+      Backlinks
+    </Heading>
+    {backlinks.length === 0 ? (
+      <Text className="mt-4" variant="muted">
+        No backlinks yet.
+      </Text>
+    ) : (
+      <ul className="backlinks-list">
+        {backlinks.map((backlink) => (
+          <li key={backlink.nodeId}>
+            <Link href={backlink.routePath}>{backlink.title}</Link>
+            <span className="backlinks-count" aria-label={`${backlink.count} references`}>
+              {backlink.count}
+            </span>
+          </li>
+        ))}
+      </ul>
+    )}
+  </>
+)
 
-export { Backlinks, BacklinksAlt }
+export { Backlinks }

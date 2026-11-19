@@ -1,7 +1,9 @@
 ;(function preloadColorScheme() {
+  const preference = localStorage.getItem("colorScheme")
   const isDark =
-    localStorage.colorScheme === "dark" ||
-    (!("colorScheme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    preference === "dark" ||
+    ((preference === null || preference === "system") &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
 
   if (isDark) {
     document.documentElement.classList.add("dark")

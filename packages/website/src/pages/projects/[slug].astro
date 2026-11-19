@@ -9,6 +9,7 @@ import { readingTime } from "@/lib/utils"
 import { FormattedDate } from "@/ui/FormattedDate"
 import { BackToPrev } from "@/ui/BackToPrev"
 import { Link } from "@/ui/NavLink"
+import { Heading } from "@/ui/Heading"
 export async function getStaticPaths() {
   const entries = await RuntimeServer.runPromise(Effect.gen(function* () {
     const content: ContentService = yield* Content
@@ -26,11 +27,15 @@ if (project === undefined) return Astro.redirect("/projects/")
 const ContentComponent = project.Content
 ---
 <SiteLayout title={project.data.title} description={project.data.description}>
-  <Container>
-    <div><BackToPrev href="/projects/">Back to projects</BackToPrev></div>
-    <div class="my-10"><h1 class="text-2xl font-semibold">{project.data.title}</h1>
-      <div class="flex items-center gap-1.5 text-sm"><FormattedDate date={project.data.createdAt} /><span>•</span>{readingTime(project.source)}</div>
-      {(project.data.demoURL || project.data.repoURL) && <nav class="flex gap-1">{project.data.demoURL && <Link href={project.data.demoURL}>demo</Link>}{project.data.demoURL && project.data.repoURL && <span>/</span>}{project.data.repoURL && <Link href={project.data.repoURL}>repo</Link>}</nav>}
-    </div><article><ContentComponent /></article>
+  <Container width="reading">
+    <div class="page-stack">
+      <BackToPrev href="/projects/">Back to projects</BackToPrev>
+      <div>
+        <Heading level={1} variant="page">{project.data.title}</Heading>
+        <div class="page-meta"><FormattedDate date={project.data.createdAt} /><span aria-hidden="true">·</span>{readingTime(project.source)}</div>
+        {(project.data.demoURL || project.data.repoURL) && <nav class="page-resource-links" aria-label="Project resources">{project.data.demoURL && <Link href={project.data.demoURL} showExternalIcon>Demo</Link>}{project.data.repoURL && <Link href={project.data.repoURL} showExternalIcon>Repository</Link>}</nav>}
+      </div>
+      <article class="prose"><ContentComponent /></article>
+    </div>
   </Container>
 </SiteLayout>

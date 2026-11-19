@@ -1,10 +1,12 @@
 ---
 import SiteLayout from "@/layouts/SiteLayout.astro"
 import { Container } from "@/ui/Container"
-import { PageTitle } from "@/ui/PageTitle"
+import { Heading } from "@/ui/Heading"
+import { Text } from "@/ui/Text"
 ---
 <SiteLayout title="Now">
-  <Container>
-    <PageTitle>Now</PageTitle>
+  <Container width="reading">
+    <Heading level={1} variant="page">Now</Heading>
+    <Text variant="lede">A month-by-month journal of what I’m working on and learning.</Text>
   </Container>
 </SiteLayout>
