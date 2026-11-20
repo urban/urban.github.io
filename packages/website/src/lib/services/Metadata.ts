@@ -1,5 +1,5 @@
 import { Effect, Layer, Schema, Context } from "effect"
-import { Essay, type CollectionEntry, Project, NoteFrontmatter, Work } from "../schemas"
+import { Essay, type CollectionEntry, Project, NoteFrontmatter, NowUpdate, Work } from "../schemas"
 import { finalizeData, humanizeSlug, normalizeSlug } from "../note"
 import type { NoteMetadataSeed } from "../note"
 
@@ -57,6 +57,7 @@ export class Metadata extends Context.Service<Metadata>()("service/Metadata", {
   make: Effect.sync(() => {
     return {
       essay: decode(Essay),
+      nowUpdate: decode(NowUpdate),
       project: decode(Project),
       work: decode(Work),
       seed: (data: unknown) => decodeNote(data),

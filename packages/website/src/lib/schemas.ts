@@ -30,6 +30,14 @@ export const Essay = Schema.Struct({
   published: Schema.optional(Schema.Boolean),
 })
 
+export const NowUpdate = Schema.Struct({
+  title: Schema.String,
+  description: Schema.String,
+  createdAt: DateTimeFromFrontmatter,
+  updatedAt: DateTimeFromFrontmatter,
+  published: Schema.Boolean,
+})
+
 export const Project = Schema.Struct({
   title: Schema.String,
   description: Schema.String,

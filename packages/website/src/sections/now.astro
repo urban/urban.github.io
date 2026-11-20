@@ -1,0 +1,60 @@
+---
+import { Effect } from "effect"
+import SiteLayout from "@/layouts/SiteLayout.astro"
+import { RuntimeServer } from "@/lib/RuntimeServer"
+import { Content } from "@/lib/services/Content"
+import type { ContentService } from "@/lib/services/Content"
+import { Container } from "@/ui/Container"
+import { FormattedDate } from "@/ui/FormattedDate"
+import { Heading } from "@/ui/Heading"
+import { Text } from "@/ui/Text"
+
+const updates = await RuntimeServer.runPromise(
+  Effect.gen(function* () {
+    const content: ContentService = yield* Content
+    const entries = yield* content.getNowUpdates
+    return entries.filter(({ data }) => import.meta.env.DEV || data.published)
+  }),
+)
+---
+
+<SiteLayout title="Now" description="A month-by-month journal of what I’m working on and learning.">
+  <Container width="reading">
+    <div class="page-stack">
+      <header>
+        <Heading level={1} variant="page">Now</Heading>
+        <Text variant="lede">A month-by-month journal of what I’m working on and learning.</Text>
+      </header>
+      {updates.map(({ data, slug, Content: UpdateContent }) => (
+        <article id={slug} class="now-entry" aria-labelledby={`${slug}-title`}>
+          <header>
+            <Heading id={`${slug}-title`} level={2} variant="section">
+              <a class="site-link" href={`#${slug}`}>{data.title}</a>
+            </Heading>
+            <div class="page-meta">
+              {!data.published && <span>Draft</span>}
+              <span>Updated <FormattedDate date={data.updatedAt} /></span>
+            </div>
+          </header>
+          <div class="prose"><UpdateContent /></div>
+        </article>
+      ))}
+    </div>
+  </Container>
+</SiteLayout>
+
+<style>
+  .now-entry {
+    scroll-margin-top: 2rem;
+  }
+  .now-entry > header {
+    margin-bottom: 2rem;
+  }
+  .now-entry + .now-entry {
+    border-top: 1px solid var(--site-rule);
+    padding-top: 3rem;
+  }
+  .now-entry h2 a {
+    color: inherit;
+  }
+</style>

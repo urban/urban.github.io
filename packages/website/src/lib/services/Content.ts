@@ -15,7 +15,14 @@ import { createElement } from "react"
 import type { JSX } from "react"
 import { glob } from "tinyglobby"
 import { VFile } from "vfile"
-import { type Essay, CollectionEntry, CompiledVFileData, type Project, type Work } from "../schemas"
+import {
+  type Essay,
+  CollectionEntry,
+  CompiledVFileData,
+  type NowUpdate,
+  type Project,
+  type Work,
+} from "../schemas"
 import {
   buildPublishedWikiLinkLookup,
   finalizeData,
@@ -67,10 +74,14 @@ type PreparedNoteEntry = NoteSourceEntry & {
 
 export type ContentService = {
   readonly getCollection: (
-    collection: "essays" | "projects" | "work",
+    collection: "essays" | "projects" | "work" | "now",
   ) => Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError>
   readonly getEssays: Effect.Effect<
     ReadonlyArray<CompiledCollectionEntry<typeof Essay.Type>>,
+    ContentError
+  >
+  readonly getNowUpdates: Effect.Effect<
+    ReadonlyArray<CompiledCollectionEntry<typeof NowUpdate.Type>>,
     ContentError
   >
   readonly getProjects: Effect.Effect<
@@ -101,7 +112,7 @@ export class Content extends Context.Service<Content, ContentService>()("service
     const metadata = yield* Metadata
     const currentDate = pipe(yield* DateTime.now, DateTime.toDate)
 
-    const getCollection = (collection: "essays" | "work" | "projects") =>
+    const getCollection = (collection: "essays" | "work" | "projects" | "now") =>
       Effect.gen(function* () {
         const isPathWithIndex = collection !== "work"
         const pattern = isPathWithIndex ? "*/index.{md,mdx}" : "*.{md,mdx}"
@@ -150,7 +161,7 @@ export class Content extends Context.Service<Content, ContentService>()("service
 
     return {
       getCollection: (
-        collection: "essays" | "projects" | "work",
+        collection: "essays" | "projects" | "work" | "now",
       ): Effect.Effect<ReadonlyArray<typeof CollectionEntry.Type>, ContentError> =>
         getCollection(collection).pipe(Effect.mapError((error) => new ContentError({ error }))),
       getEssays: getCollection("essays").pipe(
@@ -160,6 +171,17 @@ export class Content extends Context.Service<Content, ContentService>()("service
           ),
         ),
         Effect.mapError((error) => new ContentError({ error })),
+      ),
+      getNowUpdates: getCollection("now").pipe(
+        Effect.flatMap((entries) =>
+          Effect.forEach(entries, (entry) =>
+            metadata.nowUpdate(entry.data).pipe(Effect.map((data) => ({ ...entry, data }))),
+          ),
+        ),
+        Effect.mapError((error) => new ContentError({ error })),
+        Effect.map(
+          Array.sortBy(Order.flip(Order.mapInput(DateTime.Order, ({ data }) => data.createdAt))),
+        ),
       ),
       getProjects: getCollection("projects").pipe(
         Effect.flatMap((entries) =>

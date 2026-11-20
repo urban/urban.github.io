@@ -11,13 +11,15 @@
     "copy-assets": "bun ./scripts/copy-assets.ts",
     "precopy-assets": "pnpm run clean-assets",
     "dev": "astro dev",
-    "predev": "pnpm run copy-assets",
+    "predev": "pnpm run copy-assets --development",
     "lint": "oxfmt && oxlint",
     "serve": "serve dist",
     "preview": "astro preview",
     "prepreview": "pnpm run copy-assets",
     "test": "bun test --preload ./test-preload.js",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.test.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "postbuild": "pnpm run verify:production",
+    "verify:production": "bun ./scripts/verify-production.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "2.1.10",

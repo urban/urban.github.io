@@ -1,6 +1,7 @@
 import { NodeServices } from "@effect/platform-node"
 import { Array, Console, Data, Effect, FileSystem, Layer, Path, pipe } from "effect"
 import { glob } from "tinyglobby"
+import { getSectionVisibility, isContentAssetEnabled } from "../src/lib/sections"
 import { WebsiteConfig } from "../src/lib/services/WebsiteConfig"
 
 class GlobError extends Data.TaggedError("ContentError")<{
@@ -13,6 +14,7 @@ const program = Effect.gen(function* () {
   const config = yield* WebsiteConfig
   const contentDir = config.contentDir
   const assetDir = config.assetDir
+  const sections = getSectionVisibility(process.argv.includes("--development"))
 
   const assetPattersn = pipe(
     ["**/*.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp}"],
@@ -24,7 +26,11 @@ const program = Effect.gen(function* () {
     catch: (error) => new GlobError({ error }),
   }).pipe(Effect.tapError((error) => Console.log(error)))
 
-  yield* Effect.forEach(filepaths, (fromPath) =>
+  const enabledFilepaths = filepaths.filter((filepath) =>
+    isContentAssetEnabled(path.relative(contentDir, filepath), sections),
+  )
+
+  yield* Effect.forEach(enabledFilepaths, (fromPath) =>
     Effect.gen(function* () {
       const toPath = path.join(assetDir, path.relative(contentDir, fromPath))
       yield* fs.makeDirectory(path.dirname(toPath), { recursive: true })

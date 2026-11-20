@@ -1,5 +1,4 @@
 import { Container } from "./Container"
-import { BackToTop } from "./BackToTop"
 import { ToggleColorScheme } from "./ToggleColorScheme"
 
 function Footer({ siteName }: { siteName: string }) {
@@ -13,7 +12,6 @@ function Footer({ siteName }: { siteName: string }) {
             &copy; <time dateTime={String(currentYear)}>{currentYear}</time> {siteName}
           </div>
           <div className="site-footer-controls">
-            <BackToTop />
             <ToggleColorScheme />
           </div>
         </div>

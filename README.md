@@ -29,3 +29,28 @@ The `@effect/language-service` plugin name in tsconfig is intentional: Effect TS
 Go still uses it for configuration. Its diagnostics are disabled there to avoid
 duplicating the Effect diagnostics emitted by Oxlint; other LSP features remain
 enabled.
+
+## Developing unfinished sections
+
+Now and Garden are enabled by `pnpm --filter @apps/personal-website dev` and are
+omitted from production navigation, routes, and copied content assets. Their page
+components live in `packages/website/src/sections`, and the `section-routes`
+integration registers only enabled sections.
+
+To publish a section, enable its entry in `productionSections` in
+`packages/website/src/lib/sections.ts`. Article-level `published` metadata still
+controls which entries appear within an enabled section.
+
+The asset-copy command defaults to production visibility. To refresh local draft
+images, including after a production build while the dev server is running, use
+`pnpm --filter @apps/personal-website copy-assets --development`.
+
+## Publishing
+
+GitHub Pages publishes `packages/website/dist` when changes reach `main`. The
+`Publish website` workflow installs the pinned tools, builds the static site,
+verifies disabled sections have no pages, content assets, or links, and deploys
+the resulting artifact. It can also be run manually from GitHub Actions.
+
+Run `pnpm run check` and `pnpm --filter @apps/personal-website build` before
+publishing. The build's `verify:production` step checks actual generated output.

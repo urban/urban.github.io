@@ -94,11 +94,21 @@
     padding-block: 1rem;
   }
   .site-wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.625rem;
     color: var(--site-ink);
     font-size: 1.375rem;
     font-weight: 650;
     letter-spacing: -0.05em;
     text-decoration: none;
+  }
+  .site-wordmark img {
+    display: block;
+    width: auto;
+    height: 1cap;
+    padding-right: 0.625rem;
+    border-right: 1px solid var(--site-rule);
   }
   .site-navigation {
     display: flex;
@@ -127,10 +137,6 @@
   .site-link[data-variant="subtle"] {
     color: var(--site-muted);
     font-size: 0.875rem;
-  }
-  .site-link-icon {
-    display: inline-block;
-    margin-inline-start: 0.6em;
   }
   .site-heading {
     color: var(--site-ink);
@@ -486,9 +492,17 @@
   display: block;
   overflow-x: auto;
 }
-.external-link::after {
-  content: "↗";
+.external-link,
+.site-link-icon {
+  display: inline-block;
+  width: 1cap;
+  height: 1cap;
   margin-inline-start: 0.25em;
+  vertical-align: baseline;
+  background-color: currentColor;
+  /* Trim the SVG's inset so its visible strokes fill the text's cap height. */
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='2 2 20 20' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
 }
 .mdx-code-block {
   margin-block: 1.5rem;

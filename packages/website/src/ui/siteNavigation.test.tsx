@@ -6,7 +6,11 @@ import { Button } from "./Button"
 import { ContentCard } from "./ContentCard"
 
 test("primary navigation exposes only Now and The Garden before hydration", () => {
-  const markup = renderToStaticMarkup(<Header siteName="Urban Faubion" pathname="/" />)
+  const markup = renderToStaticMarkup(
+    <Header siteName="Urban Faubion" pathname="/" sections={{ now: true, garden: true }} />,
+  )
+  expect(markup).toContain('src="/uf-logo.svg"')
+  expect(markup).toContain('alt=""')
   expect(markup).toContain('href="/now/"')
   expect(markup).toContain('href="/garden/"')
   expect(markup).not.toContain('href="/projects/"')
@@ -16,7 +20,11 @@ test("primary navigation exposes only Now and The Garden before hydration", () =
 
 test("garden notes identify The Garden as the current navigation section on the server", () => {
   const markup = renderToStaticMarkup(
-    <Header siteName="Urban Faubion" pathname="/garden/a-note/" />,
+    <Header
+      siteName="Urban Faubion"
+      pathname="/garden/a-note/"
+      sections={{ now: true, garden: true }}
+    />,
   )
   expect(markup).toMatch(/<a[^>]+href="\/garden\/"[^>]+aria-current="page"/u)
   expect(markup).not.toMatch(/<a[^>]+href="\/now\/"[^>]+aria-current="page"/u)
@@ -54,4 +62,27 @@ test("project links have distinct accessible names and external navigation", () 
   )
   expect(markup).toContain('aria-label="View project: dotai"')
   expect(markup).toContain('target="_blank"')
+})
+
+test("disabled sections omit their links and the empty navigation landmark", () => {
+  const markup = renderToStaticMarkup(
+    <Header siteName="Urban Faubion" pathname="/" sections={{ now: false, garden: false }} />,
+  )
+  expect(markup).not.toContain("<nav")
+  expect(markup).not.toContain('href="/now/"')
+  expect(markup).not.toContain('href="/garden/"')
+  expect(markup).toContain('href="/"')
+})
+
+test("sections can be released independently", () => {
+  for (const sections of [
+    { now: true, garden: false },
+    { now: false, garden: true },
+  ]) {
+    const markup = renderToStaticMarkup(
+      <Header siteName="Urban Faubion" pathname="/" sections={sections} />,
+    )
+    expect(markup.includes('href="/now/"')).toBe(sections.now)
+    expect(markup.includes('href="/garden/"')).toBe(sections.garden)
+  }
 })

@@ -11,6 +11,7 @@
     "scripts/**/*",
     "src/lib/services/WebsiteConfig.ts",
     "eslint.config.ts",
-    "prettier.config.ts"
+    "prettier.config.ts",
+    "src/lib/sections.ts"
   ]
 }

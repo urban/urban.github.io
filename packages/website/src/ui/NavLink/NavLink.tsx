@@ -28,11 +28,7 @@ const Link = ({
       {...rest}
     >
       {children}
-      {showExternalIcon && (
-        <span className="site-link-icon" aria-hidden="true">
-          ↗
-        </span>
-      )}
+      {showExternalIcon && <span className="site-link-icon" aria-hidden="true" />}
     </a>
   )
 }

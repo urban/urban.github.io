@@ -3,6 +3,7 @@
 import "@/styles/globals.css"
 import { Footer } from "@/ui/Footer"
 import { Header } from "@/ui/Header"
+import { getSectionVisibility } from "@/lib/sections"
 interface Props {
   title?: string
   description?: string
@@ -18,13 +19,14 @@ const { title = "Urban Faubion", description = "Urban Faubion's personal website
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <title>{title} | Urban Faubion</title>
     <link rel="preload" href="/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
     <script is:inline src="/preload-color-scheme.js"></script>
   </head>
   <body data-layout={layout}>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <Header siteName="Urban Faubion" pathname={Astro.url.pathname} />
+    <Header siteName="Urban Faubion" pathname={Astro.url.pathname} sections={getSectionVisibility(import.meta.env.DEV)} />
     <main id="main-content" class="site-main" data-layout={layout} tabindex="-1"><slot /></main>
     <Footer siteName="Urban Faubion" client:load />
   </body>
