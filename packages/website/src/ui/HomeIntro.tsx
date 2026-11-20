@@ -3,7 +3,7 @@ import { Text } from "./Text"
 
 const HomeIntro = () => (
   <section className="home-intro" aria-labelledby="intro-title">
-    <Text variant="eyebrow">Engineering + Design + developer tools</Text>
+    {/*<Text variant="eyebrow">Engineering + Design + developer tools</Text>*/}
     <Heading level={1} variant="display" id="intro-title">
       I’m Urban.
       <br />I build software,
@@ -14,7 +14,7 @@ const HomeIntro = () => (
     </Heading>
     <Text variant="lede">Engineer, leader, designer, and systems thinker.</Text>
     <Text>
-      These days, I’m designing and building custom software that helps small businesses reduce
+      These days, I’m designing and building custom software that helps businesses reduce
       manual work, connect existing tools, and apply AI where it creates real value.
     </Text>
   </section>

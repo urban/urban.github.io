@@ -253,7 +253,8 @@
   }
   .home-intro .site-heading {
     max-width: 50rem;
-    margin-block: 1.25rem 1.75rem;
+    /*margin-block: 1.25rem 1.75rem;*/
+    margin-block: 0 1.75rem;
   }
   .home-intro .site-text[data-variant="lede"] {
     max-width: 36rem;
