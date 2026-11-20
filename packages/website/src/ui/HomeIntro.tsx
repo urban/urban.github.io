@@ -14,8 +14,8 @@ const HomeIntro = () => (
     </Heading>
     <Text variant="lede">Engineer, leader, designer, and systems thinker.</Text>
     <Text>
-      These days, I’m designing and building custom software that helps businesses reduce
-      manual work, connect existing tools, and apply AI where it creates real value.
+      These days, I’m designing and building custom software that helps businesses reduce manual
+      work, connect existing tools, and apply AI where it creates real value.
     </Text>
   </section>
 )
