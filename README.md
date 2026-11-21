@@ -47,6 +47,35 @@ images, including after a production build while the dev server is running, use
 
 ## Publishing
 
+### Vercel
+
+The root `vercel.json` installs the pnpm workspace, builds the Astro package,
+verifies production output, and serves `packages/website/dist` as a static site.
+It sets the framework to Other (`null`) so a previous Next.js preset does not
+apply to this build.
+
+In Vercel's **Settings > Build and Deployment**:
+
+- Leave **Root Directory** empty (the repository root), rather than
+  `packages/website`. The install needs the root `pnpm-workspace.yaml`, lockfile,
+  dependency catalog, and sibling packages.
+- Select **Node.js 24.x** or a newer supported version that meets `engines.node`.
+- The install command, build command, and output directory come from
+  `vercel.json`; remove any obsolete dashboard overrides for Bun or Next.js.
+
+To use the exact pnpm version in the root `packageManager` field, enable Vercel's
+Corepack support by setting the environment variable
+`ENABLE_EXPERIMENTAL_COREPACK=1` for the deployment environments.
+
+Bun is still used to execute the asset and verification scripts during the build;
+dependency installation uses pnpm. Vercel's build image includes Bun.
+The site uses Astro's static output and does not require a Vercel adapter.
+
+After committing these files, deploy the new commit. The dependency-install log
+should show `pnpm install --frozen-lockfile`, followed by the Astro build.
+
+### GitHub Pages
+
 GitHub Pages publishes `packages/website/dist` when changes reach `main`. The
 `Publish website` workflow installs the pinned tools, builds the static site,
 verifies disabled sections have no pages, content assets, or links, and deploys
